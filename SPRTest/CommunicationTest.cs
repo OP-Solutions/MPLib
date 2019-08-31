@@ -10,17 +10,18 @@ using SPR.Models;
 
 namespace SPRTest
 {
-    class CommunicationTest
+    [TestClass]
+    public class CommunicationTest
     {
         [DataTestMethod]
         [DataRow("217.147.224.170", 87, "Chudo123", "bakurits")] // from me
-        [DataRow("94.100.237.197", 87, "bakurits", "Chudo123")] // from kukur
+        //[DataRow("94.100.237.197", 87, "bakurits", "Chudo123")] // from kukur
         public void TestP2P(string targetIp, int targetPort, string messageToSend, string messageToReceive)
         {
+            var remoteClient = new RemoteClient(null, null, new IPEndPoint(IPAddress.Parse(targetIp), targetPort));
             var time = DateTime.UtcNow;
             var time2 = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute + 1, 0);
             Thread.Sleep(time2 - time);
-            var remoteClient = new RemoteClient(null, null, new IPEndPoint(IPAddress.Parse(targetIp), targetPort));
             remoteClient.Connect();
             var stream = remoteClient.GetStream();
             stream.SendMessage(messageToSend);

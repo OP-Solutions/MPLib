@@ -21,7 +21,7 @@ namespace SPR.Models
 
         public AesCryptoServiceProvider AesProvider { get; set; }
 
-        private TcpClient _client { get; set; }
+        private TcpClient _client { get; set; } = new TcpClient();
 
         public RemoteClient(string ethAddress, EthECKey ecKey, IPEndPoint endpoint)
         {
