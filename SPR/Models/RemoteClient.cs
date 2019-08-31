@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -30,11 +31,18 @@ namespace SPR.Models
             Endpoint = endpoint;
         }
 
-        public void Connect()
+        public async Task Connect()
         {
             if (!_client.Connected)
             {
-                _client.Connect(Endpoint);
+                try
+                {
+                    await _client.ConnectAsync(Endpoint.Address, Endpoint.Port);
+                }
+                catch(Exception ex)
+                {
+                   Debug.WriteLine(ex.Message);
+                }
                 ExchangeAesKeys();
             }
 
