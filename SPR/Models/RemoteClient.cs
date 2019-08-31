@@ -22,13 +22,14 @@ namespace SPR.Models
 
         public AesCryptoServiceProvider AesProvider { get; set; }
 
-        private TcpClient _client { get; set; } = new TcpClient();
+        private TcpClient _client { get; set; }
 
         public RemoteClient(string ethAddress, EthECKey ecKey, IPEndPoint endpoint)
         {
             EthAddress = ethAddress;
             EcKey = ecKey;
             Endpoint = endpoint;
+            _client = new TcpClient(new IPEndPoint(IPAddress.Any, endpoint.Port));
         }
 
         public async Task Connect()
