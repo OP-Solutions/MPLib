@@ -11,23 +11,23 @@ using SPR.Models;
 
 namespace SPR
 {
-    public class CryptoStream
+    public class CryptoNetWorkStream
     {
-        private NetworkStream _stream;
+        private Socket _socket;
 
         private ICryptoTransform _encryptor;
         private ICryptoTransform _decryptor;
 
-        public CryptoStream(NetworkStream stream, AesCryptoServiceProvider aes)
+        public CryptoNetWorkStream(Socket socket, AesCryptoServiceProvider aes)
         {
-            _stream = stream;
+            _socket = socket;
             _encryptor = aes.CreateEncryptor();
             _decryptor = aes.CreateDecryptor();
         }
 
         public void SendMessage(object message)
         {
-            using (var aes = new System.Security.Cryptography.CryptoStream(_stream, _encryptor, CryptoStreamMode.Write))
+            using (var aes = new System.Security.Cryptography.CryptoStream(new NetworkStream(_socket, FileAccess.ReadWrite), _encryptor, CryptoStreamMode.Write))
             {
                 using (var writer = new StreamWriter(aes, Encoding.UTF8))
                 {
@@ -39,7 +39,7 @@ namespace SPR
 
         public object ReceiveMessage()
         {
-            using (var aes = new System.Security.Cryptography.CryptoStream(_stream, _encryptor, CryptoStreamMode.Read))
+            using (var aes = new System.Security.Cryptography.CryptoStream(new NetworkStream(_socket, FileAccess.ReadWrite), _decryptor, CryptoStreamMode.Read))
             {
                 using (var reader = new StreamReader(aes, Encoding.UTF8))
                 {

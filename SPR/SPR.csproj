@@ -63,7 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CryptoStream.cs" />
+    <Compile Include="CryptoNetWorkStream.cs" />
     <Compile Include="Models\Player.cs" />
     <Compile Include="Models\RemoteClient.cs" />
     <Compile Include="PokerTable.cs" />

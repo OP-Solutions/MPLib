@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -29,29 +30,22 @@ namespace SPR.Models
             EthAddress = ethAddress;
             EcKey = ecKey;
             Endpoint = endpoint;
-            _client = new TcpClient(new IPEndPoint(IPAddress.Any, endpoint.Port));
+            _client = new TcpClient(new IPEndPoint(IPAddress.Parse("127.0.0.1"), endpoint.Port));
         }
 
         public async Task Connect()
         {
             if (!_client.Connected)
             {
-                try
-                {
-                    await _client.ConnectAsync(Endpoint.Address, Endpoint.Port);
-                }
-                catch(Exception ex)
-                {
-                   Debug.WriteLine(ex.Message);
-                }
+                await _client.ConnectAsync(Endpoint.Address, Endpoint.Port);
                 ExchangeAesKeys();
             }
 
         }
 
-        public CryptoStream GetStream()
+        public CryptoNetWorkStream GetStream()
         {
-            return new CryptoStream(_client.GetStream(), AesProvider);
+            return new CryptoNetWorkStream(_client.Client, AesProvider);
         }
 
         private void ExchangeAesKeys()

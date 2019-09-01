@@ -14,8 +14,8 @@ namespace SPRTest
     public class CommunicationTest
     {
         [DataTestMethod]
-        [DataRow("217.147.224.170", 8789, "Chudo123", "bakurits")] // from me
-        [DataRow("31.146.149.134", 8789, "bakurits", "Chudo123")] // from kukur
+        [DataRow("62.168.171.183", 8789, "Chudo123", "bakurits")] // from me // kukur home ip 62.168.171.183
+        //[DataRow("31.146.149.134, 8788", "bakurits", "Chudo123")] // from kukur
         public void TestP2P(string targetIp, int targetPort, string messageToSend, string messageToReceive)
         {
             var remoteClient = new RemoteClient(null, null, new IPEndPoint(IPAddress.Parse(targetIp), targetPort));
