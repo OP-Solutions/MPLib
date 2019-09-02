@@ -63,12 +63,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CryptoNetWorkStream.cs" />
+    <Compile Include="Core\Crypto\CryptoNetWorkStream.cs" />
+    <Compile Include="Core\Crypto\Encryption\HellMan\HellManCryptoProvider.cs" />
+    <Compile Include="Core\Crypto\Encryption\SRA\SraCryptoProvider.cs" />
+    <Compile Include="Core\Crypto\Encryption\SRA\SraParameters.cs" />
+    <Compile Include="Core\Game\Poker\Card\Card.cs" />
+    <Compile Include="Core\Game\Poker\Card\CardRank.cs" />
+    <Compile Include="Core\Game\Poker\Card\CardSuit.cs" />
+    <Compile Include="Core\Random\Shuffling.cs" />
     <Compile Include="Models\Player.cs" />
-    <Compile Include="Models\RemoteClient.cs" />
-    <Compile Include="PokerTable.cs" />
-    <Compile Include="SignerStream.cs" />
-    <Compile Include="Signer.cs" />
+    <Compile Include="Core\Networking\RemoteClient.cs" />
+    <Compile Include="Models\PokerTable.cs" />
+    <Compile Include="Core\Signing\SignerStream.cs" />
+    <Compile Include="Core\Signing\Signer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -81,5 +88,6 @@
       <Name>AppContext</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
