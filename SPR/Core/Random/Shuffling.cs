@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
-
-namespace SPR.Core.Poker
+namespace SPR.Core.Random
 {
     public class Shuffling
     {
@@ -17,7 +13,8 @@ namespace SPR.Core.Poker
         /// <returns></returns>
         public List<BigInteger> Shuffle(List<BigInteger> source)
         {
-            throw new NotImplementedException();
+            var rnd = new System.Random();
+            return source.OrderBy(x => rnd.Next()).ToList();
         }
     }
 }
