@@ -83,6 +83,7 @@
     <Compile Include="Core\Game\Poker\PokerCombinations\ThreeOfAKind.cs" />
     <Compile Include="Core\Game\Poker\PokerCombinations\TwoPairs.cs" />
     <Compile Include="Core\Game\Poker\PokerGameData.cs" />
+    <Compile Include="Core\Random\SafeRandomGenerator.cs" />
     <Compile Include="Core\Random\Shuffling.cs" />
     <Compile Include="Models\Player.cs" />
     <Compile Include="Core\Networking\RemoteClient.cs" />
