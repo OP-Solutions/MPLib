@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 
 namespace SPR.Core.Random
 {
-    public class SafeRandomGenerator
+    public static class SafeRandomGenerator
     {
         /// <summary>
         ///     returns random integer

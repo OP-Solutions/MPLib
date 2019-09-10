@@ -8,7 +8,7 @@ using Nethereum.Signer;
 
 namespace SPR.Models
 {
-    class Player
+    public class Player
     {
         public string Name { get; set; }
         public double CurTableBalance { get; set; }

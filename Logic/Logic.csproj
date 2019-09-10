@@ -63,10 +63,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Crypto\CryptoNetWorkStream.cs" />
-    <Compile Include="Core\Crypto\Encryption\HellMan\HellManCryptoProvider.cs" />
-    <Compile Include="Core\Crypto\Encryption\SRA\SraCryptoProvider.cs" />
-    <Compile Include="Core\Crypto\Encryption\SRA\SraParameters.cs" />
+    <Compile Include="Crypto\CryptoNetWorkStream.cs" />
+    <Compile Include="Crypto\Encryption\HellMan\HellManCryptoProvider.cs" />
+    <Compile Include="Crypto\Encryption\SRA\SraCryptoProvider.cs" />
+    <Compile Include="Crypto\Encryption\SRA\SraParameters.cs" />
     <Compile Include="Core\Game\Poker\Card.cs" />
     <Compile Include="Core\Game\Poker\CardRank.cs" />
     <Compile Include="Core\Game\Poker\CardSuit.cs" />
@@ -83,19 +83,18 @@
     <Compile Include="Core\Game\Poker\PokerCombinations\ThreeOfAKind.cs" />
     <Compile Include="Core\Game\Poker\PokerCombinations\TwoPairs.cs" />
     <Compile Include="Core\Game\Poker\PokerGameData.cs" />
-    <Compile Include="Core\Random\SafeRandomGenerator.cs" />
-    <Compile Include="Core\Random\Shuffling.cs" />
+    <Compile Include="Lobby\GameFinder.cs" />
+    <Compile Include="Random\SafeRandomGenerator.cs" />
+    <Compile Include="Random\Shuffling.cs" />
     <Compile Include="Models\Player.cs" />
-    <Compile Include="Core\Networking\RemoteClient.cs" />
+    <Compile Include="Networking\RemoteClient.cs" />
     <Compile Include="Models\PokerTable.cs" />
-    <Compile Include="Core\Signing\SignerStream.cs" />
-    <Compile Include="Core\Signing\Signer.cs" />
+    <Compile Include="Crypto\Signing\SignerStream.cs" />
+    <Compile Include="Crypto\Signing\Signer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="bin\Debug\AppContext.dll.config" />
-    <None Include="bin\Debug\SPR.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -104,22 +103,6 @@
       <Name>AppContext</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="bin\Debug\AppContext.dll" />
-    <Content Include="bin\Debug\AppContext.pdb" />
-    <Content Include="bin\Debug\BouncyCastle.Crypto.dll" />
-    <Content Include="bin\Debug\Nethereum.Hex.dll" />
-    <Content Include="bin\Debug\Nethereum.Model.dll" />
-    <Content Include="bin\Debug\Nethereum.RLP.dll" />
-    <Content Include="bin\Debug\Nethereum.Signer.dll" />
-    <Content Include="bin\Debug\Nethereum.Util.dll" />
-    <Content Include="bin\Debug\Newtonsoft.Json.dll" />
-    <Content Include="bin\Debug\Newtonsoft.Json.xml" />
-    <Content Include="bin\Debug\SPR.dll" />
-    <Content Include="bin\Debug\SPR.pdb" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="bin\Release\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

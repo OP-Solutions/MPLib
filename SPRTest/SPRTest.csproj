@@ -82,9 +82,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SPR\SPR.csproj">
+    <ProjectReference Include="..\Logic\Logic.csproj">
       <Project>{20e80056-9eeb-479d-93fd-7a2de665cb63}</Project>
-      <Name>SPR</Name>
+      <Name>Logic</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
