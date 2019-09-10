@@ -10,6 +10,8 @@ namespace SPR.Lobby
 {
     public class GameFinder
     {
+        public delegate void FoundGameCallback(Player[] otherPlayers);
+
         public event FoundGameCallback OnGameFound;
 
         public GameFinder()
@@ -28,6 +30,4 @@ namespace SPR.Lobby
 
         }
     }
-
-    public delegate void FoundGameCallback(Player[] otherPlayers);
 }
