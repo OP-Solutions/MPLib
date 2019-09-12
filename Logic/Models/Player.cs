@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Nethereum.Signer;
+using SPR.Networking;
 
 namespace SPR.Models
 {
@@ -12,7 +13,13 @@ namespace SPR.Models
     {
         public string Name { get; set; }
         public double CurTableBalance { get; set; }
+        public string EthereumAddress { get; }
+        public IPAddress CurrentIp { get; }
 
-        public RemoteClient Client { get; set; }
+        public Player(string ethereumAddress, IPAddress currentIp)
+        {
+            EthereumAddress = ethereumAddress;
+            CurrentIp = currentIp;
+        }
     }
 }
