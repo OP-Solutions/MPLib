@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
-using AppContext;
-using Nethereum.RLP;
 using Nethereum.Signer;
 
-namespace SPR.Models
+namespace SPR.Networking
 {
     public class RemoteClient
     {
@@ -25,7 +18,7 @@ namespace SPR.Models
 
         private TcpClient _client { get; set; }
 
-        public RemoteClient(string ethAddress, EthECKey ecKey, IPEndPoint endpoint)
+        public RemoteClient(string ethAddress, EthECKey ecKey, IPEndPoint endpoint )
         {
             EthAddress = ethAddress;
             EcKey = ecKey;
@@ -65,10 +58,10 @@ namespace SPR.Models
             AesProvider = provider;
         }
 
-        private byte[] Xor(byte[] bytes1, byte[] bytes2)
+        private static byte[] Xor(IReadOnlyList<byte> bytes1, IReadOnlyList<byte> bytes2)
         {
-            var result = new byte[bytes1.Length];
-            for (var i = 0; i < bytes1.Length; i++)
+            var result = new byte[bytes1.Count];
+            for (var i = 0; i < bytes1.Count; i++)
             {
                 var b1 = bytes1[i];
                 var b2 = bytes2[i];
