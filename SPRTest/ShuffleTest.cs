@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SPR.Core.Random;
+using SPR.Random;
 
 namespace SPRTest
 {

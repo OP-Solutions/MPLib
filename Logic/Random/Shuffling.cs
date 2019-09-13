@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 
-namespace SPR.Core.Random
+namespace SPR.Random
 {
     public class Shuffling
     {

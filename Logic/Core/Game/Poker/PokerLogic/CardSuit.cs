@@ -1,4 +1,4 @@
-﻿namespace SPR.Core.Game.Poker
+﻿namespace SPR.Core.Game.Poker.PokerLogic
 {
     /// <summary>
     /// Card suits

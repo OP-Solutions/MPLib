@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.Remoting.Contexts;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using Nethereum.Signer;
 using Context = AppContext.Context;
 
-namespace SPR
+namespace SPR.Crypto.Signing
 {
     class SignerStream : Stream
     {

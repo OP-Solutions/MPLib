@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace SPR.Core.Random
+namespace SPR.Random
 {
     public static class SafeRandomGenerator
     {

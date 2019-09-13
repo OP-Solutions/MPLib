@@ -1,7 +1,6 @@
 ﻿using System;
 
-
-namespace SPR.Core.Game.Poker.PokerCombinations
+namespace SPR.Core.Game.Poker.PokerLogic.PokerCombinations
 {
     /// <summary>
     /// The Flush combination.

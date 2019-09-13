@@ -1,6 +1,4 @@
-﻿using static SPR.Core.Game.Poker.PokerGameData;
-
-namespace SPR.Core.Game.Poker.PokerCombinations
+﻿namespace SPR.Core.Game.Poker.PokerLogic.PokerCombinations
 {
     /// <summary>
     /// Hig Card combination
@@ -24,7 +22,7 @@ namespace SPR.Core.Game.Poker.PokerCombinations
         /// </returns>
         public override Combination Check(Card[] cards)
         {
-            return new Combination(Type, new Card[1] {cards[CardCount - 1]});
+            return new Combination(Type, new Card[1] {cards[PokerGameData.CardCount - 1]});
         }
     }
 }

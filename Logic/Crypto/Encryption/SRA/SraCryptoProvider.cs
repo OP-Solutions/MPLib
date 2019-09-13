@@ -1,8 +1,7 @@
 ﻿using System;
-using Org.BouncyCastle.Math;
 using BigInteger = System.Numerics.BigInteger;
 
-namespace SPR.Core.Crypto.Encryption.SRA
+namespace SPR.Crypto.Encryption.SRA
 {
     public class SraCryptoProvider
     {

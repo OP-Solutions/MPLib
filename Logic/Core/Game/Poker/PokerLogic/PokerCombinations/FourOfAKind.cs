@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SPR.Core.Game.Poker.PokerCombinations
+namespace SPR.Core.Game.Poker.PokerLogic.PokerCombinations
 {
     /// <summary>
     /// Four of a kind type Combination

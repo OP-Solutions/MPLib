@@ -1,7 +1,6 @@
 ﻿using System;
-using SPR.Core.Game.Poker;
 
-namespace SPR.Core.Game.Poker
+namespace SPR.Core.Game.Poker.PokerLogic
 {
     /// <summary>
     /// Card array that builds poker combination

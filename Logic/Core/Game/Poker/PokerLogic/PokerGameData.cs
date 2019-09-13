@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using SPR.Core.Game.Poker.PokerCombinations;
+using SPR.Core.Game.Poker.PokerLogic.PokerCombinations;
 
-namespace SPR.Core.Game.Poker
+namespace SPR.Core.Game.Poker.PokerLogic
 {
     /// <summary>
     /// Class for storing essential variables and constraints

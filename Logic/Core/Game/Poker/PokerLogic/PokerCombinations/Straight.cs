@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using static SPR.Core.Game.Poker.PokerGameData;
 
-namespace SPR.Core.Game.Poker.PokerCombinations
+namespace SPR.Core.Game.Poker.PokerLogic.PokerCombinations
 {
     /// <summary>
     /// Straight combination
@@ -32,7 +31,7 @@ namespace SPR.Core.Game.Poker.PokerCombinations
 
             var straight = new List<Card>(5) {cards[6]};
 
-            for (var i = CardCount - 1; i >= 1; i--)
+            for (var i = PokerGameData.CardCount - 1; i >= 1; i--)
             {
                 containsRank[(int) cards[i].Rank - 1] = true;
                 if ((int) cards[i].Rank - (int) cards[i - 1].Rank == 1 ||

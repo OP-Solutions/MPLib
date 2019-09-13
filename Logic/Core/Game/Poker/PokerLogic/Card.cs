@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SPR.Core.Game.Poker
+namespace SPR.Core.Game.Poker.PokerLogic
 {
     /// <summary>
     /// The card.

@@ -1,4 +1,4 @@
-﻿namespace SPR.Core.Game.Poker.PokerCombinations
+﻿namespace SPR.Core.Game.Poker.PokerLogic.PokerCombinations
 {
     /// <summary>
     /// The royal flush.

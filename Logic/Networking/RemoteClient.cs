@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Nethereum.Signer;
+using SPR.Crypto;
 
 namespace SPR.Networking
 {
