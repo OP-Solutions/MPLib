@@ -8,7 +8,7 @@ using SPR.Crypto;
 
 namespace SPR.Networking
 {
-    public class RemoteClient
+    public class PlayerNetworkClient
     {
         public string EthAddress { get; set; }
         public EthECKey EcKey { get; set; }
@@ -19,7 +19,7 @@ namespace SPR.Networking
 
         private TcpClient _client { get; set; }
 
-        public RemoteClient(string ethAddress, EthECKey ecKey, IPEndPoint endpoint )
+        public PlayerNetworkClient(string ethAddress, EthECKey ecKey, IPEndPoint endpoint )
         {
             EthAddress = ethAddress;
             EcKey = ecKey;
@@ -34,7 +34,6 @@ namespace SPR.Networking
                 await _client.ConnectAsync(Endpoint.Address, Endpoint.Port);
                 ExchangeAesKeys();
             }
-
         }
 
         public CryptoNetWorkStream GetStream()

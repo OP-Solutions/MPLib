@@ -11,8 +11,9 @@ namespace SPR.Models
 {
     public class Player
     {
+        public static Player Me { get; } = null;
+
         public string Name { get; set; }
-        public double CurTableBalance { get; set; }
         public string EthereumAddress { get; }
         public IPAddress CurrentIp { get; }
 

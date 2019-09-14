@@ -10,7 +10,7 @@ namespace SPR.Random
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public List<BigInteger> Shuffle(IEnumerable<BigInteger> source)
+        public static List<BigInteger> Shuffle(IEnumerable<BigInteger> source)
         {
             var list = new List<BigInteger>();
             list.AddRange(source);

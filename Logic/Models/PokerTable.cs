@@ -2,11 +2,14 @@
 
 namespace SPR.Models
 {
-    class PokerTable
+    public class PokerTable
     {
         public List<Player> Players { get; set; }
-        public int CurSmallBlind { get; set; }
-        public double MinBet { get; }
+
+        public List<double> Balances { get; set; }
+
+        public int CurSmallBlindIndex { get; set; }
+        public double SmallBlind { get; }
 
 
         public PokerTable(List<Player> players)

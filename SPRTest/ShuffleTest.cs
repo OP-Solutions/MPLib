@@ -16,7 +16,7 @@ namespace SPRTest
             {
                 new BigInteger(12), new BigInteger(123), new BigInteger(-123), new BigInteger(5123123)
             };
-            var newList = new Shuffling().Shuffle(list);
+            var newList = Shuffling.Shuffle(list);
             newList.ForEach(i => Console.Write("{0}\t", i));
         }
     }

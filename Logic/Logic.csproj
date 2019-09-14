@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SPR</RootNamespace>
     <AssemblyName>SPR</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
-      <HintPath>..\packages\BouncyCastle.1.8.2\lib\BouncyCastle.Crypto.dll</HintPath>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.8.2\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="Nethereum.Hex, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
       <HintPath>..\packages\Nethereum.Hex.3.4.0\lib\net451\Nethereum.Hex.dll</HintPath>
@@ -44,7 +45,7 @@
       <HintPath>..\packages\Nethereum.RLP.3.4.0\lib\net451\Nethereum.RLP.dll</HintPath>
     </Reference>
     <Reference Include="Nethereum.Signer, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nethereum.Signer.3.4.0\lib\net451\Nethereum.Signer.dll</HintPath>
+      <HintPath>..\packages\Nethereum.Signer.3.4.0\lib\netstandard1.1\Nethereum.Signer.dll</HintPath>
     </Reference>
     <Reference Include="Nethereum.Util, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
       <HintPath>..\packages\Nethereum.Util.3.4.0\lib\net451\Nethereum.Util.dll</HintPath>
@@ -53,8 +54,13 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.3-beta1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -87,11 +93,12 @@
     <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\TwoPairs.cs" />
     <Compile Include="Core\Game\Poker\PokerLogic\PokerGameData.cs" />
     <Compile Include="Lobby\GameFinder.cs" />
+    <Compile Include="Models\PokerRound.cs" />
     <Compile Include="Random\DecentralizedDeckShuffler.cs" />
     <Compile Include="Random\SafeRandomGenerator.cs" />
     <Compile Include="Random\Shuffling.cs" />
     <Compile Include="Models\Player.cs" />
-    <Compile Include="Networking\RemoteClient.cs" />
+    <Compile Include="Networking\PlayerNetworkClient.cs" />
     <Compile Include="Models\PokerTable.cs" />
     <Compile Include="Crypto\Signing\SignerStream.cs" />
     <Compile Include="Crypto\Signing\Signer.cs" />
