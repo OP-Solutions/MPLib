@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Nethereum.Signer;
+using Org.BouncyCastle.Crypto.Tls;
 using SPR.Crypto;
 
 namespace SPR.Networking
@@ -32,7 +35,7 @@ namespace SPR.Networking
             if (!_client.Connected)
             {
                 await _client.ConnectAsync(Endpoint.Address, Endpoint.Port);
-                ExchangeAesKeys();
+                await AgreeOnAesKey();
             }
         }
 
@@ -41,21 +44,26 @@ namespace SPR.Networking
             return new CryptoNetWorkStream(_client.Client, AesProvider);
         }
 
-        private void ExchangeAesKeys()
+        private async Task AgreeOnAesKey()
         {
-            var provider = new AesCryptoServiceProvider();
-            provider.GenerateKey();
-            var localKey = provider.Key;
-            _client.Client.Send(localKey);
-            var remoteKey = new byte[32];
-            var toReceive = 32;
-            while (toReceive > 0)
+            using (ECDiffieHellmanCng keyExchange = new ECDiffieHellmanCng())
             {
-                toReceive -= _client.Client.Receive(remoteKey);
-            }
+                var keySizeBytes = keyExchange.KeySize / 8;
+                keyExchange.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
+                keyExchange.HashAlgorithm = CngAlgorithm.Sha256;
+                var myPubKey = keyExchange.PublicKey.ToByteArray();
+                var remotePubKey = new byte[keySizeBytes];
 
-            provider.Key = Xor(localKey, remoteKey);
-            AesProvider = provider;
+                using (var stream = _client.GetStream())
+                {
+                   var sendTask =  stream.WriteAsync(myPubKey, 0, keySizeBytes);
+                   var receiveTask = stream.ReadAsync(remotePubKey, 0, keySizeBytes);
+                   await Task.WhenAll(sendTask, receiveTask);
+                }
+
+                byte[] sharedKey = keyExchange.DeriveKeyMaterial(CngKey.Import(remotePubKey, CngKeyBlobFormat.EccPublicBlob));
+                AesProvider = new AesCryptoServiceProvider { Key = sharedKey };
+            }
         }
 
         private static byte[] Xor(IReadOnlyList<byte> bytes1, IReadOnlyList<byte> bytes2)
