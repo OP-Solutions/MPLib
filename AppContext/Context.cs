@@ -9,6 +9,6 @@ namespace AppContext
 {
     public class Context
     {
-        public static EthECKey WalletKey { get; set; }
+        public static EthECKey WalletKey { get; set; } = EthECKey.GenerateKey();
     }
 }
