@@ -22,7 +22,7 @@ namespace SPR.Networking
 
         private TcpClient _client { get; set; }
 
-        public PlayerNetworkClient(string ethAddress, EthECKey ecKey, IPEndPoint endpoint )
+        public PlayerNetworkClient(string ethAddress, EthECKey ecKey, IPEndPoint endpoint)
         {
             EthAddress = ethAddress;
             EcKey = ecKey;
@@ -46,7 +46,7 @@ namespace SPR.Networking
 
         private async Task AgreeOnAesKey()
         {
-            using (ECDiffieHellmanCng keyExchange = new ECDiffieHellmanCng())
+            using (var keyExchange = new ECDiffieHellmanCng())
             {
                 var keySizeBytes = keyExchange.KeySize / 8;
                 keyExchange.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
@@ -56,9 +56,9 @@ namespace SPR.Networking
 
                 using (var stream = _client.GetStream())
                 {
-                   var sendTask =  stream.WriteAsync(myPubKey, 0, keySizeBytes);
-                   var receiveTask = stream.ReadAsync(remotePubKey, 0, keySizeBytes);
-                   await Task.WhenAll(sendTask, receiveTask);
+                    var sendTask = stream.WriteAsync(myPubKey, 0, keySizeBytes);
+                    var receiveTask = stream.ReadAsync(remotePubKey, 0, keySizeBytes);
+                    await Task.WhenAll(sendTask, receiveTask);
                 }
 
                 byte[] sharedKey = keyExchange.DeriveKeyMaterial(CngKey.Import(remotePubKey, CngKeyBlobFormat.EccPublicBlob));

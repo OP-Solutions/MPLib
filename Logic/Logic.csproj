@@ -74,6 +74,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Game\Poker\Messaging\Message.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageType.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\GetKeyMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\ReEncryptMultiKeyMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\RoundStampMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\ShuffleMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\Package.cs" />
     <Compile Include="Crypto\CryptoNetWorkStream.cs" />
     <Compile Include="Crypto\Encryption\HellMan\HellManCryptoProvider.cs" />
     <Compile Include="Crypto\Encryption\SRA\SraCryptoProvider.cs" />
