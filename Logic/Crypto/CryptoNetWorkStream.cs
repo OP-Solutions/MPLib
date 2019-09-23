@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
@@ -22,7 +23,7 @@ namespace SPR.Crypto
 
         public void SendMessage(object message)
         {
-            using (var aes = new System.Security.Cryptography.CryptoStream(new NetworkStream(_socket, FileAccess.ReadWrite), _encryptor, CryptoStreamMode.Write))
+            using (var aes = new CryptoStream(new NetworkStream(_socket, FileAccess.ReadWrite), _encryptor, CryptoStreamMode.Write))
             {
                 using (var writer = new StreamWriter(aes, Encoding.UTF8))
                 {
@@ -34,7 +35,7 @@ namespace SPR.Crypto
 
         public object ReceiveMessage()
         {
-            using (var aes = new System.Security.Cryptography.CryptoStream(new NetworkStream(_socket, FileAccess.ReadWrite), _decryptor, CryptoStreamMode.Read))
+            using (var aes = new CryptoStream(new NetworkStream(_socket, FileAccess.ReadWrite), _decryptor, CryptoStreamMode.Read))
             {
                 using (var reader = new StreamReader(aes, Encoding.UTF8))
                 {
@@ -43,7 +44,6 @@ namespace SPR.Crypto
                         var serializer = new JsonSerializer();
                         return serializer.Deserialize(jsonReader);
                     }
-                    
                 }
             }
         }
