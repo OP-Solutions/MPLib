@@ -9,7 +9,6 @@ namespace SPR.Core.Game.Poker.Messaging
     public enum MessageType
     {
         RoundStamp,
-        ShuffleNextRound,
         Shuffle,
         ReEncryptMultiKey,
         GetKey,

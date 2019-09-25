@@ -102,6 +102,7 @@
     <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\TwoPairs.cs" />
     <Compile Include="Core\Game\Poker\PokerLogic\PokerGameData.cs" />
     <Compile Include="Lobby\GameFinder.cs" />
+    <Compile Include="Lobby\PlayerMeeting.cs" />
     <Compile Include="Models\PokerRound.cs" />
     <Compile Include="Random\DecentralizedDeckShuffler.cs" />
     <Compile Include="Random\SafeRandomGenerator.cs" />

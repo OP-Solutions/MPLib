@@ -22,10 +22,9 @@ namespace SPR.Networking
 
         private TcpClient _client { get; set; }
 
-        public PlayerNetworkClient(string ethAddress, EthECKey ecKey, IPEndPoint endpoint)
+        public PlayerNetworkClient(string ethAddress, IPEndPoint endpoint)
         {
             EthAddress = ethAddress;
-            EcKey = ecKey;
             Endpoint = endpoint;
             _client = new TcpClient(new IPEndPoint(IPAddress.Parse("127.0.0.1"), endpoint.Port));
         }
