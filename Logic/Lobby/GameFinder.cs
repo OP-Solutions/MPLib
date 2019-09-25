@@ -36,6 +36,10 @@ namespace SPR.Lobby
         {
 
 
+            
+
+            _ws.Connect();
+            _ws.Login().WaitOne();
             _ws.OnMessage += (sender, e) =>
             {
                 var lst = new List<string>();
@@ -48,8 +52,6 @@ namespace SPR.Lobby
 
                 OnGameFound(lst.ToArray());
             };
-
-            _ws.Connect();
             var a = new JObject
             {
                 ["type"] = "find_table",
