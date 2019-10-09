@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Org.BouncyCastle.Math;
+using System.Numerics;
 
 namespace SPR.Core.Game.Poker.Messaging.MessageTypes
 {
-    public class ShuffleMessage : Message
+    class ShuffleMessage : Message
     {
-        public BigInteger[] Cards;
+        public BigInteger[] Cards { get; set; }
+
+        public ShuffleMessage(BigInteger[] cards)
+        {
+            Type = MessageType.Shuffle;
+            Cards = cards;
+        }
     }
 }

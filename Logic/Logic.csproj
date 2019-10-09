@@ -76,7 +76,9 @@
   <ItemGroup>
     <Compile Include="Core\Game\Poker\Messaging\Message.cs" />
     <Compile Include="Core\Game\Poker\Messaging\MessageType.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\BetMessage.cs" />
     <Compile Include="Core\Game\Poker\Messaging\MessageTypes\GetKeyMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\LeaveTableMessage.cs" />
     <Compile Include="Core\Game\Poker\Messaging\MessageTypes\ReEncryptMultiKeyMessage.cs" />
     <Compile Include="Core\Game\Poker\Messaging\MessageTypes\RoundStampMessage.cs" />
     <Compile Include="Core\Game\Poker\Messaging\MessageTypes\ShuffleMessage.cs" />
