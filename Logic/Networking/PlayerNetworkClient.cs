@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using Nethereum.Signer;
 using Org.BouncyCastle.Crypto.Tls;
 using SPR.Crypto;
+using SPR.Helper;
 
 namespace SPR.Networking
 {
@@ -18,7 +21,8 @@ namespace SPR.Networking
 
         public IPEndPoint Endpoint { get; set; }
 
-        public AesCryptoServiceProvider AesProvider { get; set; }
+        public CryptoNetWorkStream Stream { get; private set; }
+        private AesCryptoServiceProvider _aesProvider { get; set; }
 
         private TcpClient _client { get; set; }
 
@@ -38,9 +42,27 @@ namespace SPR.Networking
             }
         }
 
-        public CryptoNetWorkStream GetStream()
+        private async Task Authenticate()
         {
-            return new CryptoNetWorkStream(_client.Client, AesProvider);
+            var myRandom = new byte[32];
+            using (var randGen = new RNGCryptoServiceProvider())
+            {
+                randGen.GetBytes(myRandom);
+                var myTask = Stream.WriteAsync(myRandom, 0, myRandom.Length);
+            }
+        }
+
+        private async Task OtherSign(byte[] myRandom)
+        {
+            await Stream.WriteAsync(myRandom, 0, myRandom.Length).ConfigureAwait(false);
+            var sign = Stream.ReadBlock(128);
+            throw new NotImplementedException();
+        }
+
+        private async Task MySign()
+        {
+            var otherRandom = await Stream.ReadBlockAsync(32);
+            throw new NotImplementedException();
         }
 
         private async Task AgreeOnAesKey()
@@ -60,8 +82,9 @@ namespace SPR.Networking
                     await Task.WhenAll(sendTask, receiveTask);
                 }
 
-                byte[] sharedKey = keyExchange.DeriveKeyMaterial(CngKey.Import(remotePubKey, CngKeyBlobFormat.EccPublicBlob));
-                AesProvider = new AesCryptoServiceProvider { Key = sharedKey };
+                var sharedKey = keyExchange.DeriveKeyMaterial(CngKey.Import(remotePubKey, CngKeyBlobFormat.EccPublicBlob));
+                _aesProvider = new AesCryptoServiceProvider { Key = sharedKey };
+                Stream = new CryptoNetWorkStream(_client.GetStream(), _aesProvider);
             }
         }
 

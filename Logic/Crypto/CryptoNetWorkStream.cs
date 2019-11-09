@@ -1,51 +1,65 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace SPR.Crypto
 {
-    public class CryptoNetWorkStream
+    public class CryptoNetWorkStream : Stream
     {
-        private Socket _socket;
 
-        private ICryptoTransform _encryptor;
-        private ICryptoTransform _decryptor;
+        private Stream _inStream;
+        private Stream _senderStream;
+        private Stream _recieverStream;
 
-        public CryptoNetWorkStream(Socket socket, AesCryptoServiceProvider aes)
+        public CryptoNetWorkStream(Stream baseStream, SymmetricAlgorithm aes)
         {
-            _socket = socket;
-            _encryptor = aes.CreateEncryptor();
-            _decryptor = aes.CreateDecryptor();
+            _senderStream = new CryptoStream(_inStream, aes.CreateEncryptor(), CryptoStreamMode.Write);
+            _recieverStream = new CryptoStream(_inStream, aes.CreateDecryptor(), CryptoStreamMode.Read);
+            _inStream = baseStream;
         }
 
-        public void SendMessage(object message)
+        public override void Flush()
         {
-            using (var aes = new CryptoStream(new NetworkStream(_socket, FileAccess.ReadWrite), _encryptor, CryptoStreamMode.Write))
-            {
-                using (var writer = new StreamWriter(aes, Encoding.UTF8))
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(writer, message);
-                }
-            }
+            _senderStream.Flush();
         }
 
-        public object ReceiveMessage()
+        public override long Seek(long offset, SeekOrigin origin)
         {
-            using (var aes = new CryptoStream(new NetworkStream(_socket, FileAccess.ReadWrite), _decryptor, CryptoStreamMode.Read))
-            {
-                using (var reader = new StreamReader(aes, Encoding.UTF8))
-                {
-                    using (var jsonReader = new JsonTextReader(reader))
-                    {
-                        var serializer = new JsonSerializer();
-                        return serializer.Deserialize(jsonReader);
-                    }
-                }
-            }
+            throw new NotSupportedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return _recieverStream.Read(buffer, offset, count);
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            _senderStream.Write(buffer, offset, count);
+        }
+
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            return _senderStream.WriteAsync(buffer, offset, count, cancellationToken);
+        }
+
+        public override bool CanRead { get; } = true;
+        public override bool CanSeek { get; } = false;
+        public override bool CanWrite { get; } = true;
+        public override long Length => throw new NotSupportedException();
+        public override long Position { get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
         }
     }
 }

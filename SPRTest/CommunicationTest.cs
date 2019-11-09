@@ -25,11 +25,18 @@ namespace SPRTest
             Thread.Sleep(time2 - time);
             Console.WriteLine($"Sending Connect: {DateTime.UtcNow.Second}.{DateTime.UtcNow.Millisecond}");
             remoteClient.Connect().Wait();
-            var stream = remoteClient.GetStream();
-            stream.SendMessage(messageToSend);
-            var received = stream.ReceiveMessage();
-            Console.WriteLine($"Received: {messageToReceive}");
-            Assert.AreEqual(messageToReceive, received);
+            var stream = remoteClient.Stream;
+            var toWrite = Encoding.ASCII.GetBytes(messageToSend);
+            stream.Write(toWrite,  0, toWrite.Length);
+            var toReceive = new byte[messageToReceive.Length];
+            var receivedCount = 0;
+            while (receivedCount < toReceive.Length)
+            {
+                receivedCount += stream.Read(toReceive, receivedCount, toReceive.Length - receivedCount);
+            }
+            var receivedStr = Encoding.ASCII.GetString(toReceive);
+            Console.WriteLine($"Received: {receivedStr}");
+            Assert.AreEqual(messageToReceive, receivedStr);
         }
     }
 }

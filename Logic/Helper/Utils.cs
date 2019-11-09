@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,39 @@ namespace SPR.Helper
             }
 
             return result.ToString();
+        }
+
+        public static void ReadBlock(this Stream stream, byte[] buffer, int offset, int count)
+        {
+            var receivedCount = 0;
+            while (receivedCount < count)
+            {
+                receivedCount += stream.Read(buffer, receivedCount, count - receivedCount);
+            }
+        }
+
+        public static byte[] ReadBlock(this Stream stream, int countToRead)
+        {
+            var receiveBuffer = new byte[countToRead];
+            var receivedCount = 0;
+            while (receivedCount < countToRead)
+            {
+                receivedCount += stream.Read(receiveBuffer, receivedCount, countToRead - receivedCount);
+            }
+
+            return receiveBuffer;
+        }
+
+        public static async Task<byte[]> ReadBlockAsync(this Stream stream, int countToRead)
+        {
+            var receiveBuffer = new byte[countToRead];
+            var receivedCount = 0;
+            while (receivedCount < countToRead)
+            {
+                receivedCount += await stream.ReadAsync(receiveBuffer, receivedCount, countToRead - receivedCount);
+            }
+
+            return receiveBuffer;
         }
     }
 }
