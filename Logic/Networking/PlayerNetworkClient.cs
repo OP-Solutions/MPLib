@@ -38,34 +38,21 @@ namespace SPR.Networking
             if (!_client.Connected)
             {
                 await _client.ConnectAsync(Endpoint.Address, Endpoint.Port);
-                await AgreeOnAesKey();
+                await AgreeOnAesKeyAsync();
             }
         }
 
-        private async Task Authenticate()
+        private async Task AuthenticateAsync()
         {
             var myRandom = new byte[32];
             using (var randGen = new RNGCryptoServiceProvider())
             {
                 randGen.GetBytes(myRandom);
-                var myTask = Stream.WriteAsync(myRandom, 0, myRandom.Length);
+                await Stream.WriteAsync(myRandom, 0, myRandom.Length);
             }
         }
 
-        private async Task OtherSign(byte[] myRandom)
-        {
-            await Stream.WriteAsync(myRandom, 0, myRandom.Length).ConfigureAwait(false);
-            var sign = Stream.ReadBlock(128);
-            throw new NotImplementedException();
-        }
-
-        private async Task MySign()
-        {
-            var otherRandom = await Stream.ReadBlockAsync(32);
-            throw new NotImplementedException();
-        }
-
-        private async Task AgreeOnAesKey()
+        private async Task AgreeOnAesKeyAsync()
         {
             using (var keyExchange = new ECDiffieHellmanCng())
             {
