@@ -103,6 +103,11 @@
     <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\ThreeOfAKind.cs" />
     <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\TwoPairs.cs" />
     <Compile Include="Core\Game\Poker\PokerLogic\PokerGameData.cs" />
+    <Compile Include="Crypto\Encryption\UtilClasses\KeyPair.cs" />
+    <Compile Include="Crypto\Encryption\UtilClasses\PohligHellmanKey.cs" />
+    <Compile Include="Crypto\Encryption\UtilClasses\PrivateKey.cs" />
+    <Compile Include="Crypto\Encryption\UtilClasses\PublicKey.cs" />
+    <Compile Include="Crypto\Encryption\UtilClasses\SecurityUtils.cs" />
     <Compile Include="Helper\Utils.cs" />
     <Compile Include="Lobby\Authorization.cs" />
     <Compile Include="Lobby\GameFinder.cs" />
@@ -130,4 +135,5 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Web.WebJobs.Publish.1.0.12\tools\webjobs.targets" Condition="Exists('..\packages\Microsoft.Web.WebJobs.Publish.1.0.12\tools\webjobs.targets')" />
 </Project>

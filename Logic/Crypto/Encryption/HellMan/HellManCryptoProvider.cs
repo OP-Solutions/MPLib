@@ -1,25 +1,52 @@
 ﻿using System;
 using System.Numerics;
+using System.Text;
+using SPR.Crypto.Encryption.UtilClasses;
 
 namespace SPR.Crypto.Encryption.HellMan
 {
+
     public class HellManCryptoProvider
     {
-        public BigInteger Key { get; }
+        private PohligHellmanKey Key { get; }
 
-        public HellManCryptoProvider(BigInteger key)
+        public HellManCryptoProvider(PohligHellmanKey key)
         {
-            Key = key;
+            this.Key = key;
         }
 
-        public BigInteger Encrypt(BigInteger numberToEncrypt)
+
+        public string EncryptMessage(string m)
         {
-            throw new NotImplementedException();
+            byte[] bytearray = Encoding.ASCII.GetBytes(m);
+            BigInteger message = new BigInteger(bytearray);
+            BigInteger encrypted = encr(message, Key.E, Key.P);
+            return Encoding.ASCII.GetString(encrypted.ToByteArray());
         }
 
-        public BigInteger Decrypt(BigInteger numberToDecrypt)
+        public string DecryptMessage(string c)
         {
-            throw new NotImplementedException();
+            byte[] bytearray = Encoding.ASCII.GetBytes(c);
+            BigInteger encrypted = new BigInteger(bytearray);
+            BigInteger m = decr(encrypted, Key.D, Key.P);
+            return Encoding.ASCII.GetString(m.ToByteArray());
+        }
+
+        private BigInteger crypt(BigInteger m, BigInteger e, BigInteger p)
+        {
+            BigInteger val = BigInteger.ModPow(m, e, p);
+            return val;
+
+        }
+
+        private BigInteger decr(BigInteger m, BigInteger d, BigInteger p)
+        {
+            return crypt(m, d, p);
+        }
+
+        private BigInteger encr(BigInteger m, BigInteger e, BigInteger p)
+        {
+            return crypt(m, e, p);
         }
     }
 }

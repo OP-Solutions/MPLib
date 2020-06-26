@@ -1,25 +1,40 @@
 ﻿using System;
+using System.Text;
+using SPR.Crypto.Encryption.UtilClasses;
 using BigInteger = System.Numerics.BigInteger;
+using System.Security.Cryptography;
 
 namespace SPR.Crypto.Encryption.SRA
 {
     public class SraCryptoProvider
     {
-        public SraParameters Parameters { get; }
+        private KeyPair keyPair { get; }
 
-        public SraCryptoProvider(SraParameters parameters)
+        public SraCryptoProvider(KeyPair keyPair)
         {
-            Parameters = parameters;
+            this.keyPair = keyPair;
         }
 
-        public BigInteger Encrypt(BigInteger numberToEncrypt)
+        public string Decrypt(string m)
         {
-            throw new NotImplementedException();
+            var msg = Encoding.ASCII.GetBytes(m);
+            var key = keyPair.privateKey;
+
+            var encrypted = new BigInteger(msg);
+            var message = BigInteger.ModPow(encrypted, key.D, key.N);
+            return Encoding.ASCII.GetString(message.ToByteArray());
+
         }
 
-        public BigInteger Decrypt(BigInteger numberToDecrypt)
+        public string Encrypt(String m)
         {
-            throw new NotImplementedException();
+
+            var key = keyPair.publicKey;
+            var msg = Encoding.ASCII.GetBytes(m);
+            var message = new BigInteger(msg);
+            var encrypted = BigInteger.ModPow(message, key.E, key.N);
+
+            return Encoding.ASCII.GetString(encrypted.ToByteArray());
         }
     }
 }
