@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using Nethereum.Signer;
+using Org.BouncyCastle.Crypto.Tls;
 using SPR.Crypto;
+using SPR.Helper;
 
 namespace SPR.Networking
 {
@@ -15,14 +21,14 @@ namespace SPR.Networking
 
         public IPEndPoint Endpoint { get; set; }
 
-        public AesCryptoServiceProvider AesProvider { get; set; }
+        public CryptoNetWorkStream Stream { get; private set; }
+        private AesCryptoServiceProvider _aesProvider { get; set; }
 
         private TcpClient _client { get; set; }
 
-        public PlayerNetworkClient(string ethAddress, EthECKey ecKey, IPEndPoint endpoint )
+        public PlayerNetworkClient(string ethAddress, IPEndPoint endpoint)
         {
             EthAddress = ethAddress;
-            EcKey = ecKey;
             Endpoint = endpoint;
             _client = new TcpClient(new IPEndPoint(IPAddress.Parse("127.0.0.1"), endpoint.Port));
         }
@@ -32,30 +38,54 @@ namespace SPR.Networking
             if (!_client.Connected)
             {
                 await _client.ConnectAsync(Endpoint.Address, Endpoint.Port);
-                ExchangeAesKeys();
+                await AgreeOnAesKey();
             }
         }
 
-        public CryptoNetWorkStream GetStream()
+        private async Task Authenticate()
         {
-            return new CryptoNetWorkStream(_client.Client, AesProvider);
-        }
-
-        private void ExchangeAesKeys()
-        {
-            var provider = new AesCryptoServiceProvider();
-            provider.GenerateKey();
-            var localKey = provider.Key;
-            _client.Client.Send(localKey);
-            var remoteKey = new byte[32];
-            var toReceive = 32;
-            while (toReceive > 0)
+            var myRandom = new byte[32];
+            using (var randGen = new RNGCryptoServiceProvider())
             {
-                toReceive -= _client.Client.Receive(remoteKey);
+                randGen.GetBytes(myRandom);
+                var myTask = Stream.WriteAsync(myRandom, 0, myRandom.Length);
             }
+        }
 
-            provider.Key = Xor(localKey, remoteKey);
-            AesProvider = provider;
+        private async Task OtherSign(byte[] myRandom)
+        {
+            await Stream.WriteAsync(myRandom, 0, myRandom.Length).ConfigureAwait(false);
+            var sign = Stream.ReadBlock(128);
+            throw new NotImplementedException();
+        }
+
+        private async Task MySign()
+        {
+            var otherRandom = await Stream.ReadBlockAsync(32);
+            throw new NotImplementedException();
+        }
+
+        private async Task AgreeOnAesKey()
+        {
+            using (var keyExchange = new ECDiffieHellmanCng())
+            {
+                var keySizeBytes = keyExchange.KeySize / 8;
+                keyExchange.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
+                keyExchange.HashAlgorithm = CngAlgorithm.Sha256;
+                var myPubKey = keyExchange.PublicKey.ToByteArray();
+                var remotePubKey = new byte[keySizeBytes];
+
+                using (var stream = _client.GetStream())
+                {
+                    var sendTask = stream.WriteAsync(myPubKey, 0, keySizeBytes);
+                    var receiveTask = stream.ReadAsync(remotePubKey, 0, keySizeBytes);
+                    await Task.WhenAll(sendTask, receiveTask);
+                }
+
+                var sharedKey = keyExchange.DeriveKeyMaterial(CngKey.Import(remotePubKey, CngKeyBlobFormat.EccPublicBlob));
+                _aesProvider = new AesCryptoServiceProvider { Key = sharedKey };
+                Stream = new CryptoNetWorkStream(_client.GetStream(), _aesProvider);
+            }
         }
 
         private static byte[] Xor(IReadOnlyList<byte> bytes1, IReadOnlyList<byte> bytes2)

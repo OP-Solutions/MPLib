@@ -15,12 +15,13 @@ namespace SPR.Models
 
         public string Name { get; set; }
         public string EthereumAddress { get; }
-        public IPAddress CurrentIp { get; }
+        public PlayerNetworkClient NetworkClient { get; }
 
-        public Player(string ethereumAddress, IPAddress currentIp)
+        public Player(string name, string ethereumAddress, IPEndPoint endpointToConnect)
         {
+            Name = name;
             EthereumAddress = ethereumAddress;
-            CurrentIp = currentIp;
+            NetworkClient = new PlayerNetworkClient(ethereumAddress, endpointToConnect);
         }
     }
 }

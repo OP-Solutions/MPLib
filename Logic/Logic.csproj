@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,28 +31,29 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
       <HintPath>..\packages\Portable.BouncyCastle.1.8.2\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="Nethereum.Hex, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nethereum.Hex.3.4.0\lib\net451\Nethereum.Hex.dll</HintPath>
+      <HintPath>..\packages\Nethereum.Hex.3.4.0\lib\netstandard1.1\Nethereum.Hex.dll</HintPath>
     </Reference>
     <Reference Include="Nethereum.Model, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nethereum.Model.3.4.0\lib\net451\Nethereum.Model.dll</HintPath>
+      <HintPath>..\packages\Nethereum.Model.3.4.0\lib\netstandard1.1\Nethereum.Model.dll</HintPath>
     </Reference>
     <Reference Include="Nethereum.RLP, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nethereum.RLP.3.4.0\lib\net451\Nethereum.RLP.dll</HintPath>
+      <HintPath>..\packages\Nethereum.RLP.3.4.0\lib\netstandard1.1\Nethereum.RLP.dll</HintPath>
     </Reference>
     <Reference Include="Nethereum.Signer, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
       <HintPath>..\packages\Nethereum.Signer.3.4.0\lib\netstandard1.1\Nethereum.Signer.dll</HintPath>
     </Reference>
     <Reference Include="Nethereum.Util, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nethereum.Util.3.4.0\lib\net451\Nethereum.Util.dll</HintPath>
+      <HintPath>..\packages\Nethereum.Util.3.4.0\lib\netstandard1.1\Nethereum.Util.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3-beta1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -72,6 +74,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Game\Poker\Messaging\Message.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageType.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\BetMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\GetKeyMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\LeaveTableMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\ReEncryptMultiKeyMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\RoundStampMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\ShuffleMessage.cs" />
+    <Compile Include="Core\Game\Poker\Messaging\Package.cs" />
     <Compile Include="Crypto\CryptoNetWorkStream.cs" />
     <Compile Include="Crypto\Encryption\HellMan\HellManCryptoProvider.cs" />
     <Compile Include="Crypto\Encryption\SRA\SraCryptoProvider.cs" />
@@ -97,7 +108,10 @@
     <Compile Include="Crypto\Encryption\UtilClasses\PrivateKey.cs" />
     <Compile Include="Crypto\Encryption\UtilClasses\PublicKey.cs" />
     <Compile Include="Crypto\Encryption\UtilClasses\SecurityUtils.cs" />
+    <Compile Include="Helper\Utils.cs" />
+    <Compile Include="Lobby\Authorization.cs" />
     <Compile Include="Lobby\GameFinder.cs" />
+    <Compile Include="Lobby\PlayerMeeting.cs" />
     <Compile Include="Models\PokerRound.cs" />
     <Compile Include="Random\DecentralizedDeckShuffler.cs" />
     <Compile Include="Random\SafeRandomGenerator.cs" />

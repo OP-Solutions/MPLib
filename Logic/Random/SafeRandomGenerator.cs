@@ -17,7 +17,7 @@ namespace SPR.Random
                 provider.GetBytes(byteArray);
 
                 var randomInteger = BitConverter.ToUInt32(byteArray, 0);
-                return (int) randomInteger;
+                return (int)randomInteger;
             }
         }
 
@@ -37,7 +37,7 @@ namespace SPR.Random
 
             long cnt = maxValue - minValue + 1;
             var rand = Math.Abs(GetInt()) % cnt;
-            return minValue + (int) rand;
+            return minValue + (int)rand;
         }
 
         /// <summary>

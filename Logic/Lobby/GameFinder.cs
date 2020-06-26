@@ -16,7 +16,7 @@ namespace SPR.Lobby
 {
     public class GameFinder
     {
-        public delegate void FoundGameCallback(Player[] otherPlayers);
+        public delegate void FoundGameCallback(string[] ethAddresses);
 
         public event FoundGameCallback OnGameFound;
 
@@ -36,22 +36,22 @@ namespace SPR.Lobby
         {
 
 
+            
+
+            _ws.Connect();
+            _ws.Login().WaitOne();
             _ws.OnMessage += (sender, e) =>
             {
-                List<Player> lst = new List<Player>();
+                var lst = new List<string>();
                 dynamic parser = JObject.Parse(e.Data);
                 foreach (dynamic user in parser.users)
                 {
-                    string ipAddr = user.ip_address;
                     string ethereumAddress = user.ethereum_address;
-                    var player = new Player(ethereumAddress, IPAddress.Parse(ipAddr));
-                    lst.Add(player);
+                    lst.Add(ethereumAddress);
                 }
 
                 OnGameFound(lst.ToArray());
             };
-
-            _ws.Connect();
             var a = new JObject
             {
                 ["type"] = "find_table",

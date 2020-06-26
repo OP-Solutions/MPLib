@@ -34,7 +34,7 @@ namespace SPR.Random
         {
             var currentDeck = SourceDeck;
 
-            foreach (var player in Round.Table.Players)
+            foreach (var player in Round.Players)
             {
                 if (player == Player.Me)
                 {
@@ -47,7 +47,19 @@ namespace SPR.Random
                 currentDeck = await _receiveFrom(player);
             }
 
-            throw new NotImplementedException();
+            foreach (var player in Round.Players)
+            {
+                if (player == Player.Me)
+                {
+                    var i = 0;
+                    var encryptedCards = currentDeck.Select(n => new SraCryptoProvider(Round.MyKeys2[i++]).Encrypt(n)).ToList();
+                    await _send(encryptedCards);
+                }
+
+                currentDeck = await _receiveFrom(player);
+            }
+
+            return currentDeck;
         }
     }
 }
