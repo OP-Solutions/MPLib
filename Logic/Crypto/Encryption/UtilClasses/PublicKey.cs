@@ -2,7 +2,7 @@
 
 namespace SPR.Crypto.Encryption.UtilClasses
 {
-    public class PublicKey
+    public struct PublicKey
     {
         public BigInteger E { get; }
         public BigInteger N { get; }

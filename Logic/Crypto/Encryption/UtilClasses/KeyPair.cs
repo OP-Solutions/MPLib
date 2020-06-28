@@ -9,8 +9,8 @@ namespace SPR.Crypto.Encryption.UtilClasses
 
         public KeyPair()
         {
-            privateKey = null;
-            publicKey = null;
+            privateKey = default;
+            publicKey = default;
         }
 
         public KeyPair(PublicKey pub, PrivateKey priv)
@@ -19,16 +19,9 @@ namespace SPR.Crypto.Encryption.UtilClasses
             privateKey = priv;
         }
 
-        public static KeyPair GenerateKeys()
+        public static KeyPair GenerateKeys(BigInteger p, BigInteger q)
         {
-            BigInteger p, q, n, t, e, d;
-
-
-            p = SecurityUtils.GetBigPrime();
-            do
-            {
-                q = SecurityUtils.GetBigPrime();
-            } while (p.Equals(q));
+            BigInteger n, t, e, d;
 
             n = BigInteger.Multiply(p, q);
             t = BigInteger.Multiply(BigInteger.Subtract(p, BigInteger.One), BigInteger.Subtract(q, BigInteger.One));
