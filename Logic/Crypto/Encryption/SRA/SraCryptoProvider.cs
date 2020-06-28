@@ -8,33 +8,26 @@ namespace SPR.Crypto.Encryption.SRA
 {
     public class SraCryptoProvider
     {
-        private KeyPair keyPair { get; }
+        private SraParameters keyPair { get; }
 
-        public SraCryptoProvider(KeyPair keyPair)
+        public SraCryptoProvider(SraParameters keyPair)
         {
             this.keyPair = keyPair;
         }
 
-        public string Decrypt(string m)
+        public BigInteger Decrypt(BigInteger m)
         {
-            var msg = Encoding.ASCII.GetBytes(m);
             var key = keyPair.privateKey;
-
-            var encrypted = new BigInteger(msg);
-            var message = BigInteger.ModPow(encrypted, key.D, key.N);
-            return Encoding.ASCII.GetString(message.ToByteArray());
+            var decrypted = BigInteger.ModPow(m, key.D, key.N);
+            return decrypted;
 
         }
 
-        public string Encrypt(String m)
+        public BigInteger Encrypt(BigInteger m)
         {
-
             var key = keyPair.publicKey;
-            var msg = Encoding.ASCII.GetBytes(m);
-            var message = new BigInteger(msg);
-            var encrypted = BigInteger.ModPow(message, key.E, key.N);
-
-            return Encoding.ASCII.GetString(encrypted.ToByteArray());
+            var encrypted = BigInteger.ModPow(m, key.E, key.N);
+            return encrypted;
         }
     }
 }
