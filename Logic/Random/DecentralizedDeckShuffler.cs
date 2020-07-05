@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Threading.Tasks;
-using SPR.Core.Game.Poker.PokerLogic;
-using SPR.Crypto.Encryption.HellMan;
-using SPR.Crypto.Encryption.SRA;
-using SPR.Models;
+using EtherBetClientLib.Crypto.Encryption.SRA;
+using EtherBetClientLib.Models;
 
-namespace SPR.Random
+namespace EtherBetClientLib.Random
 {
     public class DecentralizedDeckShuffler
     {

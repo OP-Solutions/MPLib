@@ -1,138 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{20E80056-9EEB-479D-93FD-7A2DE665CB63}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SPR</RootNamespace>
-    <AssemblyName>SPR</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
+    <RootNamespace>EtherBetClientLib</RootNamespace>
+    <AssemblyName>EtherBetClientLb</AssemblyName>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
-      <HintPath>..\packages\Portable.BouncyCastle.1.8.2\lib\net40\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="Nethereum.Hex, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nethereum.Hex.3.4.0\lib\netstandard1.1\Nethereum.Hex.dll</HintPath>
-    </Reference>
-    <Reference Include="Nethereum.Model, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nethereum.Model.3.4.0\lib\netstandard1.1\Nethereum.Model.dll</HintPath>
-    </Reference>
-    <Reference Include="Nethereum.RLP, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nethereum.RLP.3.4.0\lib\netstandard1.1\Nethereum.RLP.dll</HintPath>
-    </Reference>
-    <Reference Include="Nethereum.Signer, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nethereum.Signer.3.4.0\lib\netstandard1.1\Nethereum.Signer.dll</HintPath>
-    </Reference>
-    <Reference Include="Nethereum.Util, Version=3.0.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nethereum.Util.3.4.0\lib\netstandard1.1\Nethereum.Util.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="websocket-sharp, Version=1.0.2.59611, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebSocketSharp.1.0.3-rc11\lib\websocket-sharp.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.6.7" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
+    <PackageReference Include="System.Security.Cryptography.Cng" Version="4.7.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Core\Game\Poker\Messaging\Message.cs" />
-    <Compile Include="Core\Game\Poker\Messaging\MessageType.cs" />
-    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\BetMessage.cs" />
-    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\GetKeyMessage.cs" />
-    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\LeaveTableMessage.cs" />
-    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\ReEncryptMultiKeyMessage.cs" />
-    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\RoundStampMessage.cs" />
-    <Compile Include="Core\Game\Poker\Messaging\MessageTypes\ShuffleMessage.cs" />
-    <Compile Include="Core\Game\Poker\Messaging\Package.cs" />
-    <Compile Include="Crypto\CryptoNetWorkStream.cs" />
-    <Compile Include="Crypto\Encryption\HellMan\HellManCryptoProvider.cs" />
-    <Compile Include="Crypto\Encryption\SRA\SraCryptoProvider.cs" />
-    <Compile Include="Crypto\Encryption\SRA\SraParameters.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\Card.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\CardRank.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\CardSuit.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\CombinationType.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\Combination.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\Flush.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\FourOfAKind.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\FullHouse.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\HighCard.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\Pair.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\RoyalFlush.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\Straight.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\StraightFlush.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\ThreeOfAKind.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerCombinations\TwoPairs.cs" />
-    <Compile Include="Core\Game\Poker\PokerLogic\PokerGameData.cs" />
-    <Compile Include="Crypto\Encryption\HellMan\PohligHellmanKey.cs" />
-    <Compile Include="Crypto\Encryption\SRA\PrivateKey.cs" />
-    <Compile Include="Crypto\Encryption\SRA\PublicKey.cs" />
-    <Compile Include="Crypto\Encryption\UtilClasses\SecurityUtils.cs" />
-    <Compile Include="Helper\Utils.cs" />
-    <Compile Include="Lobby\Authorization.cs" />
-    <Compile Include="Lobby\GameFinder.cs" />
-    <Compile Include="Lobby\PlayerMeeting.cs" />
-    <Compile Include="Models\PokerRound.cs" />
-    <Compile Include="Random\DecentralizedDeckShuffler.cs" />
-    <Compile Include="Random\SafeRandomGenerator.cs" />
-    <Compile Include="Random\Shuffling.cs" />
-    <Compile Include="Models\Player.cs" />
-    <Compile Include="Networking\PlayerNetworkClient.cs" />
-    <Compile Include="Models\PokerTable.cs" />
-    <Compile Include="Crypto\Signing\SignerStream.cs" />
-    <Compile Include="Crypto\Signing\Signer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AppContext\AppContext.csproj">
-      <Project>{9bcfae93-cea2-46d2-992e-2da9d6b92a75}</Project>
-      <Name>AppContext</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Microsoft.Web.WebJobs.Publish.1.0.12\tools\webjobs.targets" Condition="Exists('..\packages\Microsoft.Web.WebJobs.Publish.1.0.12\tools\webjobs.targets')" />
 </Project>

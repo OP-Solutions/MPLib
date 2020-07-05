@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace SPR.Random
+namespace EtherBetClientLib.Random
 {
     public static class SafeRandomGenerator
     {

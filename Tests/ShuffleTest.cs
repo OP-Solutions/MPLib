@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SPR.Random;
+using EtherBetClientLib.Random;
+using Xunit;
 
 namespace SPRTest
 {
-    [TestClass]
     public class ShuffleTest
     {
-        [TestMethod]
+        [Fact]
         public void TestMethod1()
         {
             var list = new List<BigInteger>

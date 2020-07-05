@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Nethereum.Signer;
-
-namespace SPR.Core.Game.Poker.Messaging
+﻿namespace EtherBetClientLib.Core.Game.Poker.Messaging
 {
     public class Package
     {

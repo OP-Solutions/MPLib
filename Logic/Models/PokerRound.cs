@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using SPR.Crypto.Encryption.HellMan;
-using SPR.Crypto.Encryption.SRA;
+﻿using System.Numerics;
+using EtherBetClientLib.Crypto.Encryption.SRA;
 
-namespace SPR.Models
+namespace EtherBetClientLib.Models
 {
     public class PokerRound
     {

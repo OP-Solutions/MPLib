@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SPR.Core.Game.Poker.PokerLogic
+namespace EtherBetClientLib.Core.Game.Poker.PokerLogic
 {
     /// <summary>
     /// The card.

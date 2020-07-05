@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
-using SPR.Crypto.Encryption.UtilClasses;
+using EtherBetClientLib.Crypto.Encryption.UtilClasses;
 
-namespace SPR.Crypto.Encryption.SRA
+namespace EtherBetClientLib.Crypto.Encryption.SRA
 {
     public class SraParameters
     {

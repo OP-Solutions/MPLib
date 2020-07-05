@@ -1,4 +1,4 @@
-﻿namespace SPR.Core.Game.Poker.Messaging.MessageTypes
+﻿namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
     public class BetMessage : Message
     {

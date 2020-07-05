@@ -1,10 +1,6 @@
-﻿using System;
-using System.Text;
-using SPR.Crypto.Encryption.UtilClasses;
-using BigInteger = System.Numerics.BigInteger;
-using System.Security.Cryptography;
+﻿using BigInteger = System.Numerics.BigInteger;
 
-namespace SPR.Crypto.Encryption.SRA
+namespace EtherBetClientLib.Crypto.Encryption.SRA
 {
     public class SraCryptoProvider
     {

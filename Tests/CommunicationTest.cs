@@ -5,18 +5,16 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SPR.Models;
-using SPR.Networking;
+using EtherBetClientLib.Networking;
+using Xunit;
 
 namespace SPRTest
 {
-    [TestClass]
     public class CommunicationTest
     {
-        [DataTestMethod]
-        [DataRow("62.168.171.183", 8789, "Chudo123", "bakurits")] // from me // kukur home ip 62.168.171.183
-        //[DataRow("31.146.149.134, 8788", "bakurits", "Chudo123")] // from kukur
+        [Theory]
+        [InlineData("62.168.171.183", 8789, "Chudo123", "bakurits")] // from me // kukur home ip 62.168.171.183
+        //[InlineData("31.146.149.134, 8788", "bakurits", "Chudo123")] // from kukur
         public void TestP2P(string targetIp, int targetPort, string messageToSend, string messageToReceive)
         {
             var remoteClient = new PlayerNetworkClient(null, new IPEndPoint(IPAddress.Parse(targetIp), targetPort));
@@ -36,7 +34,7 @@ namespace SPRTest
             }
             var receivedStr = Encoding.ASCII.GetString(toReceive);
             Console.WriteLine($"Received: {receivedStr}");
-            Assert.AreEqual(messageToReceive, receivedStr);
+            Assert.Equal(messageToReceive, receivedStr);
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using System.Numerics;
 using System.Security.Cryptography;
 
-
-namespace SPR.Crypto.Encryption.UtilClasses
+namespace EtherBetClientLib.Crypto.Encryption.UtilClasses
 {
     public static class SecurityUtils
     {

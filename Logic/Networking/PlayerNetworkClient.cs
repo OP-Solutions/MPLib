@@ -1,26 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Security;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Security.Authentication;
 using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
-using Nethereum.Signer;
-using Org.BouncyCastle.Crypto;
+using EtherBetClientLib.Crypto;
 using Org.BouncyCastle.Crypto.IO;
-using Org.BouncyCastle.Crypto.Signers;
-using Org.BouncyCastle.Crypto.Tls;
-using SPR.Crypto;
-using SPR.Helper;
 
-namespace SPR.Networking
+namespace EtherBetClientLib.Networking
 {
     public class PlayerNetworkClient
     {
         public string EthAddress { get; set; }
-        public EthECKey EcKey { get; set; }
+        public byte Key { get; set; }
 
         public IPEndPoint Endpoint { get; set; }
 
@@ -51,8 +41,6 @@ namespace SPR.Networking
             using (var keyExchange = new ECDiffieHellmanCng())
             {
                 var keySizeBytes = keyExchange.KeySize / 8;
-                keyExchange.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
-                keyExchange.HashAlgorithm = CngAlgorithm.Sha256;
                 var myPubKey = keyExchange.PublicKey.ToByteArray();
                 var remotePubKey = new byte[keySizeBytes];
 
@@ -61,7 +49,9 @@ namespace SPR.Networking
                 var receiveTask = stream.ReadAsync(remotePubKey, 0, keySizeBytes);
                 await Task.WhenAll(sendTask, receiveTask);
 
-                var sharedKey = keyExchange.DeriveKeyMaterial(CngKey.Import(remotePubKey, CngKeyBlobFormat.EccPublicBlob));
+                var remotePubKeyParsed = ECDiffieHellmanCngPublicKey.FromByteArray(remotePubKey, CngKeyBlobFormat.EccPublicBlob);
+                var sharedKey = keyExchange.DeriveKeyFromHash(remotePubKeyParsed, HashAlgorithmName.SHA256);
+
                 _aesProvider = new AesCryptoServiceProvider { Key = sharedKey };
                 var cryptoStream = new CryptoNetWorkStream(stream, _aesProvider);
                 Stream = new SignerStream(cryptoStream, null, null);

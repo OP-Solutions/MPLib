@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SPR.Models
+namespace EtherBetClientLib.Models
 {
     public class PokerTable
     {

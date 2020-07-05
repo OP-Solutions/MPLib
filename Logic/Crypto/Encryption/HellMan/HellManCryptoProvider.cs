@@ -1,9 +1,7 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text;
-using SPR.Crypto.Encryption.UtilClasses;
 
-namespace SPR.Crypto.Encryption.HellMan
+namespace EtherBetClientLib.Crypto.Encryption.HellMan
 {
 
     public class HellManCryptoProvider

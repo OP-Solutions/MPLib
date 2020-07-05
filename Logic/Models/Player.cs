@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Nethereum.Signer;
-using SPR.Networking;
+﻿using System.Net;
+using EtherBetClientLib.Networking;
 
-namespace SPR.Models
+namespace EtherBetClientLib.Models
 {
     public class Player
     {

@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
+using EtherBetClientLib.Crypto.Encryption.UtilClasses;
 
-namespace SPR.Crypto.Encryption.UtilClasses
+namespace EtherBetClientLib.Crypto.Encryption.HellMan
 {
     public class PohligHellmanKey
     {

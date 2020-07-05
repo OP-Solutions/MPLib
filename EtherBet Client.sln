@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPRTest", "SPRTest\SPRTest.csproj", "{143BA9F6-F8AD-4D39-9344-52785FD18428}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{143BA9F6-F8AD-4D39-9344-52785FD18428}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppContext", "AppContext\AppContext.csproj", "{9BCFAE93-CEA2-46D2-992E-2DA9D6B92A75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppContext", "AppContext\AppContext.csproj", "{9BCFAE93-CEA2-46D2-992E-2DA9D6B92A75}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logic", "Logic\Logic.csproj", "{20E80056-9EEB-479D-93FD-7A2DE665CB63}"
 EndProject

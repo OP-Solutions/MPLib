@@ -1,18 +1,17 @@
 ﻿using System;
 using System.IO;
-using System.Text;
-using Nethereum.Signer;
-using Context = AppContext.Context;
 
-namespace SPR.Crypto.Signing
+namespace EtherBetClientLib.Crypto.Signing
 {
     class SignerStream : Stream
     {
-        private Stream _stream;
-        private readonly MessageSigner _signer = new MessageSigner();
+        private readonly Stream _stream;
+        private readonly byte[] _key;
 
-        public SignerStream(Stream targetStream) : base()
+
+        public SignerStream(Stream targetStream, byte[] key) : base()
         {
+            _key = key;
             _stream = targetStream;
         }
 
@@ -38,12 +37,7 @@ namespace SPR.Crypto.Signing
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            var buf = new byte[count];
-            Array.Copy(buffer, offset, buf, 0, count);
-            var signedMessage = _signer.HashAndSign(buf, Context.WalletKey);
-            var bytes = Encoding.ASCII.GetBytes(signedMessage);
-            _stream.Write(buffer, offset, count);
-            _stream.Write(bytes, 0, bytes.Length);
+            throw new NotImplementedException();
         }
 
         public override bool CanRead => _stream.CanRead;

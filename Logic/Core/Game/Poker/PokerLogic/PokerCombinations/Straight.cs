@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SPR.Core.Game.Poker.PokerLogic.PokerCombinations
+namespace EtherBetClientLib.Core.Game.Poker.PokerLogic.PokerCombinations
 {
     /// <summary>
     /// Straight combination

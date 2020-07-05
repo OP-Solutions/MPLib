@@ -1,14 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Net.Security;
-using System.Net.Sockets;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
-namespace SPR.Crypto
+namespace EtherBetClientLib.Crypto
 {
     public class CryptoNetWorkStream : Stream
     {

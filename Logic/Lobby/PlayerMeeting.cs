@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using SPR.Models;
+using EtherBetClientLib.Models;
 
-namespace SPR.Lobby
+namespace EtherBetClientLib.Lobby
 {
     public class PlayerMeeting
     {

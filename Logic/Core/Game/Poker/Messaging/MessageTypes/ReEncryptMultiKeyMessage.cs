@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 
-namespace SPR.Core.Game.Poker.Messaging.MessageTypes
+namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
     /// <summary>
     /// This message has exactly same format as <see cref="ShuffleMessage"/>
