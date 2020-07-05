@@ -9,7 +9,7 @@ namespace EtherBetClientLib.Networking
 {
     public class PlayerNetworkClient
     {
-        public string EthAddress { get; set; }
+        public string UniqueIdentifier { get; set; }
         public byte Key { get; set; }
 
         public IPEndPoint Endpoint { get; set; }
@@ -19,9 +19,9 @@ namespace EtherBetClientLib.Networking
 
         private TcpClient _client { get; set; }
 
-        public PlayerNetworkClient(string ethAddress, IPEndPoint endpoint)
+        public PlayerNetworkClient(string uniqueIdentifier, IPEndPoint endpoint)
         {
-            EthAddress = ethAddress;
+            UniqueIdentifier = uniqueIdentifier;
             Endpoint = endpoint;
             _client = new TcpClient(new IPEndPoint(IPAddress.Parse("127.0.0.1"), endpoint.Port));
         }

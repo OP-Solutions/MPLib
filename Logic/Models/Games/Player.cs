@@ -8,14 +8,12 @@ namespace EtherBetClientLib.Models
         public static Player Me { get; } = null;
 
         public string Name { get; set; }
-        public string EthereumAddress { get; }
         public PlayerNetworkClient NetworkClient { get; }
 
-        public Player(string name, string ethereumAddress, IPEndPoint endpointToConnect)
+        public Player(string name, string uniqueIdentifier, IPEndPoint endpointToConnect)
         {
             Name = name;
-            EthereumAddress = ethereumAddress;
-            NetworkClient = new PlayerNetworkClient(ethereumAddress, endpointToConnect);
+            NetworkClient = new PlayerNetworkClient(uniqueIdentifier, endpointToConnect);
         }
     }
 }
