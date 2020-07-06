@@ -4,12 +4,17 @@ using System.Text;
 
 namespace EtherBetClientLib.Models.Games.Poker
 {
-    class PokerTable : GameTableBase
+    public class PokerTable : GameTableBase
     {
         public double CurrentSmallBlind { get; private set; }
         public int CurrentSmallBlindPlayerIndex { get; set; }
 
-        public PokerTable(List<Player> players) : base(players)
+        /// <summary>
+        /// Time when current small blind will be doubled
+        /// </summary>
+        public DateTime SmallBlindDoubleTime { get; set; }
+
+        public PokerTable(List<PlayerBase> players) : base(players)
         {
         }
     }

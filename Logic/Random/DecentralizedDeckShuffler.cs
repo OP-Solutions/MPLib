@@ -11,7 +11,7 @@ namespace EtherBetClientLib.Random
     {
         public delegate Task SendEvent(List<BigInteger> shuffledDeck);
 
-        public delegate Task<List<BigInteger>> ReceiveFromEvent(Player player);
+        public delegate Task<List<BigInteger>> ReceiveFromEvent(PlayerBase player);
 
         public List<BigInteger> SourceDeck { get; }
         public PokerRound Round { get; }
@@ -32,7 +32,7 @@ namespace EtherBetClientLib.Random
 
             foreach (var player in Round.Players)
             {
-                if (player == Player.Me)
+                if (player == PlayerBase.Me)
                 {
                     var shuffledCards = Shuffling.Shuffle(currentDeck);
                     var provider = new SraCryptoProvider(Round.MyKeys);
@@ -45,7 +45,7 @@ namespace EtherBetClientLib.Random
 
             foreach (var player in Round.Players)
             {
-                if (player == Player.Me)
+                if (player == PlayerBase.Me)
                 {
                     var i = 0;
                     var encryptedCards = currentDeck.Select(n => new SraCryptoProvider(Round.MyKeys2[i++]).Encrypt(n)).ToList();

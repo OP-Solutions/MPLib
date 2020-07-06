@@ -4,10 +4,10 @@ namespace EtherBetClientLib.Models
 {
     public abstract class GameTableBase
     {
-        public List<Player> Players { get; set; }
+        public List<PlayerBase> Players { get; set; }
 
         
-        public GameTableBase(List<Player> players)
+        public GameTableBase(List<PlayerBase> players)
         {
             Players = players;
         }
