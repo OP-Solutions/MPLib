@@ -9,7 +9,7 @@ using EtherBetClientLib.Models;
 
 namespace EtherBetClientLib.Core.Game.General
 {
-    public class MyCardGamePlayer : Player
+    public class MyCardGamePlayer : MyPlayer
     {
         /// <summary>
         /// Key for commutative encryption of cards, this key is private and each player generates one for each round
@@ -30,10 +30,5 @@ namespace EtherBetClientLib.Core.Game.General
         /// and re-encrypts them each one with separate keys (<see cref="CurrentSraKey1"/> key was used on all before this step)
         /// </summary>
         public SraParameters[] CurrentSraKeys2 { get; set; }
-
-        public MyCardGamePlayer(string name, CngKey key, IPEndPoint endpointToConnect) : base(name, key, endpointToConnect)
-        {
-
-        }
     }
 }

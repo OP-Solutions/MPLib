@@ -4,8 +4,10 @@ using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using EtherBetClientLib.Core.Game.General;
 using EtherBetClientLib.Crypto;
 using EtherBetClientLib.Helper;
+using EtherBetClientLib.Models;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto.IO;
 using Org.BouncyCastle.X509;
@@ -15,10 +17,16 @@ namespace EtherBetClientLib.Networking
     public class PlayerNetworkClient
     {
         public string Name { get; set; }
-        public CngKey MyKey { get; }
 
-        public CngKey OtherPartyKey { get; private set; }
 
+        public MyPlayer MyPlayer { get; set; }
+
+
+        public OtherPlayer RemotePlayer { get; set; }
+
+        /// <summary>
+        /// Remote player's endpoint
+        /// </summary>
         public IPEndPoint Endpoint { get; set; }
 
         public SignerStream Stream { get; private set; }
@@ -26,22 +34,32 @@ namespace EtherBetClientLib.Networking
 
         private readonly TcpClient _client;
 
-        public PlayerNetworkClient(string name, CngKey myKey, IPEndPoint endpoint)
+        public PlayerNetworkClient(MyPlayer myPlayer, IPEndPoint endpointToConnect)
         {
-            Name = name;
-            MyKey = myKey;
-            Endpoint = endpoint;
-            _client = new TcpClient(endpoint);
+            MyPlayer = myPlayer;
+            Endpoint = endpointToConnect;
+            _client = new TcpClient(endpointToConnect);
         }
 
-        public async Task Connect()
+        public async Task<OtherPlayer> Connect()
         {
             if (!_client.Connected)
             {
                 await _client.ConnectAsync(Endpoint.Address, Endpoint.Port);
                 await AgreeOnAesKeyAsync();
                 await Authentication();
+                await ExchangeBasicInfo();
             }
+
+            return RemotePlayer;
+        }
+
+        private async Task ExchangeBasicInfo()
+        {
+            var controller = new StreamController(_client.GetStream());
+            await controller.WriteAsciiOpaque8Async(MyPlayer.Name);
+            var remotePlayerName = await controller.ReadAsciiOpaque8Async();
+            RemotePlayer.Name = remotePlayerName;
         }
 
         private async Task Authentication()
@@ -50,12 +68,12 @@ namespace EtherBetClientLib.Networking
             var controller = new StreamController(stream);
             using var randomProvider = new RNGCryptoServiceProvider();
             var myRandom = new byte[32];
-            var pubKey = MyKey.Export(CngKeyBlobFormat.EccPublicBlob);
+            var pubKey = MyPlayer.Key.Export(CngKeyBlobFormat.EccPublicBlob);
             await controller.WriteBytesOpaque16Async(pubKey);
             await controller.WriteBytesOpaque8Async(myRandom);
             var otherPartyPubKey  = await controller.ReadBytesOpaque16Async();
             var otherPartyRandom = await controller.ReadBytesOpaque8Async();
-            var signer = new ECDsaCng(MyKey);
+            var signer = new ECDsaCng(MyPlayer.Key);
             var verifier = new ECDsaCng(CngKey.Import(otherPartyPubKey, CngKeyBlobFormat.EccFullPublicBlob));
             var mySignature = signer.SignData(otherPartyRandom, HashAlgorithmName.SHA256);
             await controller.WriteBytesOpaque16Async(mySignature);
@@ -64,7 +82,7 @@ namespace EtherBetClientLib.Networking
             await controller.WriteEnumAsByteAsync(NetWorkCodes.AuthSuccess);
             var code = await controller.ReadByteAsEnumAsync<NetWorkCodes>();
             if (code != NetWorkCodes.AuthSuccess) throw new AuthenticationException();
-            OtherPartyKey = CngKey.Import(otherPartyPubKey, CngKeyBlobFormat.EccFullPublicBlob);
+            RemotePlayer.Key = CngKey.Import(otherPartyPubKey, CngKeyBlobFormat.EccFullPublicBlob);
         }
 
         private async Task AgreeOnAesKeyAsync()

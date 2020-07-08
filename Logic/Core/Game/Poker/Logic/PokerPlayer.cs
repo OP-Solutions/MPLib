@@ -16,17 +16,11 @@ namespace EtherBetClientLib.Models.Games.Poker
         public int CurrentChipAmount { get; set; }
         public int LeftChipsAfterBet { get; set; }
         public int CurrentBetAmount { get; set; }
-
-        public PokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect) : base(name, key, endpointToConnect)
-        {
-        }
-
-
     }
 
     public class MyPokerPlayer : MyCardGamePlayer
     {
-        public MyPokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect) : base(name, key, endpointToConnect)
+        public MyPokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect)
         {
         }
 

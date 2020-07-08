@@ -4,17 +4,42 @@ using EtherBetClientLib.Networking;
 
 namespace EtherBetClientLib.Models
 {
-    public abstract class Player
+    public class Player
     {
-        public static Player Me { get; } = null;
+        public static MyPlayer Me { get; } = new MyPlayer();
 
-        public string Name { get; protected set; }
+        /// <summary>
+        /// ECDSA singing key of player. this property contains full (private + public) key if this player is "our" (local)  player
+        /// Otherwise if this player is remotely connected this property contains only public key
+        /// </summary>
+        public CngKey Key { get; set; }
+
+        public string Name { get; set; }
+    }
+
+    public class OtherPlayer : Player
+    {
         public PlayerNetworkClient NetworkClient { get; }
 
-        public Player(string name, CngKey key, IPEndPoint endpointToConnect)
+        public CngKey Key { get; set; }
+        public string Name { get; set; }
+
+        public OtherPlayer(PlayerNetworkClient client)
         {
-            Name = name;
-            NetworkClient = new PlayerNetworkClient(name, key, endpointToConnect);
+            NetworkClient = client;
         }
     }
+
+
+    public class MyPlayer : Player
+    {
+        public string Name { get; set; }
+
+        /// <summary>
+        /// ECDSA singing key of player. this property contains full (private + public) key if this player is "our" (local)  player
+        /// Otherwise if this player is remotely connected this property contains only public key
+        /// </summary>
+        public CngKey Key { get; set; }
+    }
+
 }

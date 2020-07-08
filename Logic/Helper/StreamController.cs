@@ -58,6 +58,18 @@ namespace EtherBetClientLib.Helper
 
         }
 
+        public async Task WriteAsciiOpaque8Async(string value)
+        {
+            var bytes = Encoding.ASCII.GetBytes(value);
+            await WriteBytesOpaque8Async(bytes);
+        }
+
+        public async Task<string> ReadAsciiOpaque8Async()
+        {
+            var bytes = await ReadBytesOpaque8Async();
+            return Encoding.ASCII.GetString(bytes);
+        }
+
         public async Task WriteByteAsync(byte value)
         {
             _buffer[0] = value;
