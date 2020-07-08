@@ -1,11 +1,19 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
+using System.Threading.Tasks;
 using EtherBetClientLib.Crypto.Encryption.SRA;
+using EtherBetClientLib.Models.Games.Poker;
+using EtherBetClientLib.Random;
 
 namespace EtherBetClientLib.Models
 {
     public class PokerRound
     {
-        public PlayerBase[] Players { get; }
+        public PokerPlayer[] Players { get; }
+
+
+        public int CurrentBetAmount { get; }
+
         public int[] CurrentBets { get; }
 
         /// <summary>
@@ -13,22 +21,34 @@ namespace EtherBetClientLib.Models
         /// </summary>
         public BigInteger[] ShuffledDeck { get; set; }
 
-        public SraParameters MyKeys { get;  }
-        public SraParameters[] MyKeys2 { get; }
+        public SraParameters MyKey { get;  }
 
-        
-        public PokerRound(PlayerBase[] players, SraParameters myKeys, SraParameters[] myKeys2)
+        public PokerRoundState State { get; set; }
+
+        public PokerRound(PokerPlayer[] players, SraParameters myKey)
         {
             Players = players;
-            MyKeys = myKeys;
-            MyKeys2 = myKeys2;
-            CurrentBets = new double[players.Length];
+            MyKey = myKey;
+            CurrentBets = new int[players.Length];
+            State = PokerRoundState.NoStarted;
+        }
+
+        /// <summary>
+        /// Core method in poker logic. This method represents lifetime of poker round:
+        /// Round is started by calling that method and ended when this method exits
+        /// </summary>
+        /// <returns></returns>
+        public async Task ProcessRound()
+        {
+            State = PokerRoundState.BeforeDeckShuffle;
+            throw new NotImplementedException();
         }
     }
 
     public enum PokerRoundState
     {
-        NoStarted, 
+        NoStarted,
+        BeforeDeckShuffle,
         DeckShuffled, 
         SmallBlindPlaced, 
         BigBlindPlaced, 

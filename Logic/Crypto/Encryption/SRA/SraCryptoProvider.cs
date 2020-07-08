@@ -13,16 +13,13 @@ namespace EtherBetClientLib.Crypto.Encryption.SRA
 
         public BigInteger Decrypt(BigInteger m)
         {
-            var key = keyPair.privateKey;
-            var decrypted = BigInteger.ModPow(m, key.D, key.N);
+            var decrypted = BigInteger.ModPow(m, keyPair.DecryptKey,  keyPair.Modulus);
             return decrypted;
-
         }
 
         public BigInteger Encrypt(BigInteger m)
         {
-            var key = keyPair.publicKey;
-            var encrypted = BigInteger.ModPow(m, key.E, key.N);
+            var encrypted = BigInteger.ModPow(m, keyPair.EncryptKey, keyPair.DecryptKey);
             return encrypted;
         }
     }

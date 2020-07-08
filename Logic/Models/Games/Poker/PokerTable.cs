@@ -14,7 +14,7 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// </summary>
         public DateTime SmallBlindDoubleTime { get; set; }
 
-        public PokerTable(List<PlayerBase> players) : base(players)
+        public PokerTable(List<Player> players) : base(players)
         {
         }
     }

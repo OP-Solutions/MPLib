@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace EtherBetClientLib.Models.Games.Poker
 {
-    public class PokerPlayer : PlayerBase
+    public class PokerPlayer : Player
     {
         public int CurrentChipCount { get; set; }
         public PokerTable CurrentTable { get; set; }
         public PokerRound CurrentRound { get; set; }
         public int LeftChipsAfterBet { get; set; }
 
-        public PokerPlayer(string name, string uniqueIdentifier, IPEndPoint endpointToConnect) : base(name, uniqueIdentifier, endpointToConnect)
+        public PokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect) : base(name, key, endpointToConnect)
         {
         }
 
@@ -23,7 +24,7 @@ namespace EtherBetClientLib.Models.Games.Poker
     public class MyPokerPlayer : PokerPlayer
     {
 
-        public MyPokerPlayer(string name, string uniqueIdentifier, IPEndPoint endpointToConnect) : base(name, uniqueIdentifier, endpointToConnect)
+        public MyPokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect) : base(name, key, endpointToConnect)
         {
         }
 
@@ -43,6 +44,15 @@ namespace EtherBetClientLib.Models.Games.Poker
 
 
         /// <summary>
+        /// Indicates if player can <see cref="Call"/> currently.
+        /// </summary>
+        /// <returns></returns>
+        public bool CanCall()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Does "Check" poker move. (ie, does not bet any more chips, just skip his turn)
         /// </summary>
         /// <exception cref="InvalidOperationException">
@@ -55,10 +65,30 @@ namespace EtherBetClientLib.Models.Games.Poker
             throw new NotImplementedException();
         }
 
+
+        /// <summary>
+        /// Indicates if player can <see cref="Check"/> currently.
+        /// </summary>
+        /// <returns></returns>
+        public bool CanCheck()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         ///  Does "Fold" poker move, (ie, stops betting in this round and admit lose)
         /// </summary>
+        /// <exception cref="InvalidOperationException">If player is already fold or not his move</exception>
         public void Fold()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Indicates if player can <see cref="Fold"/> currently.
+        /// </summary>
+        /// <returns></returns>
+        public bool CanFold()
         {
             throw new NotImplementedException();
         }
@@ -73,22 +103,50 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <exception cref="InvalidOperationException">
         /// If this method is called when it is not this player turn
         /// Or player is already "Fold"
+        /// Or player not has <see cref="amount"/> of chips
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// if amount is less than <see cref="GetMinRaise"/> or player does not have enough funds
+        /// if amount is less than <see cref="GetMinRaise"/> or player does not have enough (<see cref="amount"/> funds
         /// </exception>
         public void Raise(int amount)
         {
             throw new NotImplementedException();
         }
 
+
         /// <summary>
-        /// Gets minimal amount of chips which can be used to call <see cref="Raise"/>
-        /// for example if method return 50 you can call <see cref="Raise"/> with 50 amount and above only
+        /// Gets minimum and maximum amount of chips that user can <see cref="Raise"/>
+        /// Or <code>default(Range)</code> if raise is not available at all
         /// </summary>
-        /// <exception cref="InvalidOperationException">if player is already "Fold"</exception>
+        /// <returns>
+        /// Range (inclusive) - For example (5, 10) you can call <see cref="Raise"/> which any of these parameters: 5, 6, 7, 8, 9, 10
+        /// </returns>
+        public Range CanRaise()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// Does "All-in" poker move. this move is always available,
+        /// only can not be used when player is already fold or not his turn
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// If this method is called when it is not this player turn
+        /// Or player is already "Fold"
+        /// Or player have 0 chips left currently, so can't bet anymore
+        /// </exception>
+        public void AllIn()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// Indicates if player can <see cref="AllIn"/> currently.
+        /// </summary>
         /// <returns></returns>
-        public int GetMinRaise()
+        public bool CanAllIn()
         {
             throw new NotImplementedException();
         }

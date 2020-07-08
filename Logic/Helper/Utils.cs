@@ -34,12 +34,13 @@ namespace EtherBetClientLib.Helper
 
         public static void ReadBlock(this Stream stream, byte[] buffer, int offset, int count)
         {
-            var receivedCount = 0;
+            var receivedCount = offset;
             while (receivedCount < count)
             {
                 receivedCount += stream.Read(buffer, receivedCount, count - receivedCount);
             }
         }
+
 
         public static byte[] ReadBlock(this Stream stream, int countToRead)
         {

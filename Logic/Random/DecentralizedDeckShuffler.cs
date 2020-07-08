@@ -11,44 +11,36 @@ namespace EtherBetClientLib.Random
     {
         public delegate Task SendEvent(List<BigInteger> shuffledDeck);
 
-        public delegate Task<List<BigInteger>> ReceiveFromEvent(PlayerBase player);
+        public delegate Task<List<BigInteger>> ReceiveFromEvent(Player player);
 
         public List<BigInteger> SourceDeck { get; }
-        public PokerRound Round { get; }
-        private SendEvent _send;
-        private ReceiveFromEvent _receiveFrom;
+        public IReadOnlyList<Player> Players { get; }
+        public SraCryptoProvider SraProvider { get; }
 
-        public DecentralizedDeckShuffler(SendEvent send, ReceiveFromEvent receiveFrom, List<BigInteger> sourceDeck, PokerRound round)
+        private readonly SendEvent _send;
+        private readonly ReceiveFromEvent _receiveFrom;
+
+        public DecentralizedDeckShuffler(SendEvent send, ReceiveFromEvent receiveFrom, List<BigInteger> sourceDeck, 
+            IReadOnlyList<Player> players, SraCryptoProvider encryptionProvider)
         {
             _send = send;
             _receiveFrom = receiveFrom;
             SourceDeck = sourceDeck;
-            Round = round;
+            Players = players;
+            SraProvider = encryptionProvider;
         }
 
         public async Task<List<BigInteger>> Shuffle()
         {
             var currentDeck = SourceDeck;
 
-            foreach (var player in Round.Players)
+            foreach (var player in Players)
             {
-                if (player == PlayerBase.Me)
+                if (player == Player.Me)
                 {
                     var shuffledCards = Shuffling.Shuffle(currentDeck);
-                    var provider = new SraCryptoProvider(Round.MyKeys);
+                    var provider = SraProvider;
                     var encryptedCards = shuffledCards.Select(n => provider.Encrypt(n)).ToList();
-                    await _send(encryptedCards);
-                }
-
-                currentDeck = await _receiveFrom(player);
-            }
-
-            foreach (var player in Round.Players)
-            {
-                if (player == PlayerBase.Me)
-                {
-                    var i = 0;
-                    var encryptedCards = currentDeck.Select(n => new SraCryptoProvider(Round.MyKeys2[i++]).Encrypt(n)).ToList();
                     await _send(encryptedCards);
                 }
 
