@@ -12,24 +12,26 @@ namespace EtherBetClientLib.Models
         public PokerPlayer[] Players { get; }
 
 
+        /// <summary>
+        /// Current bet amount for single player (not sum)
+        /// This value start with big blind value and can increase several time in round
+        /// as some players will do "Raise"
+        /// This value should be updated instantly after <see cref="MyPokerPlayer.Raise"/> is called, before cycle completed
+        /// After that, if other players will "Call" or "Fold" to that raised amount, it will stay unchanged,
+        /// But if someone will re-"Raise" this value will increase more instantly.
+        /// </summary>
         public int CurrentBetAmount { get; }
-
-        public int[] CurrentBets { get; }
 
         /// <summary>
         /// Deck card list after shuffling, cards are represented as encrypted bigIntegers
         /// </summary>
         public BigInteger[] ShuffledDeck { get; set; }
 
-        public SraParameters MyKey { get;  }
-
         public PokerRoundState State { get; set; }
 
-        public PokerRound(PokerPlayer[] players, SraParameters myKey)
+        public PokerRound(PokerPlayer[] players)
         {
             Players = players;
-            MyKey = myKey;
-            CurrentBets = new int[players.Length];
             State = PokerRoundState.NoStarted;
         }
 

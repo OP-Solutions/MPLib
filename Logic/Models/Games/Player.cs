@@ -8,7 +8,7 @@ namespace EtherBetClientLib.Models
     {
         public static Player Me { get; } = null;
 
-        public string Name { get; set; }
+        public string Name { get; protected set; }
         public PlayerNetworkClient NetworkClient { get; }
 
         public Player(string name, CngKey key, IPEndPoint endpointToConnect)

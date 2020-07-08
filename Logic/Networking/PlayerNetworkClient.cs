@@ -24,7 +24,7 @@ namespace EtherBetClientLib.Networking
         public SignerStream Stream { get; private set; }
         private AesCryptoServiceProvider _aesProvider;
 
-        private TcpClient _client;
+        private readonly TcpClient _client;
 
         public PlayerNetworkClient(string name, CngKey myKey, IPEndPoint endpoint)
         {
@@ -64,28 +64,27 @@ namespace EtherBetClientLib.Networking
             await controller.WriteEnumAsByteAsync(NetWorkCodes.AuthSuccess);
             var code = await controller.ReadByteAsEnumAsync<NetWorkCodes>();
             if (code != NetWorkCodes.AuthSuccess) throw new AuthenticationException();
+            OtherPartyKey = CngKey.Import(otherPartyPubKey, CngKeyBlobFormat.EccFullPublicBlob);
         }
 
         private async Task AgreeOnAesKeyAsync()
         {
-            using (var keyExchange = new ECDiffieHellmanCng())
-            {
-                var keySizeBytes = keyExchange.KeySize / 8;
-                var myPubKey = keyExchange.PublicKey.ToByteArray();
-                var remotePubKey = new byte[keySizeBytes];
+            using var keyExchange = new ECDiffieHellmanCng();
+            var keySizeBytes = keyExchange.KeySize / 8;
+            var myPubKey = keyExchange.PublicKey.ToByteArray();
+            var remotePubKey = new byte[keySizeBytes];
 
-                var stream = _client.GetStream();
-                var sendTask = stream.WriteAsync(myPubKey, 0, keySizeBytes);
-                var receiveTask = stream.ReadAsync(remotePubKey, 0, keySizeBytes);
-                await Task.WhenAll(sendTask, receiveTask);
+            var stream = _client.GetStream();
+            var sendTask = stream.WriteAsync(myPubKey, 0, keySizeBytes);
+            var receiveTask = stream.ReadAsync(remotePubKey, 0, keySizeBytes);
+            await Task.WhenAll(sendTask, receiveTask);
 
-                var remotePubKeyParsed = ECDiffieHellmanCngPublicKey.FromByteArray(remotePubKey, CngKeyBlobFormat.EccPublicBlob);
-                var sharedKey = keyExchange.DeriveKeyFromHash(remotePubKeyParsed, HashAlgorithmName.SHA256);
+            var remotePubKeyParsed = ECDiffieHellmanCngPublicKey.FromByteArray(remotePubKey, CngKeyBlobFormat.EccPublicBlob);
+            var sharedKey = keyExchange.DeriveKeyFromHash(remotePubKeyParsed, HashAlgorithmName.SHA256);
 
-                _aesProvider = new AesCryptoServiceProvider { Key = sharedKey };
-                var cryptoStream = new CryptoNetWorkStream(stream, _aesProvider);
-                Stream = new SignerStream(cryptoStream, null, null);
-            }
+            _aesProvider = new AesCryptoServiceProvider { Key = sharedKey };
+            var cryptoStream = new CryptoNetWorkStream(stream, _aesProvider);
+            Stream = new SignerStream(cryptoStream, null, null);
         }
 
     }

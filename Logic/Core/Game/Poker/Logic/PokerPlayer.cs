@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using EtherBetClientLib.Core.Game.General;
 
 namespace EtherBetClientLib.Models.Games.Poker
 {
     public class PokerPlayer : Player
     {
-        public int CurrentChipCount { get; set; }
         public PokerTable CurrentTable { get; set; }
         public PokerRound CurrentRound { get; set; }
+        public int CurrentChipAmount { get; set; }
         public int LeftChipsAfterBet { get; set; }
+        public int CurrentBetAmount { get; set; }
 
         public PokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect) : base(name, key, endpointToConnect)
         {
@@ -21,9 +24,8 @@ namespace EtherBetClientLib.Models.Games.Poker
 
     }
 
-    public class MyPokerPlayer : PokerPlayer
+    public class MyPokerPlayer : MyCardGamePlayer
     {
-
         public MyPokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect) : base(name, key, endpointToConnect)
         {
         }
