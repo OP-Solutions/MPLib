@@ -90,7 +90,7 @@ namespace EtherBetClientLib.Models.Games.Poker
         }
 
         /// <summary>
-        /// Does "Raise" poker move (raises current bet to specified total amount)
+        /// Does "Raise" poker move (raises current bet to specified total <paramref name="amount"/>)
         /// </summary>
         /// <param name="amount">
         /// Amount to raise to. This value is total, that means if user currently have to bet 50 but bets 100,
@@ -102,7 +102,7 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// Or player not has <see cref="amount"/> of chips
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// if amount is less than <see cref="GetMinRaise"/> or player does not have enough (<see cref="amount"/> funds
+        /// if amount is less than <see cref="GetMinRaise"/> or player does not have enough <paramref name="amount"/> funds
         /// </exception>
         public void Raise(int amount)
         {
