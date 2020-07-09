@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using EtherBetClientLib.Core.Game.Poker.Logic;
 using EtherBetClientLib.Crypto.Encryption.SRA;
 using EtherBetClientLib.Models.Games.Poker;
+using EtherBetClientLib.Models.Games.Poker.Interfaces;
 using EtherBetClientLib.Random;
 
 namespace EtherBetClientLib.Models
 {
     public class PokerRound
     {
-        public PokerPlayer[] Players { get; }
+        public IPokerPlayer[] Players { get; }
 
 
         /// <summary>
@@ -29,7 +31,7 @@ namespace EtherBetClientLib.Models
 
         public PokerRoundState State { get; set; }
 
-        public PokerRound(PokerPlayer[] players)
+        public PokerRound(OtherPokerPlayer[] players)
         {
             Players = players;
             State = PokerRoundState.NoStarted;
