@@ -18,28 +18,29 @@ namespace EtherBetClientLib.Random
 
         public List<BigInteger> SourceDeck { get; }
         public IReadOnlyList<Player> Players { get; }
+        public MyCardGamePlayer MyPlayer { get; }
         
         private readonly SendEvent _send;
         private readonly ReceiveFromEvent _receiveFrom;
 
         public DecentralizedDeckShuffler(SendEvent send, ReceiveFromEvent receiveFrom, List<BigInteger> sourceDeck, 
-            IReadOnlyList<Player> players)
+            IReadOnlyList<Player> players, MyCardGamePlayer myPlayer)
         {
             _send = send;
             _receiveFrom = receiveFrom;
             SourceDeck = sourceDeck;
             Players = players;
+            MyPlayer = myPlayer;
         }
 
         public async Task<List<BigInteger>> Shuffle()
         {
             var currentDeck = SourceDeck;
-            var me = (Player.Me as MyCardGamePlayer) ?? throw new InvalidOperationException();
-            var provider1 = new SraCryptoProvider(me.CurrentSraKey1);
+            var provider1 = new SraCryptoProvider(MyPlayer.CurrentSraKey1);
 
             foreach (var player in Players)
             {
-                if (player == me)
+                if (player == MyPlayer)
                 {
                     var shuffledCards = Shuffling.Shuffle(currentDeck);
                     var encryptedCards = shuffledCards.Select(n => provider1.Encrypt(n)).ToList();
@@ -51,14 +52,14 @@ namespace EtherBetClientLib.Random
 
             foreach (var player in Players)
             {
-                if (player == me)
+                if (player == MyPlayer)
                 {
                     var reEncryptedCards = new List<BigInteger>(currentDeck.Count);
                     for (var i = 0; i < currentDeck.Count; i++)
                     {
                         var card = currentDeck[i];
                         var decryptedCard = provider1.Decrypt(card);
-                        var provider2 = new SraCryptoProvider(me.CurrentSraKeys2[i]);
+                        var provider2 = new SraCryptoProvider(MyPlayer.CurrentSraKeys2[i]);
                         var cardReEncrypted = provider2.Encrypt(decryptedCard);
                         reEncryptedCards.Add(cardReEncrypted);
                     }
