@@ -22,6 +22,9 @@ namespace EtherBetClientLib.Models
         /// </summary>
         public int CurrentBetAmount { get; }
 
+
+        public int SumOfBet { get;  }
+
         /// <summary>
         /// Deck card list after shuffling, cards are represented as encrypted bigIntegers
         /// </summary>

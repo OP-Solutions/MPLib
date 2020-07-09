@@ -16,9 +16,15 @@ namespace EtherBetClientLib.Models.Games.Poker
         public int CurrentChipAmount { get; set; }
         public int LeftChipsAfterBet { get; set; }
         public int CurrentBetAmount { get; set; }
+        public bool IsFold { get; set; }
+        public bool IsTurn { get; set; }
+        public bool IsAllIn { get; set; }
+        public bool CheckFoldState { get; set; }
+        public bool CallAnyState { get; set; }
+
     }
 
-    public class MyPokerPlayer : MyCardGamePlayer
+    public class MyPokerPlayer : PokerPlayer
     {
         public MyPokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect)
         {
@@ -35,7 +41,20 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// </exception>
         public void Call()
         {
-            throw new NotImplementedException();
+            if (!CanCall())
+                throw new InvalidOperationException();
+            
+
+            if (CurrentRound.CurrentBetAmount - CurrentBetAmount >= CurrentChipAmount)
+            {
+                AllIn();
+            }
+            else
+            {
+                CurrentChipAmount -= (CurrentRound.CurrentBetAmount - CurrentBetAmount);
+                
+            }
+            
         }
 
 
@@ -45,7 +64,10 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <returns></returns>
         public bool CanCall()
         {
-            throw new NotImplementedException();
+            if (IsTurn && CurrentRound.CurrentBetAmount > CurrentBetAmount && !IsAllIn)
+                return true;
+
+            return false;
         }
 
         /// <summary>
@@ -68,7 +90,10 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <returns></returns>
         public bool CanCheck()
         {
-            throw new NotImplementedException();
+            if (IsTurn && CurrentRound.CurrentBetAmount == 0)
+                return true;
+
+            return false;
         }
 
         /// <summary>
@@ -146,5 +171,28 @@ namespace EtherBetClientLib.Models.Games.Poker
         {
             throw new NotImplementedException();
         }
+
+
+        public void ChangeCheckFoldState()
+        {
+            CheckFoldState = !CheckFoldState;
+        }
+
+        public bool IsCheckFoldMarked()
+        {
+            return CheckFoldState;
+        }
+
+        public void ChangeCallAnyState()
+        {
+            CallAnyState = !CallAnyState;
+        }
+
+        public bool IsCallAnyMarked()
+        {
+            return CallAnyState;
+        }
+
+
     }
 }
