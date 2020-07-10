@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EtherBetClientLib.Core.Game.Poker.Messaging;
 using EtherBetClientLib.Models;
+using EtherBetClientLib.Models.Games;
 
 namespace EtherBetClientLib.Networking
 {

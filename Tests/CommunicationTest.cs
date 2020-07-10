@@ -10,6 +10,7 @@ using EtherBetClientLib.Models;
 using EtherBetClientLib.Networking;
 using Xunit;
 using Xunit.Abstractions;
+using EtherBetClientLib.Models.Games;
 
 namespace SPRTest
 {
