@@ -30,7 +30,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
 
         public PokerRoundState State { get; set; }
 
-        public PokerRound(OtherPokerPlayer[] players)
+        public PokerRound(PokerPlayer[] players)
         {
             Players = players;
             State = PokerRoundState.NoStarted;

@@ -1,17 +1,25 @@
-﻿namespace EtherBetClientLib.Core.Game.Poker.Messaging
+﻿using System;
+
+namespace EtherBetClientLib.Core.Game.Poker.Messaging
 {
     public class Package
     {
         /// <summary>
-        /// Ethereum address of sender
+        /// Sender's public key
         /// </summary>
         public string Sender { get; set; }
 
         /// <summary>
-        /// Ethereum address of destination
+        /// Destination's public key
         /// </summary>
         public string Destination { get; set; }
 
-        public Message Message { get; set; }
+        public DateTime TimeStampUtc { get; set; }
+
+        public IMessage Message { get; set; }
+    }
+
+    public interface IMessage
+    {
     }
 }

@@ -14,21 +14,9 @@ namespace EtherBetClientLib.Models.Games
         public CngKey Key { get; set; }
 
         public string Name { get; set; }
-    }
 
-    public class OtherPlayer : Player
-    {
         public PlayerNetworkClient NetworkClient { get; }
-
-        public CngKey Key { get; set; }
-        public string Name { get; set; }
-
-        public OtherPlayer(PlayerNetworkClient client)
-        {
-            NetworkClient = client;
-        }
     }
-
 
     public class MyPlayer : Player
     {
