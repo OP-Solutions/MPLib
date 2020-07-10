@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using EtherBetClientLib.Models;
+using EtherBetClientLib.Models.Games;
 using EtherBetClientLib.Networking;
 using Xunit;
 using Xunit.Abstractions;
