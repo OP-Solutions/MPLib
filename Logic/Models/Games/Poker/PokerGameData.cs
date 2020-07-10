@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using EtherBetClientLib.Core.Game.Poker.PokerLogic.PokerCombinations;
+using EtherBetClientLib.Models.Games.CardGameModels;
+using EtherBetClientLib.Models.Games.Poker.PokerCombinations;
 
-namespace EtherBetClientLib.Core.Game.Poker.PokerLogic
+namespace EtherBetClientLib.Models.Games.Poker
 {
     /// <summary>
     /// Class for storing essential variables and constraints

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace EtherBetClientLib.Models
+namespace EtherBetClientLib.Models.Games
 {
     public abstract class GameTableBase
     {

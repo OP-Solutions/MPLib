@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using EtherBetClientLib.Models.Games;
 
-namespace EtherBetClientLib.Models.Games.Poker
+namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
     public class PokerTable : GameTableBase
     {

@@ -1,4 +1,6 @@
-﻿namespace EtherBetClientLib.Core.Game.Poker.PokerLogic.PokerCombinations
+﻿using EtherBetClientLib.Models.Games.CardGameModels;
+
+namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
 {
     /// <summary>
     /// The straight flush combination

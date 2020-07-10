@@ -1,4 +1,4 @@
-﻿namespace EtherBetClientLib.Core.Game.Poker.PokerLogic
+﻿namespace EtherBetClientLib.Models.Games.CardGameModels
 {
     /// <summary>
     /// Card suits
