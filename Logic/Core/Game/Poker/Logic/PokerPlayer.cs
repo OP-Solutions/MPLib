@@ -16,8 +16,5 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         public int LeftChipsAfterBet { get; set; }
         public int CurrentBetAmount { get; set; }
 
-        public PokerPlayer(PlayerNetworkClient client)
-        {
-        }
     }
 }
