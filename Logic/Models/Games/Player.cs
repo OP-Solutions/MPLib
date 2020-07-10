@@ -16,17 +16,12 @@ namespace EtherBetClientLib.Models.Games
         public string Name { get; set; }
 
         public PlayerNetworkClient NetworkClient { get; }
+
+        public bool IsMyPlayer() => this is MyPlayer;
     }
 
     public class MyPlayer : Player
     {
-        public string Name { get; set; }
-
-        /// <summary>
-        /// ECDSA singing key of player. this property contains full (private + public) key if this player is "our" (local)  player
-        /// Otherwise if this player is remotely connected this property contains only public key
-        /// </summary>
-        public CngKey Key { get; set; }
     }
 
 }

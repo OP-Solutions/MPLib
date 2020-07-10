@@ -19,6 +19,7 @@
     <PackageReference Include="System.Security.Cryptography.Cng" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Models\Games\Poker\Interfaces\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 </Project>

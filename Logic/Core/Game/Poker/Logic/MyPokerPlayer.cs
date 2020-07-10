@@ -2,23 +2,23 @@
 using System.Net;
 using System.Security.Cryptography;
 using EtherBetClientLib.Core.Game.General;
-using EtherBetClientLib.Models.Games.Poker.Interfaces;
+using EtherBetClientLib.Crypto.Encryption.SRA;
 
 namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
-    public class MyPokerPlayer : MyCardGamePlayer, IPokerPlayer
+    public class MyPokerPlayer : PokerPlayer, IMyCardGamePlayer
     {
+        public bool AutoCheckFoldEnabled { get; set; }
+        public bool AutoCallEnabled { get; set; }
 
-        public PokerTable CurrentTable { get; set; }
-        public PokerRound CurrentRound { get; set; }
-        public int CurrentChipAmount { get; set; }
-        public int LeftChipsAfterBet { get; set; }
-        public int CurrentBetAmount { get; set; }
-        public bool IsFold { get; set; }
-        public bool IsTurn { get; set; }
-        public bool IsAllIn { get; set; }
-        public bool CheckFoldState { get; set; }
-        public bool CallAnyState { get; set; }
+
+        #region Internal Properties
+        internal PokerTable CurrentTable { get; set; }
+        internal PokerRound CurrentRound { get; set; }
+
+        SraParameters IMyCardGamePlayer.CurrentSraKey1 { get; set; }
+        SraParameters[] IMyCardGamePlayer.CurrentSraKeys2 { get; set; } 
+        #endregion
 
         public MyPokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect)
         {
@@ -169,28 +169,5 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         {
             throw new NotImplementedException();
         }
-
-
-        public void ChangeCheckFoldState()
-        {
-            CheckFoldState = !CheckFoldState;
-        }
-
-        public bool IsCheckFoldMarked()
-        {
-            return CheckFoldState;
-        }
-
-        public void ChangeCallAnyState()
-        {
-            CallAnyState = !CallAnyState;
-        }
-
-        public bool IsCallAnyMarked()
-        {
-            return CallAnyState;
-        }
-
-
     }
 }
