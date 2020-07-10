@@ -1,17 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Numerics;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using EtherBetClientLib.Core.Game.General;
 using EtherBetClientLib.Models.Games.Poker.Interfaces;
 
-namespace EtherBetClientLib.Models.Games.Poker
+namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
     public class MyPokerPlayer : MyCardGamePlayer, IPokerPlayer
     {
+
+        public PokerTable CurrentTable { get; set; }
+        public PokerRound CurrentRound { get; set; }
+        public int CurrentChipAmount { get; set; }
+        public int LeftChipsAfterBet { get; set; }
+        public int CurrentBetAmount { get; set; }
+        public bool IsFold { get; set; }
+        public bool IsTurn { get; set; }
+        public bool IsAllIn { get; set; }
+        public bool CheckFoldState { get; set; }
+        public bool CallAnyState { get; set; }
+
         public MyPokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect)
         {
         }
@@ -34,13 +42,12 @@ namespace EtherBetClientLib.Models.Games.Poker
             if (CurrentRound.CurrentBetAmount - CurrentBetAmount >= CurrentChipAmount)
             {
                 AllIn();
+                return;
             }
-            else
-            {
-                CurrentChipAmount -= (CurrentRound.CurrentBetAmount - CurrentBetAmount);
-                
-            }
+
             
+            CurrentChipAmount -= (CurrentRound.CurrentBetAmount - CurrentBetAmount);
+
         }
 
 
@@ -50,7 +57,7 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <returns></returns>
         public bool CanCall()
         {
-            if (IsTurn && CurrentRound.CurrentBetAmount > CurrentBetAmount && !IsAllIn)
+            if (IsTurn && CurrentRound.CurrentBetAmount > CurrentBetAmount && !IsAllIn && !IsFold)
                 return true;
 
             return false;
@@ -66,7 +73,10 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// </exception>
         public void Check()
         {
-            throw new NotImplementedException();
+            if(!CanCheck())
+                throw new InvalidOperationException();
+
+
         }
 
 
@@ -76,7 +86,7 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <returns></returns>
         public bool CanCheck()
         {
-            if (IsTurn && CurrentRound.CurrentBetAmount == 0)
+            if (IsTurn && CurrentRound.CurrentBetAmount - CurrentBetAmount == 0 && !IsFold)
                 return true;
 
             return false;
@@ -88,7 +98,9 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <exception cref="InvalidOperationException">If player is already fold or not his move</exception>
         public void Fold()
         {
-            throw new NotImplementedException();
+            if(!CanFold())
+                throw new InvalidOperationException();
+
         }
 
         /// <summary>
@@ -157,16 +169,6 @@ namespace EtherBetClientLib.Models.Games.Poker
         {
             throw new NotImplementedException();
         }
-        public PokerTable CurrentTable { get; set; }
-        public PokerRound CurrentRound { get; set; }
-        public int CurrentChipAmount { get; set; }
-        public int LeftChipsAfterBet { get; set; }
-        public int CurrentBetAmount { get; set; }
-        public bool IsFold { get; set; }
-        public bool IsTurn { get; set; }
-        public bool IsAllIn { get; set; }
-        public bool CheckFoldState { get; set; }
-        public bool CallAnyState { get; set; }
 
 
         public void ChangeCheckFoldState()

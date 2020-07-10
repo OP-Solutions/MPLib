@@ -1,5 +1,6 @@
 ﻿using System;
 using EtherBetClientLib.Models;
+using EtherBetClientLib.Models.Games;
 
 namespace EtherBetClientLib.Lobby
 {

@@ -1,4 +1,4 @@
-﻿namespace EtherBetClientLib.Core.Game.Poker.PokerLogic
+﻿namespace EtherBetClientLib.Models.Games.Poker
 {
     public enum CombinationType
     {

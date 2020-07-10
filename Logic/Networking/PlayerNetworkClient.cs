@@ -8,6 +8,7 @@ using EtherBetClientLib.Core.Game.General;
 using EtherBetClientLib.Crypto;
 using EtherBetClientLib.Helper;
 using EtherBetClientLib.Models;
+using EtherBetClientLib.Models.Games;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto.IO;
 using Org.BouncyCastle.X509;

@@ -1,6 +1,7 @@
 ﻿using System;
+using EtherBetClientLib.Models.Games.CardGameModels;
 
-namespace EtherBetClientLib.Core.Game.Poker.PokerLogic
+namespace EtherBetClientLib.Models.Games.Poker
 {
     /// <summary>
     /// Card array that builds poker combination

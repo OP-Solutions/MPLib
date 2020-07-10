@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EtherBetClientLib.Core.Game.General;
 using EtherBetClientLib.Crypto.Encryption.SRA;
 using EtherBetClientLib.Models;
+using EtherBetClientLib.Models.Games;
 using EtherBetClientLib.Models.Games.Poker;
 
 namespace EtherBetClientLib.Random

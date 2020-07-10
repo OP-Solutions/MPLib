@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Numerics;
 using System.Threading.Tasks;
-using EtherBetClientLib.Core.Game.Poker.Logic;
-using EtherBetClientLib.Crypto.Encryption.SRA;
-using EtherBetClientLib.Models.Games.Poker;
 using EtherBetClientLib.Models.Games.Poker.Interfaces;
-using EtherBetClientLib.Random;
 
-namespace EtherBetClientLib.Models
+namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
     public class PokerRound
     {
