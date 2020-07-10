@@ -6,25 +6,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using EtherBetClientLib.Core.Game.General;
+using EtherBetClientLib.Models.Games.Poker.Interfaces;
 
 namespace EtherBetClientLib.Models.Games.Poker
 {
-    public class PokerPlayer : Player
-    {
-        public PokerTable CurrentTable { get; set; }
-        public PokerRound CurrentRound { get; set; }
-        public int CurrentChipAmount { get; set; }
-        public int LeftChipsAfterBet { get; set; }
-        public int CurrentBetAmount { get; set; }
-        public bool IsFold { get; set; }
-        public bool IsTurn { get; set; }
-        public bool IsAllIn { get; set; }
-        public bool CheckFoldState { get; set; }
-        public bool CallAnyState { get; set; }
-
-    }
-
-    public class MyPokerPlayer : PokerPlayer
+    public class MyPokerPlayer : MyCardGamePlayer, IPokerPlayer
     {
         public MyPokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect)
         {
@@ -171,6 +157,16 @@ namespace EtherBetClientLib.Models.Games.Poker
         {
             throw new NotImplementedException();
         }
+        public PokerTable CurrentTable { get; set; }
+        public PokerRound CurrentRound { get; set; }
+        public int CurrentChipAmount { get; set; }
+        public int LeftChipsAfterBet { get; set; }
+        public int CurrentBetAmount { get; set; }
+        public bool IsFold { get; set; }
+        public bool IsTurn { get; set; }
+        public bool IsAllIn { get; set; }
+        public bool CheckFoldState { get; set; }
+        public bool CallAnyState { get; set; }
 
 
         public void ChangeCheckFoldState()
