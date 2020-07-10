@@ -2,7 +2,7 @@
 
 namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
-    class ShuffleMessage : Message
+    class ShuffleMessage : PokerMessage
     {
         public BigInteger[] Cards { get; set; }
 

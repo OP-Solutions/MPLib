@@ -8,14 +8,15 @@ using EtherBetClientLib.Networking;
 
 namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
-    public class OtherPokerPlayer : OtherPlayer, IPokerPlayer
+    public class PokerPlayer : Player, IPokerPlayer
     {
         public PokerTable CurrentTable { get; set; }
         public PokerRound CurrentRound { get; set; }
         public int CurrentChipAmount { get; set; }
         public int LeftChipsAfterBet { get; set; }
         public int CurrentBetAmount { get; set; }
-        public OtherPokerPlayer(PlayerNetworkClient client) : base(client)
+
+        public PokerPlayer(PlayerNetworkClient client)
         {
         }
     }

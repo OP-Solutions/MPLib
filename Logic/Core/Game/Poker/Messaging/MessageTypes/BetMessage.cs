@@ -1,6 +1,6 @@
 ﻿namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
-    public class BetMessage : Message
+    public class BetMessage : PokerMessage
     {
         public double BetValue;
     }

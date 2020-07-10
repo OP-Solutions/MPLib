@@ -22,7 +22,7 @@ namespace EtherBetClientLib.Networking
         public MyPlayer MyPlayer { get; set; }
 
 
-        public OtherPlayer RemotePlayer { get; set; }
+        public Player RemotePlayer { get; set; }
 
         /// <summary>
         /// Remote player's endpoint
@@ -41,7 +41,7 @@ namespace EtherBetClientLib.Networking
             _client = new TcpClient(endpointToConnect);
         }
 
-        public async Task<OtherPlayer> Connect()
+        public async Task<Player> Connect()
         {
             if (!_client.Connected)
             {

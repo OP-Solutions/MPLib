@@ -1,6 +1,6 @@
 ﻿namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
-    class RoundStampMessage : Message
+    class RoundStampMessage : PokerMessage
     {
         /// <summary>
         /// Unique Identifier Of Table this round belongs to
