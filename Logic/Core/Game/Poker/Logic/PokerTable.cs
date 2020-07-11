@@ -6,7 +6,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
     public class PokerTable : GameTableBase
     {
-        public double CurrentSmallBlind { get; private set; }
+        public int CurrentSmallBlind { get; private set; }
         public int CurrentSmallBlindPlayerIndex { get; set; }
 
         /// <summary>

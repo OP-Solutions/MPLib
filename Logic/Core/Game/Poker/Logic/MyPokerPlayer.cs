@@ -154,7 +154,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
 
             if (CanCheck() && !HasRaised && !IsAllIn)
             {
-                Index startIndex = new Index((int)Math.Min(CurrentTable.CurrentSmallBlind * 2, (double)CurrentChipAmount));
+                Index startIndex = new Index(Math.Min(CurrentTable.CurrentSmallBlind * 2, CurrentChipAmount));
                 Index endIndex = new Index(CurrentChipAmount);
                 betRange = new Range(startIndex, endIndex);
                 return true;
@@ -204,7 +204,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
 
             if (CanCall() && !HasRaised)
             {
-                Index startIndex = new Index((int)Math.Min(CurrentTable.CurrentSmallBlind * 2, (double)CurrentChipAmount));
+                Index startIndex = new Index(Math.Min(CurrentTable.CurrentSmallBlind * 2, CurrentChipAmount));
                 Index endIndex = new Index(CurrentChipAmount);
                 raiseRange = new Range(startIndex, endIndex);
                 return true;

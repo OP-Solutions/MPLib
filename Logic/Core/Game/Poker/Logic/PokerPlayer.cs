@@ -72,6 +72,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         public bool IsFold { get; set; }
         public bool IsTurn { get; set; }
         public bool IsAllIn { get; set; }
+        public bool HasRaised { get; set; }
 
         internal PokerTable CurrentTable { get; set; }
         internal PokerRound CurrentRound { get; set; }

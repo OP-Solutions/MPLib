@@ -44,7 +44,33 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         public async Task ProcessRound()
         {
             State = PokerRoundState.BeforeDeckShuffle;
+
             throw new NotImplementedException();
+        }
+
+        private void PlaceBlinds()
+        {
+            
+        }
+
+        private void DealCards()
+        {
+
+        }
+
+        private void RoundFlop()
+        {
+
+        }
+
+        private void RoundTurn()
+        {
+
+        }
+
+        private void RoundRiver()
+        {
+
         }
 
     }
