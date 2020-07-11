@@ -25,7 +25,7 @@ namespace EtherBetClientLib.Core.Game.General
         /// Except verification, this key is not used is actual gaming process, it is used to shuffle cards
         /// After shuffling card encrypted with that key and re-encrypted (<see cref="CurrentSraKeys2"/>)
         /// </summary>
-         SraParameters CurrentSraKey1 { get; set; }
+        internal SraParameters CurrentSraKey1 { get; set; }
 
 
         /// <summary>
@@ -36,6 +36,6 @@ namespace EtherBetClientLib.Core.Game.General
         /// After shuffling player decrypts all card encrypted with <see cref="CurrentSraKey1"/> and
         /// and re-encrypts them each one with separate keys (<see cref="CurrentSraKey1"/> key was used on all before this step)
         /// </summary>
-        SraParameters[] CurrentSraKeys2 { get; set; }
+        internal SraParameters[] CurrentSraKeys2 { get; set; }
     }
 }

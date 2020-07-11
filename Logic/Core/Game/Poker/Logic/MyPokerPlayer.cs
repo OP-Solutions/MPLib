@@ -59,7 +59,6 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         {
             if (IsTurn && CurrentRound.CurrentBetAmount > CurrentBetAmount && !IsAllIn && !IsFold)
                 return true;
-
             return false;
         }
 
