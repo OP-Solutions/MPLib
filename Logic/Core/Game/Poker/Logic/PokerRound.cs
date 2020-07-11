@@ -23,6 +23,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
 
         public int SumOfBet { get;  }
 
+
         /// <summary>
         /// Deck card list after shuffling, cards are represented as encrypted bigIntegers
         /// </summary>
@@ -46,6 +47,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
             State = PokerRoundState.BeforeDeckShuffle;
             throw new NotImplementedException();
         }
+
     }
 
     public enum PokerRoundState
