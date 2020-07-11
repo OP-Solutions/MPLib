@@ -1,13 +1,53 @@
 ﻿using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using EtherBetClientLib.Models.Games;
 
 namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
     public class PokerRound
     {
-        public PokerPlayer[] Players { get; }
 
+        #region Events
+
+        public event Action<PokerRoundState> StateChanges;
+
+
+        /// <summary>
+        /// <see cref="PokerPlayer.ThisPlayerMoveCompleted"/>
+        /// </summary>
+        public event PokerPlayerMoveEventHandler AnyPlayerMoveCompleted;
+
+        /// <summary>
+        /// same as <see cref="AnyPlayerMoveCompleted"/>, but not fires on my player move, fires only when other player does any poker move
+        /// </summary>
+        public event PokerPlayerMoveEventHandler OtherPlayerMoveCompleted;
+
+        /// <summary>
+        /// same as <see cref="AnyPlayerMoveCompleted"/>, but not fires on other player move, fires only when my player does any poker move
+        /// </summary>
+        public event PokerPlayerMoveEventHandler MyPlayerMoveCompleted;
+
+
+        /// <summary>
+        /// <see cref="PokerPlayer.ThisPlayerMoveReceived"/>
+        /// </summary>
+        public event PokerPlayerMoveEventHandler AnyPlayerMoveReceived;
+
+        /// <summary>
+        /// same as <see cref="AnyPlayerMoveReceived"/>, but not fires on my player move, fires only when other player does any poker move
+        /// </summary>
+        public event PokerPlayerMoveEventHandler OtherPlayerMoveReceived;
+
+
+        /// <summary>
+        /// same as <see cref="AnyPlayerMoveReceived"/>, but not fires on other player move, fires only when my player does any poker move
+        /// </summary>
+        public event PokerPlayerMoveEventHandler MyPlayerMoveReceived;
+
+        #endregion
+
+        public PokerPlayer[] Players { get; }
 
         /// <summary>
         /// Current bet amount for single player (not sum)
@@ -20,15 +60,19 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         public int CurrentBetAmount { get; }
 
 
+        /// <summary>
+        /// Current sum of all player bets done in this round until thi time
+        /// </summary>
         public int SumOfBet { get;  }
+
+        public PokerRoundState State { get; set; }
+
 
 
         /// <summary>
         /// Deck card list after shuffling, cards are represented as encrypted bigIntegers
         /// </summary>
-        public BigInteger[] ShuffledDeck { get; set; }
-
-        public PokerRoundState State { get; set; }
+        private BigInteger[] ShuffledDeck { get; set; }
 
         public PokerRound(PokerPlayer[] players)
         {
@@ -71,6 +115,48 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         private void RoundRiver()
         {
 
+        }
+
+    }
+
+
+    public class PokerPlayerMoveInfo
+    {
+        public PokerPlayerMoveType Type { get; }
+
+
+        private int _fullBetAmount { get; set; }
+        private int _extraBetAmount { get; set; }
+
+
+        public PokerPlayerMoveInfo(PokerPlayerMoveType type, int fullBetAmount, int extraBetAmount)
+        {
+            Type = type;
+            _fullBetAmount = fullBetAmount;
+            _extraBetAmount = extraBetAmount;
+        }
+
+        /// <summary>
+        /// Full bet amount of player move. this is 0 in case of "Check" and throws <see cref="InvalidOperationException"/> in case of "Fold"
+        /// </summary>
+        public int FullBetAmount {
+            get
+            {
+                if(Type == PokerPlayerMoveType.Fold) throw new InvalidOperationException("Player can't get bet amount of move when move is \"Fold\" ");
+                return _fullBetAmount;
+            }
+        }
+
+
+        /// <summary>
+        /// Extra bet amount of player move. this is 0 in case of "Check", "Call" and throws <see cref="InvalidOperationException"/> in case of "Fold"
+        /// </summary>
+        public int ExtraBetAmount {
+            get
+            {
+                if (Type == PokerPlayerMoveType.Fold) throw new InvalidOperationException("Player can't get bet amount of move when move is \"Fold\" ");
+                return _fullBetAmount;
+            }
         }
 
     }

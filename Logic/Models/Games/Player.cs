@@ -18,10 +18,12 @@ namespace EtherBetClientLib.Models.Games
         public PlayerNetworkClient NetworkClient { get; }
 
         public bool IsMyPlayer() => this is MyPlayer;
+
     }
 
     public class MyPlayer : Player
     {
     }
+
 
 }
