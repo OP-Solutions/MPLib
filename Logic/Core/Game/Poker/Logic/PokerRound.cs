@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Numerics;
 using System.Threading.Tasks;
-using EtherBetClientLib.Models.Games.Poker.Interfaces;
 
 namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
     public class PokerRound
     {
-        public IPokerPlayer[] Players { get; }
+        public PokerPlayer[] Players { get; }
 
 
         /// <summary>
