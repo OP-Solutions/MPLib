@@ -11,9 +11,6 @@ using EtherBetClientLib.Crypto;
 using EtherBetClientLib.Helper;
 using EtherBetClientLib.Models;
 using EtherBetClientLib.Models.Games;
-using Org.BouncyCastle.Asn1.X509;
-using Org.BouncyCastle.Crypto.IO;
-using Org.BouncyCastle.X509;
 
 namespace EtherBetClientLib.Networking
 {
@@ -29,7 +26,7 @@ namespace EtherBetClientLib.Networking
         /// </summary>
         public IPEndPoint Endpoint { get; set; }
 
-        public SignerStream Stream { get; private set; }
+        public Stream Stream { get; private set; }
         private AesCryptoServiceProvider _aesProvider;
 
         private readonly TcpClient _client;
@@ -103,7 +100,7 @@ namespace EtherBetClientLib.Networking
 
             _aesProvider = new AesCryptoServiceProvider { Key = sharedKey };
             var cryptoStream = new CryptoNetWorkStream(stream, _aesProvider);
-            Stream = new SignerStream(cryptoStream, null, null);
+            Stream = cryptoStream;
         }
 
         public override void Flush()

@@ -12,7 +12,6 @@ using EtherBetClientLib.Core.Game.Poker.Messaging;
 using EtherBetClientLib.Helper;
 using EtherBetClientLib.Models;
 using EtherBetClientLib.Models.Games;
-using Org.BouncyCastle.Crypto.Signers;
 using ProtoBuf;
 
 namespace EtherBetClientLib.Networking
