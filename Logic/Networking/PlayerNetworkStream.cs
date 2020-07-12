@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography;
@@ -15,11 +17,8 @@ using Org.BouncyCastle.X509;
 
 namespace EtherBetClientLib.Networking
 {
-    public class PlayerNetworkClient
+    public class PlayerNetworkStream : Stream
     {
-        public string Name { get; set; }
-
-
         public MyPlayer MyPlayer { get; set; }
 
 
@@ -35,7 +34,7 @@ namespace EtherBetClientLib.Networking
 
         private readonly TcpClient _client;
 
-        public PlayerNetworkClient(MyPlayer myPlayer, IPEndPoint endpointToConnect)
+        public PlayerNetworkStream(MyPlayer myPlayer, IPEndPoint endpointToConnect)
         {
             MyPlayer = myPlayer;
             Endpoint = endpointToConnect;
@@ -69,13 +68,14 @@ namespace EtherBetClientLib.Networking
             var controller = new StreamController(stream);
             using var randomProvider = new RNGCryptoServiceProvider();
             var myRandom = new byte[32];
-            var pubKey = MyPlayer.Key.Export(CngKeyBlobFormat.EccPublicBlob);
+            var pubKey = MyPlayer.Key.Export(CngKeyBlobFormat.EccFullPublicBlob);
             await controller.WriteBytesOpaque16Async(pubKey);
             await controller.WriteBytesOpaque8Async(myRandom);
             var otherPartyPubKey  = await controller.ReadBytesOpaque16Async();
             var otherPartyRandom = await controller.ReadBytesOpaque8Async();
             var signer = new ECDsaCng(MyPlayer.Key);
-            var verifier = new ECDsaCng(CngKey.Import(otherPartyPubKey, CngKeyBlobFormat.EccFullPublicBlob));
+            var remotePlayerKey = CngKey.Import(otherPartyPubKey, CngKeyBlobFormat.EccPublicBlob);
+            var verifier = new ECDsaCng(remotePlayerKey);
             var mySignature = signer.SignData(otherPartyRandom, HashAlgorithmName.SHA256);
             await controller.WriteBytesOpaque16Async(mySignature);
             var otherPartySignature = await controller.ReadBytesOpaque8Async();
@@ -83,7 +83,7 @@ namespace EtherBetClientLib.Networking
             await controller.WriteEnumAsByteAsync(NetWorkCodes.AuthSuccess);
             var code = await controller.ReadByteAsEnumAsync<NetWorkCodes>();
             if (code != NetWorkCodes.AuthSuccess) throw new AuthenticationException();
-            RemotePlayer.Key = CngKey.Import(otherPartyPubKey, CngKeyBlobFormat.EccFullPublicBlob);
+            RemotePlayer.Key = remotePlayerKey;
         }
 
         private async Task AgreeOnAesKeyAsync()
@@ -106,5 +106,34 @@ namespace EtherBetClientLib.Networking
             Stream = new SignerStream(cryptoStream, null, null);
         }
 
+        public override void Flush()
+        {
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool CanRead { get; }
+        public override bool CanSeek { get; }
+        public override bool CanWrite { get; }
+        public override long Length { get; }
+        public override long Position { get; set; }
     }
 }

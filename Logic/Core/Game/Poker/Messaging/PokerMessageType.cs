@@ -1,6 +1,6 @@
 ﻿namespace EtherBetClientLib.Core.Game.Poker.Messaging
 {
-    public enum MessageType
+    public enum PokerMessageType
     {
         RoundStamp,
         Shuffle,

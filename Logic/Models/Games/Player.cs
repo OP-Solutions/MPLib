@@ -15,7 +15,7 @@ namespace EtherBetClientLib.Models.Games
 
         public string Name { get; set; }
 
-        public PlayerNetworkClient NetworkClient { get; }
+        public PlayerNetworkStream NetworkStream { get; }
 
         public bool IsMyPlayer() => this is MyPlayer;
 
