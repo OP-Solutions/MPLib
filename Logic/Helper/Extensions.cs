@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace EtherBetClientLib.Helper
 {
-    public static class Utils
+    public static class Extensions
     {
         public static byte[] FromHex(this string hexStr)
         {
@@ -65,5 +65,16 @@ namespace EtherBetClientLib.Helper
 
             return receiveBuffer;
         }
+
+
+        public static async Task ReadBlockAsync(this Stream stream, byte[] buffer, int offset, int count)
+        {
+            var receivedCount = offset;
+            while (receivedCount < count)
+            {
+                receivedCount += await stream.ReadAsync(buffer, receivedCount, count - receivedCount);
+            }
+        }
+
     }
 }

@@ -16,7 +16,7 @@ using ProtoBuf;
 
 namespace EtherBetClientLib.Networking
 {
-    public class MessageManager : IMessageManager
+    public class MessageManager<TBaseMessageType> : IMessageManager<TBaseMessageType> where TBaseMessageType : IMessage
     {
         /// <summary>
         /// Source identifier to send along with messages. (so remote party knows where messages are coming from)
@@ -41,7 +41,7 @@ namespace EtherBetClientLib.Networking
 
         private readonly Stream _targetStream;
 
-        private ECDsa _signer;
+        private readonly ECDsa _signer;
 
         public MessageManager(string sourceIdentifierToSend, string destinationIdentifierToSend, CngKey localKey, CngKey remoteExceptedPublicKey, Stream targetStream)
         {
@@ -50,13 +50,13 @@ namespace EtherBetClientLib.Networking
             _localKey = localKey;
             _remoteExceptedPublicKey = remoteExceptedPublicKey;
             _targetStream = targetStream;
-            _signer = new ECDsaCng()
+            _signer = new ECDsaCng(localKey)
             {
                 HashAlgorithm = CngAlgorithm.Sha256,
             };
         }
 
-        public async Task SendMessage(IMessage message)
+        public async Task SendMessage(TBaseMessageType message)
         {
             var package = new Package()
             {
@@ -69,10 +69,17 @@ namespace EtherBetClientLib.Networking
             try
             {
                 await using var stream = new MemoryStream(buffer);
-                var controller = new StreamController(stream);
+                stream.Position = 2;
                 Serializer.Serialize(stream, package);
-                var signature = _signer.SignData(stream.GetBuffer(), 0, (int)stream.Position, HashAlgorithmName.SHA256);
-                await controller.WriteBytesOpaque16Async(signature);
+                var pos = (int)stream.Position;
+                var len = pos - 2;
+                buffer[0] = (byte)len;
+                buffer[1] = (byte)(len >> 8);
+                var signature = _signer.SignData(buffer, 2, len, HashAlgorithmName.SHA256);
+                stream.Position += 2;
+                var signatureLen = signature.Length;
+                buffer[pos] = (byte)signatureLen;
+                buffer[pos + 1] = (byte)(signatureLen >> 8);
                 await stream.CopyToAsync(_targetStream);
             }
             finally
@@ -82,31 +89,54 @@ namespace EtherBetClientLib.Networking
             
         }
 
-        public async Task<Message> ReadMessage()
+        public async Task<T> ReadMessage<T>() where T : TBaseMessageType
         {
-            throw new NotImplementedException();
+            var buffer = ArrayPool<byte>.Shared.Rent(1024 * 32);
+            try
+            {
+                var controller = new StreamController(_targetStream);
+                var dataLen = await controller.ReadBytesOpaque16Async(buffer, 0);
+                var signature = _signer.SignData(buffer, 0 , dataLen, HashAlgorithmName.SHA256);
+                if(!_signer.VerifyData(buffer, 0, dataLen, signature, HashAlgorithmName.SHA256)) throw new Exception();
+                var package = Serializer.Deserialize<Package>(new ReadOnlySpan<byte>(buffer, 0, dataLen));
+                package.Signature = signature;
+                return (T)package.Message;
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
         }
     }
 
-    public interface IMessageManager
+    public interface IMessageManager<in TBaseMessageType> : IMessageSender<TBaseMessageType>, IMessageReceiver<TBaseMessageType> where TBaseMessageType : IMessage
     {
-        Task SendMessage(IMessage message);
+    }
+
+    public interface IMessageSender<in TBaseMessageType> where TBaseMessageType : IMessage
+    {
+        Task SendMessage(TBaseMessageType message);
+    }
+
+    public interface IMessageReceiver<in TBaseMessageType> where TBaseMessageType : IMessage
+    {
+        Task<T> ReadMessage<T>() where T : TBaseMessageType;
     }
 
 
-    public class BroadCastMessageManager : IMessageManager
+    public class BroadCastMessageSender<TBaseMessageType> : IMessageSender<TBaseMessageType> where TBaseMessageType : IMessage
     {
 
-        private readonly IMessageManager[] _targetSenders;
+        private readonly IMessageSender<TBaseMessageType>[] _targetManagers;
 
-        public BroadCastMessageManager(IMessageManager[] targetSenders)
+        public BroadCastMessageSender(IMessageSender<TBaseMessageType>[] targetManagers)
         {
-            _targetSenders = targetSenders;
+            _targetManagers = targetManagers;
         }
 
-        public async Task SendMessage(IMessage message)
+        public async Task SendMessage(TBaseMessageType message)
         {
-            var tasks = _targetSenders.Select(s => s.SendMessage(message));
+            var tasks = _targetManagers.Select(s => s.SendMessage(message));
             await Task.WhenAll(tasks);
         }
     }
