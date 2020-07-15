@@ -68,8 +68,7 @@ namespace EtherBetClientLib.Networking
             var buffer = ArrayPool<byte>.Shared.Rent(1024 * 32);
             try
             {
-                await using var stream = new MemoryStream(buffer);
-                stream.Position = 2;
+                await using var stream = new MemoryStream(buffer) { Position = 2 };
                 Serializer.Serialize(stream, package);
                 var pos = (int)stream.Position;
                 var len = pos - 2;

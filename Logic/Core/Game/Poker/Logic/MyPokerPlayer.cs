@@ -14,9 +14,6 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
 
 
         #region Internal Properties
-        internal PokerTable CurrentTable { get; set; }
-        internal PokerRound CurrentRound { get; set; }
-
         SraParameters IMyCardGamePlayer.CurrentSraKey1 { get; set; }
         SraParameters[] IMyCardGamePlayer.CurrentSraKeys2 { get; set; } 
         #endregion
@@ -74,8 +71,6 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         {
             if (!CanCheck())
                 throw new InvalidOperationException();
-
-
         }
 
 
@@ -100,7 +95,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
             if (!CanFold())
                 throw new InvalidOperationException();
 
-            IsFold = true;
+            State = PokerPlayerState.Fold;
         }
 
         /// <summary>
@@ -229,7 +224,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
             if(!CanAllIn())
                 throw new InvalidOleVariantTypeException();
 
-            IsAllIn = true;
+            State = PokerPlayerState.AllIn;
         }
 
 

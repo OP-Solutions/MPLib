@@ -33,14 +33,29 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         public int CurrentChipAmount { get; internal set; }
         public int LeftChipsAfterBet { get; internal set; }
         public int CurrentBetAmount { get; internal set; }
-        public bool IsFold { get; internal set; }
-        public bool IsTurn { get; internal set; }
-        public bool IsAllIn { get; internal set; }
-        public bool HasRaised { get; internal set; }
+        public bool IsFold => State == PokerPlayerState.Fold;
+
+
+        /// <summary>
+        /// Indicates if it's this player turn now
+        /// </summary>
+        public bool IsTurn => CurrentRound.CurrentPlayer == this;
+
+        public bool IsAllIn => State == PokerPlayerState.AllIn;
+        public PokerPlayerState State { get; internal set; }
 
         internal PokerTable CurrentTable { get; set; }
         internal PokerRound CurrentRound { get; set; }
+        internal bool HasRaised { get; set; }
 
+    }
+
+    public enum PokerPlayerState
+    {
+        Active,
+        Fold,
+        AllIn,
+        NotPlaying
     }
 
     /// <summary>

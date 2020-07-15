@@ -47,7 +47,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
 
         #endregion
 
-        public PokerPlayer[] Players { get; }
+        public PokerTable Table { get; internal set; }
 
         /// <summary>
         /// Current bet amount for single player (not sum)
@@ -63,20 +63,40 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         /// <summary>
         /// Current sum of all player bets done in this round until thi time
         /// </summary>
-        public int SumOfBet { get;  }
+        public int SumOfBet { get; }
+
+
+        /// <summary>
+        /// Index of player whose turn to move is currently
+        /// </summary>
+#pragma warning disable 618
+        public int CurrentPlayerIndex
+        {
+            get => _currentPlayerIndex;
+            internal set
+            {
+                _currentPlayerIndex = value;
+                CurrentPlayer = Table.Players[value];
+            }
+        }
+#pragma warning restore 618
+
+        public Player CurrentPlayer { get; private set; }
 
         public PokerRoundState State { get; set; }
-
-
 
         /// <summary>
         /// Deck card list after shuffling, cards are represented as encrypted bigIntegers
         /// </summary>
         private BigInteger[] ShuffledDeck { get; set; }
 
-        public PokerRound(PokerPlayer[] players)
+        [Obsolete("Not use this variable, instead use this: " + nameof(CurrentPlayerIndex))]
+        private int _currentPlayerIndex;
+
+
+        public PokerRound(PokerTable table)
         {
-            Players = players;
+            Table = table;
             State = PokerRoundState.NoStarted;
         }
 
@@ -94,7 +114,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
 
         private void PlaceBlinds()
         {
-            
+
         }
 
         private void DealCards()
@@ -139,10 +159,11 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         /// <summary>
         /// Full bet amount of player move. this is 0 in case of "Check" and throws <see cref="InvalidOperationException"/> in case of "Fold"
         /// </summary>
-        public int FullBetAmount {
+        public int FullBetAmount
+        {
             get
             {
-                if(Type == PokerPlayerMoveType.Fold) throw new InvalidOperationException("Player can't get bet amount of move when move is \"Fold\" ");
+                if (Type == PokerPlayerMoveType.Fold) throw new InvalidOperationException("Player can't get bet amount of move when move is \"Fold\" ");
                 return _fullBetAmount;
             }
         }
@@ -151,7 +172,8 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         /// <summary>
         /// Extra bet amount of player move. this is 0 in case of "Check", "Call" and throws <see cref="InvalidOperationException"/> in case of "Fold"
         /// </summary>
-        public int ExtraBetAmount {
+        public int ExtraBetAmount
+        {
             get
             {
                 if (Type == PokerPlayerMoveType.Fold) throw new InvalidOperationException("Player can't get bet amount of move when move is \"Fold\" ");
@@ -165,10 +187,10 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
     {
         NoStarted,
         BeforeDeckShuffle,
-        DeckShuffled, 
-        SmallBlindPlaced, 
-        BigBlindPlaced, 
-        CardsDealDone, 
+        DeckShuffled,
+        SmallBlindPlaced,
+        BigBlindPlaced,
+        CardsDealDone,
         Flop,
         Turn,
         River,
