@@ -4,9 +4,12 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using EtherBetClientLib.Core.Game.General;
+using EtherBetClientLib.Core.Game.Poker.PokerLogic.PokerCombinations;
 using EtherBetClientLib.Crypto.Encryption.SRA;
 using EtherBetClientLib.Models;
+using EtherBetClientLib.Models.Exceptions;
 using EtherBetClientLib.Models.Games.Poker;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace EtherBetClientLib.Random
 {
@@ -14,24 +17,33 @@ namespace EtherBetClientLib.Random
     {
         public delegate Task SendEvent(List<BigInteger> shuffledDeck);
 
-        public delegate Task<List<BigInteger>> ReceiveFromEvent(Player player);
+        public delegate Task<List<BigInteger>> ReceiveDeckFromEvent(Player player);
+
+        public delegate Task<PlayerKeys> ReceiveKeysFromEvent(Player player);
 
         public List<BigInteger> SourceDeck { get; }
-        public IReadOnlyList<Player> Players { get; }
-        
-        private readonly SendEvent _send;
-        private readonly ReceiveFromEvent _receiveFrom;
 
-        public DecentralizedDeckShuffler(SendEvent send, ReceiveFromEvent receiveFrom, List<BigInteger> sourceDeck, 
-            IReadOnlyList<Player> players)
+        public IReadOnlyList<Player> Players { get; }
+
+        private readonly Dictionary<Player, List<BigInteger>> _firstCycleDeck;
+        private readonly Dictionary<Player, List<BigInteger>> _secondCycleDeck;
+        private readonly SendEvent _send;
+        private readonly ReceiveDeckFromEvent _receiveDeckFrom;
+        private readonly ReceiveKeysFromEvent _receiveKeysFrom;
+
+        public DecentralizedDeckShuffler(SendEvent send, ReceiveDeckFromEvent receiveDeckFrom, ReceiveKeysFromEvent receiveKeysFrom, 
+            List<BigInteger> sourceDeck, IReadOnlyList<Player> players)
         {
             _send = send;
-            _receiveFrom = receiveFrom;
+            _receiveDeckFrom = receiveDeckFrom;
+            _receiveKeysFrom = receiveKeysFrom;
+            _firstCycleDeck = new Dictionary<Player, List<BigInteger>>();
+            _secondCycleDeck = new Dictionary<Player, List<BigInteger>>();
             SourceDeck = sourceDeck;
             Players = players;
         }
 
-        public async Task<List<BigInteger>> Shuffle()
+        public async Task<IReadOnlyList<BigInteger>> Shuffle()
         {
             var currentDeck = SourceDeck;
             var me = (Player.Me as MyCardGamePlayer) ?? throw new InvalidOperationException();
@@ -44,9 +56,13 @@ namespace EtherBetClientLib.Random
                     var shuffledCards = Shuffling.Shuffle(currentDeck);
                     var encryptedCards = shuffledCards.Select(n => provider1.Encrypt(n)).ToList();
                     await _send(encryptedCards);
+                    currentDeck = encryptedCards;
                 }
-
-                currentDeck = await _receiveFrom(player);
+                else
+                {
+                    currentDeck = await _receiveDeckFrom(player);
+                }
+                _firstCycleDeck.Add(player, currentDeck);
             }
 
             foreach (var player in Players)
@@ -63,12 +79,142 @@ namespace EtherBetClientLib.Random
                         reEncryptedCards.Add(cardReEncrypted);
                     }
                     await _send(reEncryptedCards);
+                    currentDeck = reEncryptedCards;
                 }
-
-                currentDeck = await _receiveFrom(player);
+                else
+                {
+                    currentDeck = await _receiveDeckFrom(player);
+                }
+                _secondCycleDeck.Add(player, currentDeck);
             }
 
             return currentDeck;
         }
+
+        public async Task<List<CheatInstance>> FindCheater(Player requestedBy)
+        {
+            var playerKeyDict = new Dictionary<Player, PlayerKeys>();
+            var me = (Player.Me as MyCardGamePlayer) ?? throw new InvalidOperationException();
+
+            foreach (var player in Players)
+            {
+                if (player != me)
+                {
+                    var playerKeys = await _receiveKeysFrom(player);
+                    playerKeyDict.Add(player, playerKeys);
+                }
+                else
+                {
+                    var playerKeys = new PlayerKeys
+                    {
+                        CurrentSraKey1 = me.CurrentSraKey1,
+                        CurrentSraKeys2 = me.CurrentSraKeys2
+                    };
+                    playerKeyDict.Add(player, playerKeys);
+                }
+            }
+
+            var sourceDeck = SourceDeck;
+            var cheaters = new List<CheatInstance>();
+
+            foreach (var player in Players)
+            {
+                if (!CheckShuffleValidity(sourceDeck, _firstCycleDeck[player], playerKeyDict[player].CurrentSraKey1))
+                {
+                    cheaters.Add(new CheatInstance(player, CheatType.InvalidShuffle));
+                }
+
+                sourceDeck = _firstCycleDeck[player];
+            }  
+            
+            foreach (var player in Players)
+            {
+                if (!CheckPostShuffleEncryptionValidity(sourceDeck, _secondCycleDeck[player], playerKeyDict[player]))
+                {
+                    cheaters.Add(new CheatInstance(player, CheatType.InvalidPostShuffleEncryption));
+                }
+
+                sourceDeck = _secondCycleDeck[player];
+            }
+
+
+            if (cheaters.Count > 0)
+                return cheaters;
+            
+
+            cheaters.Add(new CheatInstance(requestedBy, CheatType.InvalidCheatAccusation));
+            return cheaters;
+        }
+
+        private bool CheckShuffleValidity(List<BigInteger> sourceDeck, List<BigInteger> resultDeck, SraParameters key)
+        {
+
+            var provider = new SraCryptoProvider(key);
+            var shuffledDeck = sourceDeck.Select(n => provider.Encrypt(n)).ToList();
+            return IsPermutation(shuffledDeck, resultDeck);
+        }       
+
+        private bool CheckPostShuffleEncryptionValidity(List<BigInteger> sourceDeck, List<BigInteger> resultDeck, PlayerKeys keys)
+        {
+            var provider1 = new SraCryptoProvider(keys.CurrentSraKey1);
+            var reEncryptedCards = new List<BigInteger>(sourceDeck.Count);
+            for (var i = 0; i < sourceDeck.Count; i++)
+            {
+                var card = sourceDeck[i];
+                var decryptedCard = provider1.Decrypt(card);
+                var provider2 = new SraCryptoProvider(keys.CurrentSraKeys2[i]);
+                var cardReEncrypted = provider2.Encrypt(decryptedCard);
+                reEncryptedCards.Add(cardReEncrypted);
+            }
+            return IsPermutation(reEncryptedCards, resultDeck);
+        }
+
+        private bool IsPermutation(List<BigInteger> sourceDeck, List<BigInteger> resultDeck)
+        {
+            if (sourceDeck.Count != resultDeck.Count)
+            {
+                return false;
+            }
+            var sourceDeckCopy = new BigInteger[SourceDeck.Count];
+            var resultDeckCopy = new BigInteger[resultDeck.Count];
+            sourceDeck.CopyTo(sourceDeckCopy);
+            resultDeck.CopyTo(resultDeckCopy);
+            Array.Sort(sourceDeckCopy);
+            Array.Sort(resultDeckCopy);
+            
+
+            for (int i = 0; i < sourceDeckCopy.Length; i++)
+            {
+                if (!sourceDeckCopy[i].Equals(resultDeckCopy[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+
+        }
+
+
+       
+    }
+
+    public class CheatInstance
+    {
+        public CheatInstance(Player players, CheatType cheatType)
+        {
+            Players = players;
+            CheackType = cheatType;
+        }
+
+        public Player Players { get; }
+        public CheatType CheackType { get; }
+    }
+
+    public enum CheatType
+    {
+        InvalidShuffle,
+        InvalidPostShuffleEncryption,
+        InvalidCheatAccusation
     }
 }
