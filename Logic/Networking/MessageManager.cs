@@ -58,7 +58,7 @@ namespace EtherBetClientLib.Networking
 
         public async Task SendMessage(TBaseMessageType message)
         {
-            var package = new Package()
+            var package = new Package<TBaseMessageType>()
             {
                 SenderIdentifier = _sourceIdentifierToSend,
                 DestinationIdentifier = _destinationIdentifierToSend,
@@ -97,7 +97,7 @@ namespace EtherBetClientLib.Networking
                 var dataLen = await controller.ReadBytesOpaque16Async(buffer, 0);
                 var signature = _signer.SignData(buffer, 0 , dataLen, HashAlgorithmName.SHA256);
                 if(!_signer.VerifyData(buffer, 0, dataLen, signature, HashAlgorithmName.SHA256)) throw new Exception();
-                var package = Serializer.Deserialize<Package>(new ReadOnlySpan<byte>(buffer, 0, dataLen));
+                var package = Serializer.Deserialize<Package<TBaseMessageType>>(new ReadOnlySpan<byte>(buffer, 0, dataLen));
                 package.Signature = signature;
                 return (T)package.Message;
             }

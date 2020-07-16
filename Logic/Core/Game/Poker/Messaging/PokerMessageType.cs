@@ -2,14 +2,15 @@
 {
     public enum PokerMessageType
     {
-        RoundStamp,
+        RoundStamp = 100,
         Shuffle,
+        EncryptSingleKey,
         ReEncryptMultiKey,
-        GetKey,
+        KeyExpose,
         Bet,
-        LeaveTable,
+        Fold,
+        FullKeysExpose,
+        LeaveTable = Fold + 1,
         ReShuffle,
-        ReEncryptSingleKey,
-        KeysExpose,
     }
 }

@@ -3,11 +3,11 @@
 namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
     [ProtoContract]
-    class LeaveTableMessage : PokerMessage
+    class LeaveTableMessage : IPokerMessage
     {
-        public LeaveTableMessage()
-        {
-            Type = PokerMessageType.LeaveTable;
-        }
+        public const PokerMessageType BoundType = PokerMessageType.LeaveTable;
+
+        public PokerMessageType Type { get; set; } = BoundType;
+
     }
 }

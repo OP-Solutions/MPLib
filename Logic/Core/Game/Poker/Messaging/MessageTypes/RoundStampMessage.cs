@@ -3,8 +3,12 @@
 namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
     [ProtoContract]
-    class RoundStampMessage : PokerMessage
+    class RoundStampMessage : IPokerMessage
     {
+        public const PokerMessageType BoundType = PokerMessageType.RoundStamp;
+
+        public PokerMessageType Type { get; set; } = BoundType;
+
         /// <summary>
         /// Unique Identifier Of Table this round belongs to
         /// </summary>
@@ -26,7 +30,6 @@ namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 
         public RoundStampMessage(string tableUuid, string roundUuid, string[] players)
         {
-            Type = PokerMessageType.RoundStamp;
             TableUuid = tableUuid;
             RoundUuid = roundUuid;
             Players = players;

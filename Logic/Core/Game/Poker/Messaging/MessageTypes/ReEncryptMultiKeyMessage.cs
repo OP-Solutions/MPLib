@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using EtherBetClientLib.Models.Games.CardGameModels;
 using ProtoBuf;
 
 namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
@@ -7,11 +8,13 @@ namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
     /// This message has exactly same format as <see cref="ShuffleMessage"/>
     /// </summary>
     [ProtoContract]
-    class ReEncryptMultiKeyMessage : ShuffleMessage
+    class ReEncryptMultiKeyMessage : IPokerMessage
     {
-        public ReEncryptMultiKeyMessage(BigInteger[] cards) : base(cards)
-        {
-            Type = PokerMessageType.ReEncryptMultiKey;
-        }
+        public const PokerMessageType BoundType = PokerMessageType.Bet;
+
+        public PokerMessageType Type { get; set; } = BoundType;
+
+        [ProtoMember(1)]
+        public BigInteger[] Cards { get; set; }
     }
 }
