@@ -1,17 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using EtherBetClientLib.Core.Game.General;
-using EtherBetClientLib.Models.Games.Poker.Interfaces;
+using EtherBetClientLib.Crypto.Encryption.SRA;
 
-namespace EtherBetClientLib.Models.Games.Poker
+namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
-    public class MyPokerPlayer : MyCardGamePlayer, IPokerPlayer
+    public class MyPokerPlayer : PokerPlayer, IMyCardGamePlayer
     {
+        public bool AutoCheckFoldEnabled { get; set; }
+        public bool AutoCallEnabled { get; set; }
+
+
+        #region Internal Properties
+        SraParameters IMyCardGamePlayer.CurrentSraKey1 { get; set; }
+        SraParameters[] IMyCardGamePlayer.CurrentSraKeys2 { get; set; } 
+        #endregion
+
         public MyPokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect)
         {
         }
@@ -27,7 +33,18 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// </exception>
         public void Call()
         {
-            throw new NotImplementedException();
+            if (!CanCall())
+                throw new InvalidOperationException();
+
+
+            if (CurrentRound.CurrentBetAmount - CurrentBetAmount >= CurrentChipAmount)
+            {
+                AllIn();
+                return;
+            }
+
+            CurrentChipAmount -= (CurrentRound.CurrentBetAmount - CurrentBetAmount);
+
         }
 
 
@@ -37,7 +54,9 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <returns></returns>
         public bool CanCall()
         {
-            throw new NotImplementedException();
+            if (IsTurn && !IsAllIn && !IsFold )
+                return true;
+            return false;
         }
 
         /// <summary>
@@ -50,7 +69,8 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// </exception>
         public void Check()
         {
-            throw new NotImplementedException();
+            if (!CanCheck())
+                throw new InvalidOperationException();
         }
 
 
@@ -60,7 +80,10 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <returns></returns>
         public bool CanCheck()
         {
-            throw new NotImplementedException();
+            if (IsTurn && CurrentRound.CurrentBetAmount - CurrentBetAmount == 0 && !IsFold)
+                return true;
+
+            return false;
         }
 
         /// <summary>
@@ -69,7 +92,10 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <exception cref="InvalidOperationException">If player is already fold or not his move</exception>
         public void Fold()
         {
-            throw new NotImplementedException();
+            if (!CanFold())
+                throw new InvalidOperationException();
+
+            State = PokerPlayerState.Fold;
         }
 
         /// <summary>
@@ -78,7 +104,59 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <returns></returns>
         public bool CanFold()
         {
-            throw new NotImplementedException();
+            if (IsTurn && !IsAllIn && !IsFold)
+                return true;
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// Does "Bet" poker move (bets total <paramref name="amount"/>)
+        /// </summary>
+        /// <param name="amount">
+        /// Amount to bet to.
+        /// </param>
+        /// <exception cref="InvalidOperationException">
+        /// If this method is called when it is not this player turn
+        /// Or player is already "Fold"
+        /// Or player doesn't <see cref="amount"/> of chips
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// if amount is less than <see cref="GetMinRaise"/> or player does not have enough <paramref name="amount"/> funds
+        /// </exception>
+        public void Bet(int amount)
+        {
+            Range range;
+            CanBet(out range);
+
+            if (!CanBet(out range) && range.Start.Value < amount && range.End.Value > amount)
+                throw new InvalidOperationException();
+
+
+            CurrentBetAmount += amount;
+            CurrentChipAmount -= amount;
+        }
+
+        /// <summary>
+        /// Indicates if user can bet (<see cref="Bet"/> is available only when there is nothing to call so user can check or bet)
+        /// Gets minimum and maximum amount of chips that user can <see cref="Bet"/>
+        /// Or <code>default(Range)</code> if bet is not available at all
+        /// </summary>
+        /// <param name="betRange">/// Range (inclusive) - For example (5, 10) you can call <see cref="Bet"/> which any of these parameters: 5, 6, 7, 8, 9, 10</param>
+        public bool CanBet(out Range betRange)
+        {
+
+            if (CanCheck() && !HasRaised && !IsAllIn)
+            {
+                Index startIndex = new Index(Math.Min(CurrentTable.CurrentSmallBlind * 2, CurrentChipAmount));
+                Index endIndex = new Index(CurrentChipAmount);
+                betRange = new Range(startIndex, endIndex);
+                return true;
+            }
+
+            betRange = new Range();
+            return false;
         }
 
         /// <summary>
@@ -91,27 +169,44 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <exception cref="InvalidOperationException">
         /// If this method is called when it is not this player turn
         /// Or player is already "Fold"
-        /// Or player not has <see cref="amount"/> of chips
+        /// Or player doesn't <see cref="amount"/> of chips
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// if amount is less than <see cref="GetMinRaise"/> or player does not have enough <paramref name="amount"/> funds
         /// </exception>
         public void Raise(int amount)
         {
-            throw new NotImplementedException();
+            Range range;
+
+            if(!CanRaise(out range))
+                throw new InvalidOperationException();
+
+
+            CurrentBetAmount += amount;
+            CurrentChipAmount -= amount;
         }
 
 
         /// <summary>
+        /// Indicates if user can raise (<see cref="Raise"/> is available only if there is some bet to call and player hasn't raised in this round yet)
         /// Gets minimum and maximum amount of chips that user can <see cref="Raise"/>
         /// Or <code>default(Range)</code> if raise is not available at all
         /// </summary>
-        /// <returns>
-        /// Range (inclusive) - For example (5, 10) you can call <see cref="Raise"/> which any of these parameters: 5, 6, 7, 8, 9, 10
-        /// </returns>
-        public Range CanRaise()
+        /// <param name="raiseRange">/// Range (inclusive) - For example (5, 10) you can call <see cref="Raise"/> which any of these parameters: 5, 6, 7, 8, 9, 10</param>
+        public bool CanRaise(out Range raiseRange)
         {
-            throw new NotImplementedException();
+
+
+            if (CanCall() && !HasRaised)
+            {
+                Index startIndex = new Index(Math.Min(CurrentTable.CurrentSmallBlind * 2, CurrentChipAmount));
+                Index endIndex = new Index(CurrentChipAmount);
+                raiseRange = new Range(startIndex, endIndex);
+                return true;
+            }
+
+            raiseRange = new Range();
+            return false;
         }
 
 
@@ -126,7 +221,10 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// </exception>
         public void AllIn()
         {
-            throw new NotImplementedException();
+            if(!CanAllIn())
+                throw new InvalidOleVariantTypeException();
+
+            State = PokerPlayerState.AllIn;
         }
 
 
@@ -136,12 +234,10 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <returns></returns>
         public bool CanAllIn()
         {
-            throw new NotImplementedException();
+            if (IsTurn && !IsFold && !IsAllIn)
+                return true;
+
+            return false;
         }
-        public PokerTable CurrentTable { get; set; }
-        public PokerRound CurrentRound { get; set; }
-        public int CurrentChipAmount { get; set; }
-        public int LeftChipsAfterBet { get; set; }
-        public int CurrentBetAmount { get; set; }
     }
 }

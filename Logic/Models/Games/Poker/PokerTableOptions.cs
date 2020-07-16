@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Org.BouncyCastle.Asn1.Cms;
 
 namespace EtherBetClientLib.Models.Games.Poker
 {

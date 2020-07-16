@@ -7,13 +7,15 @@ using EtherBetClientLib.Core.Game.General;
 using EtherBetClientLib.Core.Game.Poker.PokerLogic.PokerCombinations;
 using EtherBetClientLib.Crypto.Encryption.SRA;
 using EtherBetClientLib.Models;
-using EtherBetClientLib.Models.Exceptions;
+using EtherBetClientLib.Models.Games;
 using EtherBetClientLib.Models.Games.Poker;
 using Org.BouncyCastle.Asn1.X509;
 
 namespace EtherBetClientLib.Random
 {
-    public class DecentralizedDeckShuffler
+    public class DecentralizedDeckShuffler<TPlayer, TMyPlayer>
+        where TPlayer : CardGamePlayer
+        where TMyPlayer : TPlayer, IMyCardGamePlayer
     {
         public delegate Task SendEvent(List<BigInteger> shuffledDeck);
 
@@ -22,6 +24,9 @@ namespace EtherBetClientLib.Random
         public delegate Task<PlayerKeys> ReceiveKeysFromEvent(Player player);
 
         public List<BigInteger> SourceDeck { get; }
+        public IReadOnlyList<TPlayer> Players { get; }
+        public TMyPlayer MyPlayer { get; }
+        
 
         public IReadOnlyList<Player> Players { get; }
 
@@ -41,17 +46,17 @@ namespace EtherBetClientLib.Random
             _secondCycleDeck = new Dictionary<Player, List<BigInteger>>();
             SourceDeck = sourceDeck;
             Players = players;
+            MyPlayer = myPlayer;
         }
 
         public async Task<IReadOnlyList<BigInteger>> Shuffle()
         {
             var currentDeck = SourceDeck;
-            var me = (Player.Me as MyCardGamePlayer) ?? throw new InvalidOperationException();
-            var provider1 = new SraCryptoProvider(me.CurrentSraKey1);
+            var provider1 = new SraCryptoProvider(MyPlayer.CurrentSraKey1);
 
             foreach (var player in Players)
             {
-                if (player == me)
+                if (player == MyPlayer)
                 {
                     var shuffledCards = Shuffling.Shuffle(currentDeck);
                     var encryptedCards = shuffledCards.Select(n => provider1.Encrypt(n)).ToList();
@@ -67,14 +72,14 @@ namespace EtherBetClientLib.Random
 
             foreach (var player in Players)
             {
-                if (player == me)
+                if (player == MyPlayer)
                 {
                     var reEncryptedCards = new List<BigInteger>(currentDeck.Count);
                     for (var i = 0; i < currentDeck.Count; i++)
                     {
                         var card = currentDeck[i];
                         var decryptedCard = provider1.Decrypt(card);
-                        var provider2 = new SraCryptoProvider(me.CurrentSraKeys2[i]);
+                        var provider2 = new SraCryptoProvider(MyPlayer.CurrentSraKeys2[i]);
                         var cardReEncrypted = provider2.Encrypt(decryptedCard);
                         reEncryptedCards.Add(cardReEncrypted);
                     }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EtherBetClientLib.Core.Game.Poker.PokerLogic
+namespace EtherBetClientLib.Models.Games.CardGameModels
 {
     /// <summary>
     /// The card.

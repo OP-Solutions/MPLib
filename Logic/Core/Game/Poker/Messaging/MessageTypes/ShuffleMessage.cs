@@ -1,14 +1,20 @@
 ﻿using System.Numerics;
+using ProtoBuf;
 
 namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
-    class ShuffleMessage : Message
+    [ProtoContract]
+    class ShuffleMessage : IPokerMessage
     {
+        public const PokerMessageType BoundType = PokerMessageType.Shuffle;
+
+        public PokerMessageType Type { get; set; } = BoundType;
+
+        [ProtoMember(1)]
         public BigInteger[] Cards { get; set; }
 
         public ShuffleMessage(BigInteger[] cards)
         {
-            Type = MessageType.Shuffle;
             Cards = cards;
         }
     }

@@ -7,9 +7,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using EtherBetClientLib.Models;
+using EtherBetClientLib.Models.Games;
 using EtherBetClientLib.Networking;
 using Xunit;
 using Xunit.Abstractions;
+using EtherBetClientLib.Models.Games;
 
 namespace SPRTest
 {
@@ -25,7 +27,7 @@ namespace SPRTest
         //[InlineData("31.146.149.134, 8788", "bakurits", "Chudo123")] // from kukur
         public void TestP2P(string targetIp, int targetPort, string messageToSend, string messageToReceive)
         {
-            var remoteClient = new PlayerNetworkClient(Player.Me, new IPEndPoint(IPAddress.Parse(targetIp), targetPort));
+            var remoteClient = new PlayerNetworkStream(Player.Me, new IPEndPoint(IPAddress.Parse(targetIp), targetPort));
             var time = DateTime.UtcNow;
             var time2 = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute + 1, 0);
             Thread.Sleep(time2 - time);

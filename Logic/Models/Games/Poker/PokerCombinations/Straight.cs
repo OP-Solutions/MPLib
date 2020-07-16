@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using EtherBetClientLib.Models.Games.CardGameModels;
 
-namespace EtherBetClientLib.Core.Game.Poker.PokerLogic.PokerCombinations
+namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
 {
     /// <summary>
     /// Straight combination
