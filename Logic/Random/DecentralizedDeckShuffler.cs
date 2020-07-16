@@ -19,31 +19,29 @@ namespace EtherBetClientLib.Random
     {
         public delegate Task SendEvent(List<BigInteger> shuffledDeck);
 
-        public delegate Task<List<BigInteger>> ReceiveDeckFromEvent(Player player);
+        public delegate Task<List<BigInteger>> ReceiveDeckFromEvent(TPlayer player);
 
-        public delegate Task<PlayerKeys> ReceiveKeysFromEvent(Player player);
+        public delegate Task<PlayerKeys> ReceiveKeysFromEvent(TPlayer player);
 
         public List<BigInteger> SourceDeck { get; }
         public IReadOnlyList<TPlayer> Players { get; }
         public TMyPlayer MyPlayer { get; }
         
 
-        public IReadOnlyList<Player> Players { get; }
-
-        private readonly Dictionary<Player, List<BigInteger>> _firstCycleDeck;
-        private readonly Dictionary<Player, List<BigInteger>> _secondCycleDeck;
+        private readonly Dictionary<TPlayer, List<BigInteger>> _firstCycleDeck;
+        private readonly Dictionary<TPlayer, List<BigInteger>> _secondCycleDeck;
         private readonly SendEvent _send;
         private readonly ReceiveDeckFromEvent _receiveDeckFrom;
         private readonly ReceiveKeysFromEvent _receiveKeysFrom;
 
         public DecentralizedDeckShuffler(SendEvent send, ReceiveDeckFromEvent receiveDeckFrom, ReceiveKeysFromEvent receiveKeysFrom, 
-            List<BigInteger> sourceDeck, IReadOnlyList<Player> players)
+            List<BigInteger> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
         {
             _send = send;
             _receiveDeckFrom = receiveDeckFrom;
             _receiveKeysFrom = receiveKeysFrom;
-            _firstCycleDeck = new Dictionary<Player, List<BigInteger>>();
-            _secondCycleDeck = new Dictionary<Player, List<BigInteger>>();
+            _firstCycleDeck = new Dictionary<TPlayer, List<BigInteger>>();
+            _secondCycleDeck = new Dictionary<TPlayer, List<BigInteger>>();
             SourceDeck = sourceDeck;
             Players = players;
             MyPlayer = myPlayer;
@@ -96,14 +94,13 @@ namespace EtherBetClientLib.Random
             return currentDeck;
         }
 
-        public async Task<List<CheatInstance>> FindCheater(Player requestedBy)
+        public async Task<List<CheatInstance>> FindCheater(TPlayer requestedBy)
         {
-            var playerKeyDict = new Dictionary<Player, PlayerKeys>();
-            var me = (Player.Me as MyCardGamePlayer) ?? throw new InvalidOperationException();
+            var playerKeyDict = new Dictionary<TPlayer, PlayerKeys>();
 
             foreach (var player in Players)
             {
-                if (player != me)
+                if (player != MyPlayer)
                 {
                     var playerKeys = await _receiveKeysFrom(player);
                     playerKeyDict.Add(player, playerKeys);
@@ -112,8 +109,8 @@ namespace EtherBetClientLib.Random
                 {
                     var playerKeys = new PlayerKeys
                     {
-                        CurrentSraKey1 = me.CurrentSraKey1,
-                        CurrentSraKeys2 = me.CurrentSraKeys2
+                        CurrentSraKey1 = MyPlayer.CurrentSraKey1,
+                        CurrentSraKeys2 = MyPlayer.CurrentSraKeys2
                     };
                     playerKeyDict.Add(player, playerKeys);
                 }
