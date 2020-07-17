@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using EtherBetClientLib.Models.Games;
@@ -46,6 +47,14 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         public event PokerPlayerMoveEventHandler MyPlayerMoveReceived;
 
         #endregion
+
+
+        /// <summary>
+        /// Players that are playing in this round. Note that this many not be same as <seealso cref="PokerTable.Players"/>,
+        /// because some player may be joined on table but not playing in this round.
+        /// For example if player just joined table, it will not be in current round but will start playing from next round
+        /// </summary>
+        public IReadOnlyList<Player> Players { get; set; }
 
         public PokerTable Table { get; internal set; }
 

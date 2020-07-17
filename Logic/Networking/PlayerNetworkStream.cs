@@ -16,7 +16,7 @@ namespace EtherBetClientLib.Networking
 {
     public class PlayerNetworkStream : Stream
     {
-        public MyPlayer MyPlayer { get; set; }
+        public Player MyPlayer { get; set; }
 
 
         public Player RemotePlayer { get; set; }
@@ -31,7 +31,7 @@ namespace EtherBetClientLib.Networking
 
         private readonly TcpClient _client;
 
-        public PlayerNetworkStream(MyPlayer myPlayer, IPEndPoint endpointToConnect)
+        public PlayerNetworkStream(Player myPlayer, IPEndPoint endpointToConnect)
         {
             MyPlayer = myPlayer;
             Endpoint = endpointToConnect;

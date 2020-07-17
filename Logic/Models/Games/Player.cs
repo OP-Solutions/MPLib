@@ -5,7 +5,7 @@ namespace EtherBetClientLib.Models.Games
 {
     public class Player
     {
-        public static MyPlayer Me { get; } = new MyPlayer();
+        public static Player Me { get; } = null;
 
         /// <summary>
         /// ECDSA singing key of player. this property contains full (private + public) key if this player is "our" (local)  player
@@ -15,15 +15,9 @@ namespace EtherBetClientLib.Models.Games
 
         public string Name { get; set; }
 
-        public PlayerNetworkStream NetworkStream { get; }
+        public bool IsMyPlayer() => NetworkStream == null;
 
-        public bool IsMyPlayer() => this is MyPlayer;
+        internal PlayerNetworkStream NetworkStream { get; }
 
     }
-
-    public class MyPlayer : Player
-    {
-    }
-
-
 }

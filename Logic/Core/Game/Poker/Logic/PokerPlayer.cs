@@ -26,9 +26,9 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
 
 
         /// <summary>
-        /// Are called as soon as information about player move is received before any cryptographic, verification
+        /// Are called as soon as information about player move is received before any cryptographic verification
         /// </summary>
-        public event PokerPlayerMoveEventHandler ThisPlayerMoveReceived; 
+        internal event PokerPlayerMoveEventHandler ThisPlayerMoveReceived; 
 
         public int CurrentChipAmount { get; internal set; }
         public int LeftChipsAfterBet { get; internal set; }
