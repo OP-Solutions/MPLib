@@ -20,21 +20,23 @@ namespace EtherBetClientLib.Networking
     public class PlayerMessageManager<TPlayerType, TBaseMessageType> : IPlayerMessageManager<TPlayerType, TBaseMessageType> where TBaseMessageType : IMessage where TPlayerType : Player
     {
 
-        private readonly TPlayerType _myPlayer;
         private readonly string _myIdentifier;
         private readonly ECDsa _signer;
         private readonly IReadOnlyDictionary<TPlayerType, string> _connectedPlayers;
 
 
-        /// <param name="myPlayer"></param>
-        /// <param name="myIdentifier">identifier to include in messages, so receiver know that it come from this player</param>
-        /// <param name="otherPlayers">Other players dictionary. key is player itself, value - corresponding player identifier</param>
-        public PlayerMessageManager(TPlayerType myPlayer, string myIdentifier, IReadOnlyDictionary<TPlayerType, string> otherPlayers)
+        /// <param name="otherPlayers">
+        /// players dictionary. key is player itself, value - corresponding player identifier, which is included in each message
+        /// so remote party knows who message are coming from, or who is destination of that message:
+        /// (<see cref="Package{TBaseMessageType}.SenderIdentifier"/>/>, (<see cref="Package{TBaseMessageType}.DestinationIdentifier"/>/>,
+        /// </param>
+        public PlayerMessageManager(IReadOnlyDictionary<TPlayerType, string> players)
         {
-            _connectedPlayers = otherPlayers;
-            _myIdentifier = myIdentifier;
-            _myPlayer = myPlayer;
-            _signer = new ECDsaCng(_myPlayer.Key);
+            _connectedPlayers = players.Where(p => !p.Key.IsMyPlayer()).ToDictionary(p => p.Key, p => p.Value);
+            var myPlayerInfo = players.First(p => p.Key.IsMyPlayer());
+            var myPlayer = myPlayerInfo.Key;
+            _myIdentifier = myPlayerInfo.Value;
+            _signer = new ECDsaCng(myPlayer.Key);
         }
 
         public async Task SendMessageTo(TPlayerType player, TBaseMessageType message)

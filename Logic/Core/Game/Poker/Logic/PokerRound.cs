@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using EtherBetClientLib.Core.Game.Poker.Messaging;
 using EtherBetClientLib.Models.Games;
+using EtherBetClientLib.Networking;
 
 namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
@@ -54,7 +57,9 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         /// because some player may be joined on table but not playing in this round.
         /// For example if player just joined table, it will not be in current round but will start playing from next round
         /// </summary>
-        public IReadOnlyList<Player> Players { get; set; }
+        public IReadOnlyList<PokerPlayer> Players { get; set; }
+
+        public MyPokerPlayer MyPlayer { get; set; }
 
         public PokerTable Table { get; internal set; }
 
@@ -78,35 +83,48 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         /// <summary>
         /// Index of player whose turn to move is currently
         /// </summary>
-#pragma warning disable 618
         public int CurrentPlayerIndex
         {
+#pragma warning disable 618
             get => _currentPlayerIndex;
             internal set
             {
                 _currentPlayerIndex = value;
                 CurrentPlayer = Table.Players[value];
             }
-        }
 #pragma warning restore 618
+        }
 
+        /// <summary>
+        /// Player whose turn to move is currently
+        /// </summary>
         public Player CurrentPlayer { get; private set; }
 
         public PokerRoundState State { get; set; }
+
 
         /// <summary>
         /// Deck card list after shuffling, cards are represented as encrypted bigIntegers
         /// </summary>
         private BigInteger[] ShuffledDeck { get; set; }
 
-        [Obsolete("Not use this variable, instead use this: " + nameof(CurrentPlayerIndex))]
+        [Obsolete("Not use this variable (intended for internal usage), instead use this: " + nameof(CurrentPlayerIndex))]
         private int _currentPlayerIndex;
 
+        private readonly IPlayerMessageManager<PokerPlayer, IPokerMessage> _messageManager;
 
-        public PokerRound(PokerTable table)
+        public PokerRound(PokerTable table, IReadOnlyList<PokerPlayer> players)
         {
             Table = table;
             State = PokerRoundState.NoStarted;
+            var dict = new Dictionary<PokerPlayer, string>();
+            for (var i = 0; i < players.Count; i++)
+            {
+                var pokerPlayer = players[i];
+                dict[pokerPlayer] = i.ToString(); // player identifier in poker round messaging is index of player in round
+            }
+
+            _messageManager = new PlayerMessageManager<PokerPlayer, IPokerMessage>(dict);
         }
 
         /// <summary>
