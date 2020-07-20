@@ -5,12 +5,12 @@
         RoundStamp = 100,
         Shuffle,
         EncryptSingleKey,
-        ReEncryptMultiKey,
+        DecryptCard,
         KeyExpose,
         Bet,
         Fold,
         FullKeysExpose,
-        LeaveTable = Fold + 1,
+        LeaveTable,
         ReShuffle,
     }
 }

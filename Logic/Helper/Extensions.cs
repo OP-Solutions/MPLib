@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -74,6 +77,27 @@ namespace EtherBetClientLib.Helper
             {
                 receivedCount += await stream.ReadAsync(buffer, receivedCount, count - receivedCount);
             }
+        }
+
+        public static  bool IsPermutationOf<T>(this IEnumerable<T> sourceDeck, IEnumerable<T> resultDeck)
+        {
+            var sourceDeckCopy = sourceDeck.ToArray();
+            var resultDeckCopy = resultDeck.ToArray();
+
+            Array.Sort(sourceDeckCopy);
+            Array.Sort(resultDeckCopy);
+
+
+            for (int i = 0; i < sourceDeckCopy.Length; i++)
+            {
+                if (!sourceDeckCopy[i].Equals(resultDeckCopy[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+
         }
 
     }

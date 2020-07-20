@@ -4,7 +4,7 @@ using ProtoBuf;
 namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
     [ProtoContract]
-    public class BetMessage : IPokerMessage
+    class BetMessage : IPokerMessage
     {
         public const PokerMessageType BoundType = PokerMessageType.Bet;
 

@@ -8,6 +8,8 @@ using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.ServiceModel.Channels;
 using System.Text;
+using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using EtherBetClientLib.Core.Game.Poker.Messaging;
 using EtherBetClientLib.Helper;
@@ -23,7 +25,11 @@ namespace EtherBetClientLib.Networking
         private readonly string _myIdentifier;
         private readonly ECDsa _signer;
         private readonly IReadOnlyDictionary<TPlayerType, string> _connectedPlayers;
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly byte[] _internalBuffer = new byte[1024 * 1024];
 
+
+        private readonly Dictionary<Player, Dictionary<Type, Channel<Package>>> _messageStorage;
 
         /// <param name="otherPlayers">
         /// players dictionary. key is player itself, value - corresponding player identifier, which is included in each message
@@ -37,11 +43,47 @@ namespace EtherBetClientLib.Networking
             var myPlayer = myPlayerInfo.Key;
             _myIdentifier = myPlayerInfo.Value;
             _signer = new ECDsaCng(myPlayer.Key);
+            _messageStorage = new Dictionary<Player, Dictionary<Type, Channel<Package>>>(_connectedPlayers.Count);
+            foreach (var (player, _) in _connectedPlayers)
+            {
+                _messageStorage[player] = new Dictionary<Type, Channel<Package>>();
+            }
         }
+
+        public void StartAsyncReading()
+        {
+            foreach (var (player, _) in _connectedPlayers)
+            {
+                Task.Run(async () =>
+                {
+                    var controller = new StreamController(player.NetworkStream);
+                    var stream = new MemoryStream(_internalBuffer);
+                    while (true)
+                    {
+                        var dataLen = await controller.ReadBytesOpaque16Async(_internalBuffer, 0);
+                        if(dataLen == 0) break;
+                        var signature = await controller.ReadBytesOpaque16Async();
+                        if(signature == null) break;
+                        var package = Serializer.Deserialize<Package>(new ReadOnlySpan<byte>(_internalBuffer, 0, dataLen));
+                        package.Signature = signature;
+                        var messageType = package.Message.GetType();
+                        var playerMessageStorage = _messageStorage[player];
+                        if (!playerMessageStorage.TryGetValue(messageType, out var channel))
+                        {
+                            channel = Channel.CreateUnbounded<Package>();
+                            playerMessageStorage[messageType] = channel;
+                        }
+                        await channel.Writer.WriteAsync(package);
+                    }
+                }, _cancellationTokenSource.Token);
+            }
+        }
+
+
 
         public async Task SendMessageTo(TPlayerType player, TBaseMessageType message)
         {
-            var package = new Package<TBaseMessageType>()
+            var package = new Package()
             {
                 SenderIdentifier = _myIdentifier,
                 DestinationIdentifier = _connectedPlayers[player],
@@ -71,23 +113,9 @@ namespace EtherBetClientLib.Networking
             
         }
 
-        public async Task<T> ReadMessageFrom<T>(TPlayerType player) where T : TBaseMessageType
+        public Task<T> ReadMessageFrom<T>(TPlayerType player) where T : TBaseMessageType
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(1024 * 32);
-            try
-            {
-                var controller = new StreamController(player.NetworkStream);
-                var dataLen = await controller.ReadBytesOpaque16Async(buffer, 0);
-                var signature = _signer.SignData(buffer, 0 , dataLen, HashAlgorithmName.SHA256);
-                if(!_signer.VerifyData(buffer, 0, dataLen, signature, HashAlgorithmName.SHA256)) throw new Exception();
-                var package = Serializer.Deserialize<Package<TBaseMessageType>>(new ReadOnlySpan<byte>(buffer, 0, dataLen));
-                package.Signature = signature;
-                return (T)package.Message;
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            throw new NotImplementedException();
         }
     }
 

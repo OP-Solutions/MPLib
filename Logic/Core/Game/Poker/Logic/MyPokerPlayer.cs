@@ -15,7 +15,6 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
 
         #region Internal Properties
         SraParameters IMyCardGamePlayer.CurrentSraKey1 { get; set; }
-        SraParameters[] IMyCardGamePlayer.CurrentSraKeys2 { get; set; } 
         #endregion
 
         public MyPokerPlayer(string name, CngKey key, IPEndPoint endpointToConnect)

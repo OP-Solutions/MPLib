@@ -4,7 +4,7 @@ using ProtoBuf;
 namespace EtherBetClientLib.Core.Game.Poker.Messaging
 {
     [ProtoContract]
-    public class Package<TBaseMessageType> where TBaseMessageType : IMessage
+    public class Package
     {
         /// <summary>
         /// Sender identifier. It can be senders public key, sender player index index in game, etc..
@@ -23,7 +23,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Messaging
         public DateTime TimeStampUtc { get; set; }
 
         [ProtoMember(4)]
-        public TBaseMessageType Message { get; set; }
+        public IMessage Message { get; set; }
 
         public byte[] Signature { get; set; }
     }
