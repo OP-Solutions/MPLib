@@ -95,10 +95,13 @@ namespace EtherBetClientLib.Random
 
 
         /// <summary>
-        /// Open car only for local player. (only local player will see what card it is).
+        /// Open card from deck only for local player. (only local player will see what card it is).
         /// When this is called local player gets sra keys from other players and decrypts card with these keys
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Decrypted card</returns>
+        /// <remarks>
+        /// when this is called, <see cref="OpenOtherPlayerCard"/> should be called on all remote player devices.
+        /// </remarks>
         public async Task<Card> OpenMyCard(int cardIndex)
         {
             throw new NotImplementedException();
@@ -106,11 +109,29 @@ namespace EtherBetClientLib.Random
 
 
         /// <summary>
-        /// Publicly open card. (all players will see what card is).
+        /// Open card from deck for target player (only specified player will see what card it is)
+        /// When this is called local player sends his keys to specified player.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// This method is should be called on all player devices, except of target player who should decrypt card,
+        /// instead <see cref="OpenMyCard"/> should be called on target player device.
+        /// </remarks>
+        public async Task OpenOtherPlayerCard(Player targetPlayer, int cardIndex)
+        {
+
+        }
+
+
+        /// <summary>
+        /// Publicly open card from deck. (all players will see what card is).
         /// When this is called local player gets sra keys from other players and also sending own key to them,
         /// after that all players will have all keys for corresponding card and they will decrypt it.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// This method should be called on all player devices, so everyone knows keys of each other and all can decrypt target card
+        /// </remarks>
+        /// <returns>Decrypted card</returns>
         public async Task<Card> OpenPublicCard(int cardIndex)
         {
             throw new NotImplementedException();
