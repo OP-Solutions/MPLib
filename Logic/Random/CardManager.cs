@@ -7,11 +7,12 @@ using EtherBetClientLib.Core.Game.General;
 using EtherBetClientLib.Crypto.Encryption.SRA;
 using EtherBetClientLib.Models;
 using EtherBetClientLib.Models.Games;
+using EtherBetClientLib.Models.Games.CardGameModels;
 using EtherBetClientLib.Models.Games.Poker;
 
 namespace EtherBetClientLib.Random
 {
-    public class DecentralizedDeckShuffler<TPlayer, TMyPlayer>
+    public class CardManager<TPlayer, TMyPlayer>
         where TPlayer : CardGamePlayer
         where TMyPlayer : TPlayer, IMyCardGamePlayer
     {
@@ -32,7 +33,7 @@ namespace EtherBetClientLib.Random
         private readonly ReceiveDeckFromEvent _receiveDeckFrom;
         private readonly ReceiveKeysFromEvent _receiveKeysFrom;
 
-        public DecentralizedDeckShuffler(SendEvent send, ReceiveDeckFromEvent receiveDeckFrom, ReceiveKeysFromEvent receiveKeysFrom,
+        public CardManager(SendEvent send, ReceiveDeckFromEvent receiveDeckFrom, ReceiveKeysFromEvent receiveKeysFrom,
             List<BigInteger> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
         {
             _send = send;
@@ -90,6 +91,29 @@ namespace EtherBetClientLib.Random
             }
 
             return currentDeck;
+        }
+
+
+        /// <summary>
+        /// Open car only for local player. (only local player will see what card it is).
+        /// When this is called local player gets sra keys from other players and decrypts card with these keys
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Card> OpenMyCard(int cardIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// Publicly open card. (all players will see what card is).
+        /// When this is called local player gets sra keys from other players and also sending own key to them,
+        /// after that all players will have all keys for corresponding card and they will decrypt it.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Card> OpenPublicCard(int cardIndex)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<List<CheatInstance>> FindCheater(TPlayer requestedBy)
@@ -194,8 +218,6 @@ namespace EtherBetClientLib.Random
             return true;
 
         }
-
-
 
     }
 
