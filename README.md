@@ -1,7 +1,7 @@
 # MPLib
 MPLib ([Mental Poker](https://en.wikipedia.org/wiki/Mental_poker) Library) is open source decentralized gambling library written in c# (.Netstandard 2).
-Since it's written in .Netstandard 2.0 it can be consumed by any .Net project. Unity games are intended to be primary consumer of this library
-This project is currently under development! First supported game will be "Texas Holdem Poker".
+Since it's written in .Netstandard 2.0 it can be consumed by any .Net project. Unity games are intended to be primary consumer of this library.
+This project is currently under development and first supported game will be "Texas Holdem Poker".
 
 **Why this game library is special?**
 
