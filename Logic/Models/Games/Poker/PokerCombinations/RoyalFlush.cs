@@ -35,7 +35,7 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
 
             PokerGameData.Combinations[CombinationType.StraightFlush] = straightFlush.Cards;
 
-            return cards[1].Rank == CardRank.Teen
+            return cards[1].Rank == CardRank.Ten
                 ? new Combination(Type, cards)
                 : null;
         }

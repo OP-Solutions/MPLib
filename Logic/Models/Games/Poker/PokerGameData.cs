@@ -105,16 +105,6 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// </summary>
         public static int CaseCount = 0;
 
-        /// <summary>
-        /// Extension method to cast int to Card
-        /// </summary>
-        public static Card ToCard(this int index)
-        {
-            var rank = index % RankCount;
-            if (rank == 0) rank = 13;
-            var suit = (index - rank) / RankCount + 1;
 
-            return new Card((CardRank) rank, (CardSuit) suit);
-        }
     }
 }

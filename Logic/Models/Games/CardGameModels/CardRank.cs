@@ -1,5 +1,6 @@
 ﻿namespace EtherBetClientLib.Models.Games.CardGameModels
 {
+    
     /// <summary>
     /// Card ranks
     /// </summary>
@@ -15,7 +16,7 @@
         Seven,
         Eight,
         Nine,
-        Teen,
+        Ten,
         Jack,
         Queen,
         King

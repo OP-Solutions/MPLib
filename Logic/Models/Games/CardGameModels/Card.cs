@@ -1,4 +1,5 @@
 ﻿using System;
+using EtherBetClientLib.Models.Games.Poker;
 
 namespace EtherBetClientLib.Models.Games.CardGameModels
 {
@@ -7,6 +8,9 @@ namespace EtherBetClientLib.Models.Games.CardGameModels
     /// </summary>
     public struct Card : IComparable<Card>
     {
+        public const int RankCount = 13;
+        public const int SuitCount = 4;
+
         public bool Equals(Card other)
         {
             return Rank == other.Rank && Suit == other.Suit;
@@ -24,6 +28,11 @@ namespace EtherBetClientLib.Models.Games.CardGameModels
             {
                 return ((int) Rank * 397) ^ (int) Suit;
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{Rank}, {Suit}";
         }
 
         /// <summary>
@@ -49,6 +58,24 @@ namespace EtherBetClientLib.Models.Games.CardGameModels
         {
             Rank = rank;
             Suit = suit;
+        }
+
+
+        public static int ToNumber(Card card)
+        {
+            return ((int) card.Rank - 1) + ((int) card.Suit - 1) * RankCount;
+        }
+
+        /// <summary>
+        /// Extension method to cast int to Card
+        /// </summary>
+        public static Card FromNumber(int number)
+        {
+            var rank = (number % RankCount) + 1;
+            
+            var suit = (number / RankCount) + 1;
+
+            return new Card((CardRank)rank, (CardSuit)suit);
         }
 
         #region OPERATOR OVERLOADING AND INTERFACE IMPLEMENTING

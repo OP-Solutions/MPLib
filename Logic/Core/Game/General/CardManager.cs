@@ -22,18 +22,19 @@ namespace EtherBetClientLib.Core.Game.General
         public IReadOnlyList<TPlayer> Players { get; }
         public TMyPlayer MyPlayer { get; }
 
-
+        private IReadOnlyList<BigInteger> _finalDeck;
         private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _firstCycleDeck;
         private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _secondCycleDeck;
 
         private readonly IPlayerMessageManager<TPlayer, IMessage> _messageManager;
 
-        public CardManager(IPlayerMessageManager<TPlayer, IMessage> messageManager, IReadOnlyList<BigInteger> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
+        public CardManager(IPlayerMessageManager<TPlayer, IMessage> messageManager, IReadOnlyList<Card> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
         {
+
             _messageManager = messageManager;
             _firstCycleDeck = new Dictionary<TPlayer, IReadOnlyList<BigInteger>>();
             _secondCycleDeck = new Dictionary<TPlayer, IReadOnlyList<BigInteger>>();
-            SourceDeck = sourceDeck;
+            SourceDeck = sourceDeck.Select(card => new BigInteger(Card.ToNumber(card))).ToArray();
             Players = players;
             MyPlayer = myPlayer;
         }
@@ -84,7 +85,8 @@ namespace EtherBetClientLib.Core.Game.General
                 _secondCycleDeck.Add(player, currentDeck);
             }
 
-            return currentDeck;
+
+            return (_finalDeck = currentDeck);
         }
 
 
@@ -98,7 +100,15 @@ namespace EtherBetClientLib.Core.Game.General
         /// </remarks>
         public async Task<Card> OpenMyCard(int cardIndex)
         {
-            throw new NotImplementedException();
+            var card = _finalDeck[cardIndex];
+            foreach (var player in Players)
+            {
+                var key = player == MyPlayer ? MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex] : (await _messageManager.ReadMessageFrom<SingleKeyExposeMessage>(player)).Key;
+                var provider = new SraCryptoProvider(key);
+                card = provider.Decrypt(card);
+            }
+            
+            return Card.FromNumber((int)card);
         }
 
 
