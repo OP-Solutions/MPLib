@@ -79,7 +79,10 @@ namespace EtherBetClientLib.Networking
             }
         }
 
-
+        public async Task BroadcastMessage(TBaseMessageType message)
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task SendMessageTo(TPlayerType player, TBaseMessageType message)
         {
@@ -128,6 +131,7 @@ namespace EtherBetClientLib.Networking
     public interface IPlayerMessageSender<in TPlayerType, in TBaseMessageType> where TBaseMessageType : IMessage
     {
         Task SendMessageTo(TPlayerType player, TBaseMessageType message);
+        Task BroadcastMessage(TBaseMessageType message);
     }
 
     public interface IPlayerMessageReceiver<in TPlayerType, in TBaseMessageType> where TBaseMessageType : IMessage

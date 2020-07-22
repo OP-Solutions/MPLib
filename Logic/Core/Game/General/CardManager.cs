@@ -3,44 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using EtherBetClientLib.Core.Game.General;
+using EtherBetClientLib.Core.Game.Poker.Messaging;
+using EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes;
 using EtherBetClientLib.Crypto.Encryption.SRA;
-using EtherBetClientLib.Models;
 using EtherBetClientLib.Models.Games;
 using EtherBetClientLib.Models.Games.CardGameModels;
-using EtherBetClientLib.Models.Games.Poker;
+using EtherBetClientLib.Networking;
+using EtherBetClientLib.Random;
 
-namespace EtherBetClientLib.Random
+namespace EtherBetClientLib.Core.Game.General
 {
     public class CardManager<TPlayer, TMyPlayer>
         where TPlayer : CardGamePlayer
         where TMyPlayer : TPlayer, IMyCardGamePlayer
     {
-        public delegate Task SendEvent(List<BigInteger> shuffledDeck);
 
-        public delegate Task<List<BigInteger>> ReceiveDeckFromEvent(TPlayer player);
-
-        public delegate Task<PlayerKeys> ReceiveKeysFromEvent(TPlayer player);
-
-        public List<BigInteger> SourceDeck { get; }
+        public IReadOnlyList<BigInteger> SourceDeck { get; }
         public IReadOnlyList<TPlayer> Players { get; }
         public TMyPlayer MyPlayer { get; }
 
 
-        private readonly Dictionary<TPlayer, List<BigInteger>> _firstCycleDeck;
-        private readonly Dictionary<TPlayer, List<BigInteger>> _secondCycleDeck;
-        private readonly SendEvent _send;
-        private readonly ReceiveDeckFromEvent _receiveDeckFrom;
-        private readonly ReceiveKeysFromEvent _receiveKeysFrom;
+        private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _firstCycleDeck;
+        private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _secondCycleDeck;
 
-        public CardManager(SendEvent send, ReceiveDeckFromEvent receiveDeckFrom, ReceiveKeysFromEvent receiveKeysFrom,
-            List<BigInteger> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
+        private readonly IPlayerMessageManager<TPlayer, IMessage> _messageManager;
+
+        public CardManager(IPlayerMessageManager<TPlayer, IMessage> messageManager, IReadOnlyList<BigInteger> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
         {
-            _send = send;
-            _receiveDeckFrom = receiveDeckFrom;
-            _receiveKeysFrom = receiveKeysFrom;
-            _firstCycleDeck = new Dictionary<TPlayer, List<BigInteger>>();
-            _secondCycleDeck = new Dictionary<TPlayer, List<BigInteger>>();
+            _messageManager = messageManager;
+            _firstCycleDeck = new Dictionary<TPlayer, IReadOnlyList<BigInteger>>();
+            _secondCycleDeck = new Dictionary<TPlayer, IReadOnlyList<BigInteger>>();
             SourceDeck = sourceDeck;
             Players = players;
             MyPlayer = myPlayer;
@@ -56,13 +48,13 @@ namespace EtherBetClientLib.Random
                 if (player == MyPlayer)
                 {
                     var shuffledCards = Shuffling.Shuffle(currentDeck);
-                    var encryptedCards = shuffledCards.Select(n => provider1.Encrypt(n)).ToList();
-                    await _send(encryptedCards);
+                    var encryptedCards = shuffledCards.Select(n => provider1.Encrypt(n)).ToArray();
+                    await _messageManager.BroadcastMessage(new EncryptDeckMessage(encryptedCards));
                     currentDeck = encryptedCards;
                 }
                 else
                 {
-                    currentDeck = await _receiveDeckFrom(player);
+                    currentDeck = (await _messageManager.ReadMessageFrom<EncryptDeckMessage>(player)).EncryptedCards;
                 }
                 _firstCycleDeck.Add(player, currentDeck);
             }
@@ -80,12 +72,14 @@ namespace EtherBetClientLib.Random
                         var cardReEncrypted = provider2.Encrypt(decryptedCard);
                         reEncryptedCards.Add(cardReEncrypted);
                     }
-                    await _send(reEncryptedCards);
+                    await _messageManager.BroadcastMessage(new EncryptDeckMessage(reEncryptedCards));
+
+
                     currentDeck = reEncryptedCards;
                 }
                 else
                 {
-                    currentDeck = await _receiveDeckFrom(player);
+                    currentDeck = (await _messageManager.ReadMessageFrom<EncryptDeckMessage>(player)).EncryptedCards;
                 }
                 _secondCycleDeck.Add(player, currentDeck);
             }
@@ -145,7 +139,7 @@ namespace EtherBetClientLib.Random
             {
                 if (player != MyPlayer)
                 {
-                    var playerKeys = await _receiveKeysFrom(player);
+                    var playerKeys = (await _messageManager.ReadMessageFrom<ExposeKeysMessage>(player)).Keys;
                     playerKeyDict.Add(player, playerKeys);
                 }
                 else
@@ -191,7 +185,7 @@ namespace EtherBetClientLib.Random
             return cheaters;
         }
 
-        private bool CheckShuffleValidity(List<BigInteger> sourceDeck, List<BigInteger> resultDeck, SraParameters key)
+        private bool CheckShuffleValidity(IEnumerable<BigInteger> sourceDeck, IReadOnlyList<BigInteger> resultDeck, SraParameters key)
         {
 
             var provider = new SraCryptoProvider(key);
@@ -199,7 +193,7 @@ namespace EtherBetClientLib.Random
             return IsPermutation(shuffledDeck, resultDeck);
         }
 
-        private bool CheckPostShuffleEncryptionValidity(List<BigInteger> sourceDeck, List<BigInteger> resultDeck, PlayerKeys keys)
+        private bool CheckPostShuffleEncryptionValidity(IReadOnlyList<BigInteger> sourceDeck, IReadOnlyList<BigInteger> resultDeck, PlayerKeys keys)
         {
             var provider1 = new SraCryptoProvider(keys.SraKey1);
             var reEncryptedCards = new List<BigInteger>(sourceDeck.Count);
@@ -214,16 +208,14 @@ namespace EtherBetClientLib.Random
             return IsPermutation(reEncryptedCards, resultDeck);
         }
 
-        private bool IsPermutation(List<BigInteger> sourceDeck, List<BigInteger> resultDeck)
+        private bool IsPermutation(IReadOnlyList<BigInteger> sourceDeck, IReadOnlyList<BigInteger> resultDeck)
         {
             if (sourceDeck.Count != resultDeck.Count)
             {
                 return false;
             }
-            var sourceDeckCopy = new BigInteger[SourceDeck.Count];
-            var resultDeckCopy = new BigInteger[resultDeck.Count];
-            sourceDeck.CopyTo(sourceDeckCopy);
-            resultDeck.CopyTo(resultDeckCopy);
+            var sourceDeckCopy = sourceDeck.ToArray();
+            var resultDeckCopy = resultDeck.ToArray();
             Array.Sort(sourceDeckCopy);
             Array.Sort(resultDeckCopy);
 
