@@ -119,7 +119,7 @@ namespace EtherBetClientLib.Random
         /// </remarks>
         public async Task OpenOtherPlayerCard(Player targetPlayer, int cardIndex)
         {
-
+            throw new NotImplementedException();
         }
 
 
