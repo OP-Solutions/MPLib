@@ -83,22 +83,12 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         /// <summary>
         /// Index of player whose turn to move is currently
         /// </summary>
-        public int CurrentPlayerIndex
-        {
-#pragma warning disable 618
-            get => _currentPlayerIndex;
-            internal set
-            {
-                _currentPlayerIndex = value;
-                CurrentPlayer = Table.Players[value];
-            }
-#pragma warning restore 618
-        }
+        public int CurrentPlayerIndex { get; internal set; }
 
         /// <summary>
         /// Player whose turn to move is currently
         /// </summary>
-        public Player CurrentPlayer { get; private set; }
+        public Player CurrentPlayer => Players[CurrentPlayerIndex];
 
         public PokerRoundState State { get; set; }
 
@@ -107,9 +97,6 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
         /// Deck card list after shuffling, cards are represented as encrypted bigIntegers
         /// </summary>
         private BigInteger[] ShuffledDeck { get; set; }
-
-        [Obsolete("Not use this variable (intended for internal usage), instead use this: " + nameof(CurrentPlayerIndex))]
-        private int _currentPlayerIndex;
 
         private readonly IPlayerMessageManager<PokerPlayer, IPokerMessage> _messageManager;
 

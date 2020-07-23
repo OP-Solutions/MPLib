@@ -146,7 +146,7 @@ namespace EtherBetClientLib.Core.Game.General
         /// </summary>
         /// <remarks>
         /// This method should be called on all player devices, so everyone knows keys of each other and all can decrypt target card
-        /// </remarks>
+        /// </remarks>  
         /// <returns>Decrypted card</returns>
         public async Task<Card> OpenPublicCard(int cardIndex)
         {
