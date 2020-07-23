@@ -38,8 +38,8 @@ namespace EtherBetClientLib.Networking
         /// </param>
         public PlayerMessageManager(IReadOnlyDictionary<TPlayerType, string> players)
         {
-            _connectedPlayers = players.Where(p => !p.Key.IsMyPlayer()).ToDictionary(p => p.Key, p => p.Value);
-            var myPlayerInfo = players.First(p => p.Key.IsMyPlayer());
+            _connectedPlayers = players.Where(p => !p.Key.IsMyPlayer).ToDictionary(p => p.Key, p => p.Value);
+            var myPlayerInfo = players.First(p => p.Key.IsMyPlayer);
             var myPlayer = myPlayerInfo.Key;
             _myIdentifier = myPlayerInfo.Value;
             _signer = new ECDsaCng(myPlayer.Key);

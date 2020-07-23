@@ -28,13 +28,11 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
         /// </returns>
         public override Combination Check(Card[] cards)
         {
-            var containsRank = new bool[13]; // index == rank
 
             var straight = new List<Card>(5) {cards[6]};
 
             for (var i = PokerGameData.CardCount - 1; i >= 1; i--)
             {
-                containsRank[(int) cards[i].Rank - 1] = true;
                 if ((int) cards[i].Rank - (int) cards[i - 1].Rank == 1 ||
                     (int) cards[i].Rank - (int) cards[i - 1].Rank == 12) straight.Add(cards[i - 1]);
 

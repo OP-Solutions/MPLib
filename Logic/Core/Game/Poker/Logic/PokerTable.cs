@@ -4,21 +4,31 @@ using EtherBetClientLib.Models.Games;
 
 namespace EtherBetClientLib.Core.Game.Poker.Logic
 {
-    public class PokerTable : GameTableBase
+    public class PokerTable : GameTableBase<PokerPlayer, MyPokerPlayer>
     {
-
-        public MyPokerPlayer MyPlayer { get; internal set; }
-
-        public int CurrentSmallBlind { get; private set; }
+        public int CurrentSmallBlind { get; internal set; }
         public int CurrentSmallBlindPlayerIndex { get; set; }
+        public PokerPlayer CurrentSmallBlindPlayer => Players[CurrentSmallBlindPlayerIndex];
+
 
         /// <summary>
-        /// Time when current small blind will be doubled
+        /// Time when current small blind will be changed
+        /// Can be <see cref="DateTime.MaxValue"/> meaning constant small blind all game
         /// </summary>
-        public DateTime SmallBlindDoubleTime { get; set; }
+        public DateTime NextSmallBlindChangeTime { get; internal set; }
 
-        public PokerTable(List<Player> players) : base(players)
+        /// <summary>
+        /// Value of small blind after <see cref="NextSmallBlindChangeTime"/>
+        /// </summary>
+        public int NextSmallBlind { get; internal set; }
+
+        /// <summary>
+        /// Notifies remote players about being ready to start
+        /// If others player also call this method within some interval game will start
+        /// </summary>
+        public void RequireStart()
         {
+            throw new NotImplementedException();
         }
     }
 }

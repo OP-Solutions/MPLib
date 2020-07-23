@@ -13,9 +13,11 @@ namespace EtherBetClientLib.Models.Games
         /// </summary>
         public CngKey Key { get; set; }
 
-        public string Name { get; set; }
+        public virtual string Name { get; internal set; }
 
-        public bool IsMyPlayer() => NetworkStream == null;
+        public bool IsPlaying { get; internal set; }
+
+        public bool IsMyPlayer => NetworkStream != null;
 
         internal PlayerNetworkStream NetworkStream { get; }
 
