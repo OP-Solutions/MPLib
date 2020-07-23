@@ -148,8 +148,8 @@ namespace EtherBetClientLib.Models.Games.Poker
             if (Type < other.Type) return -1;
             
             // else if combination types are equal we must compare greatest cards (override in FullHouse)
-            if (Cards[Cards.Length - 1] > Cards[other.Cards.Length - 1]) return 1;
-            if (Cards[Cards.Length - 1] < Cards[other.Cards.Length - 1]) return -1;
+            if (Cards[^1] > Cards[other.Cards.Length - 1]) return 1;
+            if (Cards[^1] < Cards[other.Cards.Length - 1]) return -1;
 
             return 0;
         }
