@@ -6,10 +6,10 @@
         Shuffle,
         EncryptSingleKey,
         DecryptCard,
-        KeyExpose,
+        SingleKeyExpose,
         Bet,
         Fold,
-        FullKeysExpose,
+        ExposeKeys,
         LeaveTable,
         ReShuffle,
     }
