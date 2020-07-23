@@ -39,6 +39,14 @@ namespace EtherBetClientLib.Core.Game.General
             MyPlayer = myPlayer;
         }
 
+
+
+        /// <summary>
+        /// shuffle and encrypt the deck of cards. after this process the deck becomes an array of 52 integers
+        /// each encrypted by every player with a unique key
+        /// </summary>
+        /// <returns>shuffled and encrypted deck</returns>
+
         public async Task<IReadOnlyList<BigInteger>> Shuffle()
         {
             var currentDeck = SourceDeck;
@@ -121,9 +129,13 @@ namespace EtherBetClientLib.Core.Game.General
         /// This method is should be called on all player devices, except of target player who should decrypt card,
         /// instead <see cref="OpenMyCard"/> should be called on target player device.
         /// </remarks>
-        public async Task OpenOtherPlayerCard(Player targetPlayer, int cardIndex)
+        public async Task OpenOtherPlayerCard(TPlayer targetPlayer, int cardIndex)
         {
-            throw new NotImplementedException();
+            await _messageManager.SendMessageTo(targetPlayer, new SingleKeyExposeMessage()
+            {
+                CardIndex = cardIndex,
+                Key = MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex]
+            });
         }
 
 
@@ -138,9 +150,29 @@ namespace EtherBetClientLib.Core.Game.General
         /// <returns>Decrypted card</returns>
         public async Task<Card> OpenPublicCard(int cardIndex)
         {
-            throw new NotImplementedException();
+            await _messageManager.BroadcastMessage(new SingleKeyExposeMessage()
+            {
+                CardIndex = cardIndex,
+                Key = MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex]
+            });
+
+            var card = _finalDeck[cardIndex];
+            foreach (var player in Players)
+            {
+                var key = player == MyPlayer ? MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex] : (await _messageManager.ReadMessageFrom<SingleKeyExposeMessage>(player)).Key;
+                var provider = new SraCryptoProvider(key);
+                card = provider.Decrypt(card);
+            }
+
+            return Card.FromNumber((int)card);
         }
 
+
+        /// <summary>
+        /// start a process that will find every invalid action during shuffling process
+        /// and return an array of these actions along with players that executed them
+        /// </summary>
+        /// <returns> a list of cheat instances</returns>
         public async Task<List<CheatInstance>> FindCheater(TPlayer requestedBy)
         {
             var playerKeyDict = new Dictionary<TPlayer, PlayerKeys>();
@@ -195,6 +227,13 @@ namespace EtherBetClientLib.Core.Game.General
             return cheaters;
         }
 
+        /// <summary>
+        /// check if a step during a shuffling process was executed properly
+        /// </summary>
+        /// <param name="sourceDeck"> deck state at the start of the step </param>
+        /// <param name="resultDeck"> deck state at the end of the step </param>
+        /// <param name="key"> key by which the cards were encrypted post shuffle </param>
+        /// <returns> true or false depending on the validity of the action taken </returns>
         private bool CheckShuffleValidity(IEnumerable<BigInteger> sourceDeck, IReadOnlyList<BigInteger> resultDeck, SraParameters key)
         {
 
@@ -203,6 +242,13 @@ namespace EtherBetClientLib.Core.Game.General
             return IsPermutation(shuffledDeck, resultDeck);
         }
 
+        /// <summary>
+        /// check if a step during a reencrypting process was executed properly
+        /// </summary>
+        /// <param name="sourceDeck"> deck state at the start of the step </param>
+        /// <param name="resultDeck"> deck state at the end of the step </param>
+        /// <param name="keys"> keys by which the cards were encrypted post shuffle </param>
+        /// <returns> true or false depending on the validity of the action taken </returns>
         private bool CheckPostShuffleEncryptionValidity(IReadOnlyList<BigInteger> sourceDeck, IReadOnlyList<BigInteger> resultDeck, PlayerKeys keys)
         {
             var provider1 = new SraCryptoProvider(keys.SraKey1);
@@ -218,6 +264,9 @@ namespace EtherBetClientLib.Core.Game.General
             return IsPermutation(reEncryptedCards, resultDeck);
         }
 
+        /// <summary>
+        /// checks if one array is another array's permutation
+        /// </summary>
         private bool IsPermutation(IReadOnlyList<BigInteger> sourceDeck, IReadOnlyList<BigInteger> resultDeck)
         {
             if (sourceDeck.Count != resultDeck.Count)
@@ -249,11 +298,11 @@ namespace EtherBetClientLib.Core.Game.General
         public CheatInstance(Player players, CheatType cheatType)
         {
             Players = players;
-            CheackType = cheatType;
+            CheatType = cheatType;
         }
 
         public Player Players { get; }
-        public CheatType CheackType { get; }
+        public CheatType CheatType { get; }
     }
 
     public enum CheatType
