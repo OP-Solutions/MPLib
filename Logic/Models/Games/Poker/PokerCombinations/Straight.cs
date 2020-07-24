@@ -6,28 +6,32 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
     /// <summary>
     /// Straight combination
     /// </summary>
-    public class Straight : Combination
+    public class Straight : ICombinationTypeChecker
     {
-        #region CONSTRUCTOR
-
-        public Straight(Card[] cards) : base(CombinationType.Straight, cards)
-        {
-        }
-
-        #endregion
-
-
         /// <summary>
-        /// Checks if 7 element cards array contains Straight
+        /// Checks if 7 element cards array contains Straight and writes resulting combination to <paramref name="combination"/>
         /// </summary>
         /// <param name="cards">
         /// 7 element array of cards
         /// </param>
+        /// <param name="combination">
+        /// combination instance
+        /// </param>
         /// <returns>
-        /// Cards in Straight combination
+        /// if the cards make up a straight
         /// </returns>
-        public override Combination Check(Card[] cards)
+        public bool Check(Card[] cards, Combination combination)
         {
+            if (combination.SatisfiedCombinationTypes.HasFlag(CombinationType.Straight))
+            {
+                return true;
+            }
+
+            if (combination.UnsatisfiedCombinationTypes.HasFlag(CombinationType.Straight))
+            {
+                return false;
+            }
+
 
             var straight = new List<Card>(5) {cards[6]};
 
@@ -42,10 +46,19 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
                     straight.Add(cards[i - 1]);
                 }
 
-                if (straight.Count == 5) return new Combination(Type, straight.ToArray());
+                if (straight.Count != 5) continue;
+                combination.SatisfiedCombinationTypes |= CombinationType.Straight;
+                combination.Top5 = straight.ToArray();
+                return true;
             }
 
-            return null;
+            combination.UnsatisfiedCombinationTypes |= CombinationType.Straight;
+            return false;
+        }
+
+        public int Compare(Combination first, Combination second)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

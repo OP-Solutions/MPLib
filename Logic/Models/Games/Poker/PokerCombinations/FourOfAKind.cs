@@ -6,27 +6,21 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
     /// <summary>
     /// Four of a kind type Combination
     /// </summary>
-    public class FourOfAKind : Combination
+    public class FourOfAKind : ICombinationTypeChecker
     {
-        #region CONSTRUCTOR
-
-        public FourOfAKind(Card[] cards) : base(CombinationType.FourOfAKind, cards)
-        {
-        }
-
-        #endregion
-
-
         /// <summary>
         /// checks if 7 element array of cards contains Four Of A Kind combination
         /// </summary>
         /// <param name="cards">
         /// Array of 7 cards
         /// </param>
+        /// <param name="combination">
+        /// combination instance
+        /// </param>
         /// <returns>
         /// Four Of A Kind  combination if it's found, Null if not found
         /// </returns>
-        public override Combination Check(Card[] cards)
+        public bool Check(Card[] cards, Combination combination)
         {
             var frequency = 1; // max frequency of rank in array
 
@@ -47,26 +41,23 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
                 // copy 4 "combination builder" cards at i-2, i-1, i, i+1 indexes from cards to result array.
                 Array.Copy(cards, i - 2, result, 0, 4);
 
-                return new Combination(Type, result);
+                return true;
             }
 
-            return null;
+            return false;
         }
 
         /// <summary>
         /// Compares two Four Of A Kind combination
         /// </summary>
-        /// <param name="other">
-        /// The other.
-        /// </param>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
         /// <returns>
         /// 0 if equal 1 if current is greater and -1 if other is greater
         /// </returns>
-        protected override int Compare(Combination other)
+        public int Compare(Combination first, Combination second)
         {
-            if (Cards[1].Rank > other.Cards[1].Rank) return 1;
-            if (Cards[1].Rank < other.Cards[1].Rank) return -1;
-
+           
             return 0;
         }
     }

@@ -5,15 +5,8 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
     /// <summary>
     /// Three Of A Kind combination
     /// </summary>
-    public class ThreeOfAKind : Combination
+    public class ThreeOfAKind : ICombinationTypeChecker
     {
-        #region CONSTRUCTOR
-
-        public ThreeOfAKind(Card[] cards) : base(CombinationType.ThreeOfAKind, cards)
-        {
-        }
-
-        #endregion
 
         /// <summary>
         /// Checks if given array of cards contains ThreeOfaKind combination
@@ -23,14 +16,37 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
         /// <param name="cards">
         /// 7 elements cards array
         /// </param>
+        /// <param name="combination">
+        /// combination instance
+        /// </param>
         /// <returns>
         /// Cards if contains, null if not contains
         /// </returns>
-        public override Combination Check(Card[] cards)
+        public bool Check(Card[] cards, Combination combination)
         {
-            return PokerGameData.Combinations[CombinationType.ThreeOfAKind] == null
-                ? null
-                : new Combination(Type, PokerGameData.Combinations[CombinationType.ThreeOfAKind]);
+            if (combination.SatisfiedCombinationTypes.HasFlag(CombinationType.ThreeOfAKind))
+            {
+                return true;
+            }
+            if (combination.UnsatisfiedCombinationTypes.HasFlag(CombinationType.ThreeOfAKind))
+            {
+                return false;
+            }
+
+
+            return false;
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
+        /// <returns></returns>
+        public int Compare(Combination first, Combination second)
+        {
+            return 0;
         }
     }
 }

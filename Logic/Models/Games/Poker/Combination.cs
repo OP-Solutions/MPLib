@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using EtherBetClientLib.Models.Games.CardGameModels;
 
 namespace EtherBetClientLib.Models.Games.Poker
@@ -16,9 +18,26 @@ namespace EtherBetClientLib.Models.Games.Poker
         public CombinationType Type;
 
         /// <summary>
-        /// The cards in combination
+        /// The 7 cards in hand
         /// </summary>
         public Card[] Cards;
+
+        /// <summary>
+        /// Top 5 cards from 7 card hand
+        /// </summary>
+        public Card[] Top5;
+
+
+        /// <summary>
+        /// array of all the combination types that are satisfied by hand
+        /// </summary>
+        public CombinationType SatisfiedCombinationTypes = CombinationType.HighCard;
+
+
+        /// <summary>
+        ///  array of all the combination types that are unsatisfied by hand
+        /// </summary>
+        public CombinationType UnsatisfiedCombinationTypes = CombinationType.HighCard;
 
         #region CONSTRUCTOR
 
@@ -29,15 +48,58 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// The rank.
         /// </param>
         /// <param name="cards">
-        /// The cards.
+        /// 7 cards.
         /// </param>
-        public Combination(CombinationType type, Card[] cards)
+        /// <param name="top5">
+        /// best combination of 5 out of 7 cards
+        /// </param>
+        public Combination(Card[] cards, CombinationType type, Card[] top5)
         {
+            Array.Sort(cards);
             Type = type;
             Cards = cards;
+            Top5 = top5;
         }
- 
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Combination"/> class.
+        /// </summary>
+        /// <param name="cards">
+        /// The cards.
+        /// </param>
+        public Combination(Card[] cards)
+        {
+            Array.Sort(cards);
+            foreach (var combination in PokerGameData.CombTypes)
+            {
+                if (!combination.Check(cards, this)) continue;
+                break;
+            }
+
+            Cards = cards;
+        }
+
         #endregion
+
+        public static Card[] GetKickers(Card[] cards, List<CardRank> used, int expectedKickerCount)
+        {
+            var kickerCount = 0;
+            var kickers = new Card[expectedKickerCount];
+            for (var i = cards.Length - 1; i > 0; i--)
+            {
+                if (used.Contains(cards[i].Rank)) continue;
+                
+                if (kickerCount < expectedKickerCount)
+                {
+                    kickers[kickerCount++] = cards[i];
+                    continue;
+                }
+                break;
+            }
+
+            return kickers;
+        }
+
 
         #region OPERATOR OVERRIDING
 
@@ -93,7 +155,7 @@ namespace EtherBetClientLib.Models.Games.Poker
                 return false;
             }
 
-            return a.Compare(b) == -1 ? true : false;
+            return a.Compare(b) == -1;
         }
  
         #endregion
@@ -115,23 +177,6 @@ namespace EtherBetClientLib.Models.Games.Poker
             return Compare(other);
         }
 
-        /// <summary>
-        /// Checks if input array contains specified combination
-        /// overridden for all poker combination types
-        /// </summary>
-        /// <param name="cards">
-        /// 7 elements cards array.
-        /// </param>
-        /// <returns>
-        /// The <see>
-        ///     <cref>Card[]</cref>
-        /// </see>
-        /// .
-        /// </returns>
-        public virtual Combination Check(Card[] cards)
-        {
-            return null;
-        }
 
         /// <summary>
         /// The compare.
@@ -146,12 +191,8 @@ namespace EtherBetClientLib.Models.Games.Poker
         {
             if (Type > other.Type) return 1;
             if (Type < other.Type) return -1;
-            
-            // else if combination types are equal we must compare greatest cards (override in FullHouse)
-            if (Cards[Cards.Length - 1] > Cards[other.Cards.Length - 1]) return 1;
-            if (Cards[Cards.Length - 1] < Cards[other.Cards.Length - 1]) return -1;
 
-            return 0;
+            return PokerGameData.CombTypesDictionary[Type].Compare(this, other);
         }
 
         #endregion
