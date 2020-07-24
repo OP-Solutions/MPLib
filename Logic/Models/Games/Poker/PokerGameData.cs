@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using EtherBetClientLib.Models.Games.CardGameModels;
 using EtherBetClientLib.Models.Games.Poker.PokerCombinations;
 
@@ -98,7 +99,7 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// List of all cards
         /// will be initialized in main method
         /// </summary>
-        public static Card[] CardDeck = new Card[52];
+        public static Card[] CardDeck = Enumerable.Range(0, 52).Select(Card.FromNumber).ToArray();
 
         #endregion
 
@@ -116,7 +117,5 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// Count of all checked cases
         /// </summary>
         public static int CaseCount = 0;
-
-
     }
 }
