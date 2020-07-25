@@ -5,10 +5,6 @@ namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
     [ProtoContract]
     class RoundStampMessage : IPokerMessage
     {
-        public const PokerMessageType BoundType = PokerMessageType.RoundStamp;
-
-        public PokerMessageType Type { get; set; } = BoundType;
-
         /// <summary>
         /// Unique Identifier Of Table this round belongs to
         /// </summary>

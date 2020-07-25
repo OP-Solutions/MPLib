@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -11,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using EtherBetClientLib.Core.Game.Poker.Messaging;
 using EtherBetClientLib.Helper;
 using EtherBetClientLib.Models;
@@ -27,15 +29,18 @@ namespace EtherBetClientLib.Networking
         private readonly IReadOnlyDictionary<TPlayerType, string> _connectedPlayers;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly byte[] _internalBuffer = new byte[1024 * 1024];
-
-
         private readonly Dictionary<Player, Dictionary<Type, Channel<Package>>> _messageStorage;
+
+
+        // TODO need to implement thi dictionary fill
+        private readonly IReadOnlyDictionary<short, Type> _messageCodeToTypeMap = new Dictionary<short, Type>();
 
         /// <param name="otherPlayers">
         /// players dictionary. key is player itself, value - corresponding player identifier, which is included in each message
         /// so remote party knows who message are coming from, or who is destination of that message:
         /// (<see cref="Package{TBaseMessageType}.SenderIdentifier"/>/>, (<see cref="Package{TBaseMessageType}.DestinationIdentifier"/>/>,
         /// </param>
+        /// <param name="players">Contact list to send messages to</param>
         public PlayerMessageManager(IReadOnlyDictionary<TPlayerType, string> players)
         {
             _connectedPlayers = players.Where(p => !p.Key.IsMyPlayer).ToDictionary(p => p.Key, p => p.Value);
@@ -57,16 +62,24 @@ namespace EtherBetClientLib.Networking
                 Task.Run(async () =>
                 {
                     var controller = new StreamController(player.NetworkStream);
-                    var stream = new MemoryStream(_internalBuffer);
+                    var memStream = new MemoryStream(_internalBuffer);
+                    var memStreamController = new StreamController(memStream);
                     while (true)
                     {
                         var dataLen = await controller.ReadBytesOpaque16Async(_internalBuffer, 0);
                         if(dataLen == 0) break;
-                        var signature = await controller.ReadBytesOpaque16Async();
-                        if(signature == null) break;
-                        var package = Serializer.Deserialize<Package>(new ReadOnlySpan<byte>(_internalBuffer, 0, dataLen));
-                        package.Signature = signature;
-                        var messageType = package.Message.GetType();
+                        var messageTypeCode = await controller.ReadInt16Async();
+                        var messageType = _messageCodeToTypeMap[messageTypeCode];
+                        var packageLen = await memStreamController.ReadInt16Async();
+                        memStream.SetLength(memStream.Position + packageLen);
+                        var package = Serializer.Deserialize<Package>(memStream);
+                        var messageLen = await memStreamController.ReadInt16Async();
+                        memStream.SetLength(memStream.Position + messageLen);
+                        var message = Serializer.Deserialize(messageType, memStream);
+                        var signature = await memStreamController.ReadBytesOpaque16Async();
+                        if (signature == null) break;
+                        package.SenderSignature = signature;
+                        package.Message = message;
                         var playerMessageStorage = _messageStorage[player];
                         if (!playerMessageStorage.TryGetValue(messageType, out var channel))
                         {

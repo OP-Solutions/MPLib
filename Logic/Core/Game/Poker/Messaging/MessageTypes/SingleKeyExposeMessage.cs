@@ -7,11 +7,6 @@ namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
     [ProtoContract]
     class SingleKeyExposeMessage : IPokerMessage
     {
-        public const PokerMessageType BoundType = PokerMessageType.SingleKeyExpose;
-
-        public PokerMessageType Type { get; set; } = BoundType;
-
-
         [ProtoMember(1)]
         public int CardIndex { get; set; }
 

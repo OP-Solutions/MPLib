@@ -6,6 +6,9 @@ namespace EtherBetClientLib.Core.Game.Poker.Messaging
     [ProtoContract]
     public class Package
     {
+
+        public short MessageTypeCode { get; set; }
+
         /// <summary>
         /// Sender identifier. It can be senders public key, sender player index index in game, etc..
         /// But it strictly depends on situation. for example if we are sending message in poker round it should be always sender player index in round, not anything else
@@ -22,10 +25,12 @@ namespace EtherBetClientLib.Core.Game.Poker.Messaging
         [ProtoMember(3)]
         public DateTime TimeStampUtc { get; set; }
 
-        [ProtoMember(4)]
-        public IMessage Message { get; set; }
+        #region These fields are [de]serialized manually
 
-        public byte[] Signature { get; set; }
+        public object Message { get; set; }
+
+        public byte[] SenderSignature { get; set; } 
+        #endregion
     }
 
     public interface IMessage

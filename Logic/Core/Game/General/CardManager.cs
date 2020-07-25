@@ -58,12 +58,12 @@ namespace EtherBetClientLib.Core.Game.General
                 {
                     var shuffledCards = Shuffling.Shuffle(currentDeck);
                     var encryptedCards = shuffledCards.Select(n => provider1.Encrypt(n)).ToArray();
-                    await _messageManager.BroadcastMessage(new EncryptDeckMessage(encryptedCards));
+                    await _messageManager.BroadcastMessage(new EncryptShuffleDeckMessage(encryptedCards));
                     currentDeck = encryptedCards;
                 }
                 else
                 {
-                    currentDeck = (await _messageManager.ReadMessageFrom<EncryptDeckMessage>(player)).EncryptedCards;
+                    currentDeck = (await _messageManager.ReadMessageFrom<EncryptShuffleDeckMessage>(player)).EncryptedCards;
                 }
                 _firstCycleDeck.Add(player, currentDeck);
             }
@@ -81,14 +81,14 @@ namespace EtherBetClientLib.Core.Game.General
                         var cardReEncrypted = provider2.Encrypt(decryptedCard);
                         reEncryptedCards.Add(cardReEncrypted);
                     }
-                    await _messageManager.BroadcastMessage(new EncryptDeckMessage(reEncryptedCards));
+                    await _messageManager.BroadcastMessage(new EncryptShuffleDeckMessage(reEncryptedCards));
 
 
                     currentDeck = reEncryptedCards;
                 }
                 else
                 {
-                    currentDeck = (await _messageManager.ReadMessageFrom<EncryptDeckMessage>(player)).EncryptedCards;
+                    currentDeck = (await _messageManager.ReadMessageFrom<EncryptShuffleDeckMessage>(player)).EncryptedCards;
                 }
                 _secondCycleDeck.Add(player, currentDeck);
             }

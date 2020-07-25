@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
-    class FoldMessage : IPokerMessage
+    class ReshuffleMessage : IPokerMessage
     {
     }
 }

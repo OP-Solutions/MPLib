@@ -7,17 +7,17 @@ using ProtoBuf;
 
 namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
 {
-    class EncryptDeckMessage : IPokerMessage
+    class EncryptShuffleDeckMessage : IPokerMessage
     {
 
-        public const PokerMessageType BoundType = PokerMessageType.EncryptSingleKey;
+        public const PokerMessageType BoundType = PokerMessageType.EncryptShuffleDeck;
 
         public PokerMessageType Type { get; set; } = BoundType;
 
         [ProtoMember(1)]
         public IReadOnlyList<BigInteger> EncryptedCards { get; set; }
 
-        public EncryptDeckMessage(IReadOnlyList<BigInteger> encryptedCards)
+        public EncryptShuffleDeckMessage(IReadOnlyList<BigInteger> encryptedCards)
         {
             EncryptedCards = encryptedCards;
         }

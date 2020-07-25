@@ -22,7 +22,7 @@ namespace EtherBetClientLib.Helper
             _buffer = new byte[8];
         }
 
-        public async Task<int> ReadInt16Async()
+        public async Task<short> ReadInt16Async()
         {
             await _baseStream.ReadAsync(_buffer, 0, 2);
             var len = (short)(_buffer[0] | _buffer[1] << 8);
