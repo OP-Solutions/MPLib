@@ -96,7 +96,10 @@ namespace EtherBetClientLib.Networking
 
         public async Task BroadcastMessage(TBaseMessageType message)
         {
-            throw new NotImplementedException();
+            var tasks = (from TPlayerType player in _connectedPlayers
+                         select SendMessageTo(player, message)).ToList();
+
+            await Task.WhenAll(tasks);
         }
 
         public async Task SendMessageTo(TPlayerType player, TBaseMessageType message)
