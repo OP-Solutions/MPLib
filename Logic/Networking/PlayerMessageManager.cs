@@ -63,21 +63,23 @@ namespace EtherBetClientLib.Networking
                 {
                     var controller = new StreamController(player.NetworkStream);
                     var memStream = new MemoryStream(_internalBuffer);
-                    var memStreamController = new StreamController(memStream);
                     while (true)
                     {
+                        //data length (without signature)
                         var dataLen = await controller.ReadBytesOpaque16Async(_internalBuffer, 0);
                         if(dataLen == 0) break;
                         var messageTypeCode = await controller.ReadInt16Async();
                         var messageType = _messageCodeToTypeMap[messageTypeCode];
-                        var packageLen = await memStreamController.ReadInt16Async();
-                        memStream.SetLength(memStream.Position + packageLen);
-                        var package = Serializer.Deserialize<Package>(memStream);
-                        var messageLen = await memStreamController.ReadInt16Async();
-                        memStream.SetLength(memStream.Position + messageLen);
-                        var message = Serializer.Deserialize(messageType, memStream);
-                        var signature = await memStreamController.ReadBytesOpaque16Async();
+                        var package = (Package)DeserializePrefixedLenInt16(typeof(Package), memStream);
+                        var message = DeserializePrefixedLenInt16(messageType, memStream);
+
+
+                        var signature = await controller.ReadBytesOpaque16Async();
                         if (signature == null) break;
+
+                        if(!_signer.VerifyData(_internalBuffer, 0, dataLen, signature, HashAlgorithmName.SHA256))
+                            break;
+
                         package.SenderSignature = signature;
                         package.Message = message;
                         var playerMessageStorage = _messageStorage[player];
@@ -109,17 +111,12 @@ namespace EtherBetClientLib.Networking
             var buffer = ArrayPool<byte>.Shared.Rent(1024 * 32);
             try
             {
-                await using var stream = new MemoryStream(buffer) { Position = 2 };
-                Serializer.Serialize(stream, package);
-                var pos = (int)stream.Position;
-                var len = pos - 2;
-                buffer[0] = (byte)len;
-                buffer[1] = (byte)(len >> 8);
-                var signature = _signer.SignData(buffer, 2, len, HashAlgorithmName.SHA256);
-                stream.Position += 2;
-                var signatureLen = signature.Length;
-                buffer[pos] = (byte)signatureLen;
-                buffer[pos + 1] = (byte)(signatureLen >> 8);
+                await using var stream = new MemoryStream(buffer) { Position = 0 };
+                Serializer.NonGeneric.SerializeWithLengthPrefix(stream, package, PrefixStyle.Fixed32BigEndian, 0);
+                Serializer.NonGeneric.SerializeWithLengthPrefix(stream, message, PrefixStyle.Fixed32BigEndian, 0);
+                var signature = _signer.SignData(buffer, 0, (int)stream.Position, HashAlgorithmName.SHA256);
+                var controller = new StreamController(stream);
+                await controller.WriteBytesOpaque16Async(signature);
                 await stream.CopyToAsync(player.NetworkStream);
             }
             finally
@@ -133,6 +130,18 @@ namespace EtherBetClientLib.Networking
         {
             throw new NotImplementedException();
         }
+
+
+        //Note: not preserves initial length value
+        private static object DeserializePrefixedLenInt16(Type type, MemoryStream source)
+        {
+            if (!Serializer.TryReadLengthPrefix(source, PrefixStyle.Base128, out var length))
+                throw new Exception("Unexpected data from stream, can't read length prefix");
+
+            source.SetLength(source.Position + length);
+            return Serializer.Deserialize(type, source);
+        }
+
     }
 
     public interface IPlayerMessageManager<in TPlayerType, in TBaseMessageType> : IPlayerMessageSender<TPlayerType, TBaseMessageType>, IPlayerMessageReceiver<TPlayerType, TBaseMessageType> 
