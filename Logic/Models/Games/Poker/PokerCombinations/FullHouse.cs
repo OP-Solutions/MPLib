@@ -6,32 +6,28 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
     /// <summary>
     /// FullHouse combination
     /// </summary>
-    public class FullHouse : Combination
+    public class FullHouse : ICombinationTypeChecker
     {
-        #region CONSTRUCTOR
-
-        public FullHouse(Card[] cards) : base(CombinationType.FullHouse, cards)
-        {
-        }
-
-        #endregion
-
         /// <summary>
         /// Checks if 7 element Card array contains FullHouse
         /// </summary>
         /// <param name="cards">
         /// 7 element Card array
         /// </param>
+        /// <param name="combination">
+        /// combination instance
+        /// </param>
         /// <returns>
         /// Full House Combination if found
         /// </returns>
-        public override Combination Check(Card[] cards)
+        public bool Check(Card[] cards, Combination combination)
         {
             var pair = new Card[2];
             var threeOfaKind = new Card[3];
 
-            PokerGameData.Combinations[CombinationType.Pair] = null;
+            /*PokerGameData.Combinations[CombinationType.Pair] = null;
             PokerGameData.Combinations[CombinationType.ThreeOfAKind] = null;
+            */
 
             var isThreeOfaKind = threeOfaKind[0].Rank != CardRank.Default;
             for (var i = 0; i < cards.Length - 1; i++)
@@ -53,30 +49,26 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
 
                 var isPair = pair[0].Rank != CardRank.Default;
 
+                /*
                 if (isPair) PokerGameData.Combinations[CombinationType.Pair] = pair;
                 if (isThreeOfaKind) PokerGameData.Combinations[CombinationType.ThreeOfAKind] = threeOfaKind;
+                */
 
                 if (!isPair || !isThreeOfaKind) continue;
                 var fullHouse = new Card[5];
                 Array.Copy(pair, fullHouse, 2); // copy 2 elements to 0;1 positions
                 Array.Copy(threeOfaKind, 0, fullHouse, 2, 3); // copy 3 elements to 2;3;4 positions
-                return new Combination(Type, fullHouse);
+               // return new Combination(Type, fullHouse);
+                return true;
             }
 
-            return null;
+            return false;
         }
 
-        protected override int Compare(Combination other)
+        public int Compare(Combination first, Combination second)
         {
-            if (Cards[2] > other.Cards[2]) return 1;
-            if (Cards[2] < other.Cards[2]) return -1;
-
-            /* if 3rd elements (threeOfaKind cards) is equal 
-            we must compare 1rst elements (pair cards) */
-            if (Cards[0] > other.Cards[0]) return 1;
-            if (Cards[0] < other.Cards[0]) return -1;
-
-            return 0;
+            throw new NotImplementedException();
         }
+
     }
 }

@@ -22,4 +22,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Logic\Logic.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Games\PokerCombinations\" />
+  </ItemGroup>
 </Project>

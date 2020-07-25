@@ -63,18 +63,36 @@ namespace EtherBetClientLib.Models.Games.Poker
         /// <summary>
         /// List of all poker combinations types
         /// </summary>
-        public static Combination[] CombTypes =
+        public static ICombinationTypeChecker[] CombTypes =
         {
-            new RoyalFlush(null),
-            new StraightFlush(null),
-            new FourOfAKind(null),
-            new FullHouse(null),
-            new FLush(null),
-            new Straight(null),
-            new ThreeOfAKind(null),
-            new TwoPairs(null),
-            new Pair(null),
-            new HighCard(null)
+            new RoyalFlush(),
+            new StraightFlush(),
+            new FourOfAKind(),
+            new FullHouse(),
+            new FLush(),
+            new Straight(),
+            new ThreeOfAKind(),
+            new TwoPairs(),
+            new Pair(),
+            new HighCard()
+        };
+
+
+        /// <summary>
+        /// Dictionary of all poker combination types
+        /// </summary>
+        public static Dictionary<CombinationType, ICombinationTypeChecker> CombTypesDictionary = new Dictionary<CombinationType, ICombinationTypeChecker>()
+        {
+            [CombinationType.RoyalFlush] = new RoyalFlush(),
+            [CombinationType.StraightFlush] = new StraightFlush(),
+            [CombinationType.FourOfAKind] = new FourOfAKind(),
+            [CombinationType.FullHouse] = new FullHouse(),
+            [CombinationType.Flush] = new FLush(),
+            [CombinationType.StraightFlush] = new Straight(),
+            [CombinationType.ThreeOfAKind] = new ThreeOfAKind(),
+            [CombinationType.TwoPairs] = new TwoPairs(),
+            [CombinationType.Pair] = new Pair(),
+            [CombinationType.HighCard] = new HighCard()
         };
 
         /// <summary>
@@ -86,12 +104,6 @@ namespace EtherBetClientLib.Models.Games.Poker
         #endregion
 
 
-        /// <summary>
-        /// Determines if current 7 card array contains specified combination
-        /// Used to preserve time. Using this dictionary avoids double checking for some Combinations,
-        /// For example for "Flush".
-        /// </summary>
-        public static Dictionary<CombinationType, Card[]> Combinations = new Dictionary<CombinationType, Card[]>(10);
 
         /// <summary>
         /// Main database where frequency of getting each combination

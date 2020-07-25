@@ -6,15 +6,9 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
     /// <summary>
     /// The Flush combination.
     /// </summary>
-    public class FLush : Combination
+    public class FLush : ICombinationTypeChecker
     {
-        #region CONSTRUCTOR
 
-        public FLush(Card[] cards) : base(CombinationType.Flush, cards)
-        {
-        }
-
-        #endregion
 
         /// <summary>
         /// Checks if 7 element cards array contains Flush
@@ -22,21 +16,18 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
         /// <param name="cards">
         /// 7 element array of cards
         /// </param>
+        /// <param name="combination">
+        /// combination instance
+        /// </param>
         /// <returns>
         /// Flush combination if found
         /// </returns>
-        public override Combination Check(Card[] cards)
+        public bool Check(Card[] cards, Combination combination)
         {
-            return Check(cards, true);
-        }
 
-        public Combination Check(Card[] cards, bool alreadyChecked)
-        {
-            if (alreadyChecked)
+            if (combination.SatisfiedCombinationTypes.HasFlag(CombinationType.Flush))
             {
-                return PokerGameData.Combinations[CombinationType.Flush] == null
-                    ? null
-                    : new Combination(Type, PokerGameData.Combinations[CombinationType.Flush]);
+                return true;
             }
 
             var frequency = new int[4]; // frequency of each suit
@@ -50,9 +41,17 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
                 if (frequency[(int) cards[i].Suit - 1] == 5) flushSuit = (int) cards[i].Suit;
             }
 
-            return flushSuit != -1
-                ? new Combination(Type, Array.FindAll(cards, card => card.Suit == (CardSuit) flushSuit))
-                : null;
+            if (flushSuit == -1)
+                return false;
+
+            combination.Type = CombinationType.Flush;
+            return true;
+
+        }
+
+        public int Compare(Combination first, Combination second)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,16 +1,15 @@
-﻿using EtherBetClientLib.Models.Games.CardGameModels;
+﻿using System;
+using System.Linq;
+using EtherBetClientLib.Models.Exceptions;
+using EtherBetClientLib.Models.Games.CardGameModels;
 
 namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
 {
     /// <summary>
     /// Hig Card combination
     /// </summary>
-    public class HighCard : Combination
+    public class HighCard : ICombinationTypeChecker
     {
-        public HighCard(Card[] cards) : base(CombinationType.HighCard, cards)
-        {
-        }
-
         /// <summary>
         /// checks if 7 elements cards array contains HighCard combination
         /// because all cards array contains HighCard combination it always returns
@@ -19,12 +18,24 @@ namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
         /// <param name="cards">
         /// 7 elements cards array
         /// </param>
+        /// <param name="combination"></param>
         /// <returns>
         /// HighCard combination (which always exist and its highest card in array)
         /// </returns>
-        public override Combination Check(Card[] cards)
+        public bool Check(Card[] cards, Combination combination)
         {
-            return new Combination(Type, new Card[1] {cards[PokerGameData.CardCount - 1]});
+            if (cards.Length != 7)
+            {
+                throw new WrongSizeArrayException();
+            }
+            combination.Top5 = cards.Skip(2).ToArray();
+            combination.Type = CombinationType.HighCard;
+            return true;
+        }
+
+        public int Compare(Combination first, Combination second)
+        {
+            throw new NotImplementedException();
         }
     }
 }

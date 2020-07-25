@@ -8,8 +8,6 @@ namespace EtherBetClientLib.Models.Games.CardGameModels
     /// </summary>
     public struct Card : IComparable<Card>
     {
-        public const int RankCount = 13;
-        public const int SuitCount = 4;
 
         public bool Equals(Card other)
         {
@@ -63,7 +61,7 @@ namespace EtherBetClientLib.Models.Games.CardGameModels
 
         public static int ToNumber(Card card)
         {
-            return ((int) card.Rank - 1) + ((int) card.Suit - 1) * RankCount;
+            return ((int) card.Rank - 1) + ((int) card.Suit - 1) * PokerGameData.RankCount;
         }
 
         /// <summary>
@@ -71,9 +69,9 @@ namespace EtherBetClientLib.Models.Games.CardGameModels
         /// </summary>
         public static Card FromNumber(int number)
         {
-            var rank = (number % RankCount) + 1;
+            var rank = (number % PokerGameData.RankCount) + 1;
             
-            var suit = (number / RankCount) + 1;
+            var suit = (number / PokerGameData.RankCount) + 1;
 
             return new Card((CardRank)rank, (CardSuit)suit);
         }
