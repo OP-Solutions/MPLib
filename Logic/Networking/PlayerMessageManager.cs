@@ -21,6 +21,16 @@ using ProtoBuf;
 
 namespace EtherBetClientLib.Networking
 {
+    /// <summary>
+    /// Class which manager card deck. This class is intended to be used in various card game logic implementation
+    /// This class is responsible for encrypting-shuffling cards, decrypting it only for specific player or decrypting publicly
+    /// And also if someone would cheat or does any mistake in card encryption this class will be able to identify it
+    /// </summary>
+    /// <remarks>
+    /// TODO: need to test this class and debug if needed
+    /// </remarks>
+    /// <typeparam name="TPlayerType"></typeparam>
+    /// <typeparam name="TBaseMessageType"></typeparam>
     public class PlayerMessageManager<TPlayerType, TBaseMessageType> : IPlayerMessageManager<TPlayerType, TBaseMessageType> where TBaseMessageType : IMessage where TPlayerType : Player
     {
 
@@ -55,6 +65,15 @@ namespace EtherBetClientLib.Networking
             }
         }
 
+
+        /// <summary>
+        /// This method starts continuously reading messages from other player (<see cref="_connectedPlayers"/>),
+        /// Cryptographically verifies their signature, timestamp, ensures correct format
+        /// And saves them in storage indexed my message type, so user of thi class can read anytime with <see cref="ReadMessageFrom{T}"/>
+        /// </summary>
+        /// <remarks>
+        /// TODO: timestamp check and packet relay to other destination need to be done
+        /// </remarks>
         public void StartAsyncReading()
         {
             foreach (var (player, _) in _connectedPlayers)
@@ -70,8 +89,11 @@ namespace EtherBetClientLib.Networking
                         if(dataLen == 0) break;
                         var messageTypeCode = await controller.ReadInt16Async();
                         var messageType = _messageCodeToTypeMap[messageTypeCode];
-                        var package = (Package)DeserializePrefixedLenInt16(typeof(Package), memStream);
-                        var message = DeserializePrefixedLenInt16(messageType, memStream);
+                        Serializer.NonGeneric.TryDeserializeWithLengthPrefix(memStream, PrefixStyle.Fixed32BigEndian, 
+                            _ => typeof(Package), out var packageObj);
+                        var package = (Package)packageObj;
+                        Serializer.NonGeneric.TryDeserializeWithLengthPrefix(memStream, PrefixStyle.Fixed32BigEndian, 
+                            _ => messageType, out var message);
 
 
                         var signature = await controller.ReadBytesOpaque16Async();
@@ -82,18 +104,14 @@ namespace EtherBetClientLib.Networking
 
                         package.SenderSignature = signature;
                         package.Message = message;
-                        var playerMessageStorage = _messageStorage[player];
-                        if (!playerMessageStorage.TryGetValue(messageType, out var channel))
-                        {
-                            channel = Channel.CreateUnbounded<Package>();
-                            playerMessageStorage[messageType] = channel;
-                        }
+
+                        var channel = GetChannel(player, messageType);
                         await channel.Writer.WriteAsync(package);
                     }
                 }, _cancellationTokenSource.Token);
             }
         }
-
+        
         public async Task BroadcastMessage(TBaseMessageType message)
         {
             var tasks = (from TPlayerType player in _connectedPlayers
@@ -129,25 +147,34 @@ namespace EtherBetClientLib.Networking
             
         }
 
-        public Task<T> ReadMessageFrom<T>(TPlayerType player) where T : TBaseMessageType
+        public async Task<T> ReadMessageFrom<T>(TPlayerType player) where T : TBaseMessageType
         {
-            throw new NotImplementedException();
+            var channel = GetChannel(player, typeof(T));
+            var package = await channel.Reader.ReadAsync();
+            return (T)package.Message;
         }
 
 
-        //Note: not preserves initial length value
-        private static object DeserializePrefixedLenInt16(Type type, MemoryStream source)
+        private Channel<Package> GetChannel(TPlayerType player, Type messageType)
         {
-            if (!Serializer.TryReadLengthPrefix(source, PrefixStyle.Base128, out var length))
-                throw new Exception("Unexpected data from stream, can't read length prefix");
 
-            source.SetLength(source.Position + length);
-            return Serializer.Deserialize(type, source);
+            Channel<Package> channel;
+            lock (_messageStorage)
+            {
+                var playerMessageStorage = _messageStorage[player];
+                if (!playerMessageStorage.TryGetValue(messageType, out channel))
+                {
+                    channel = Channel.CreateBounded<Package>(100);
+                    playerMessageStorage[messageType] = channel;
+                }
+            }
+            return channel;
         }
 
     }
 
-    public interface IPlayerMessageManager<in TPlayerType, in TBaseMessageType> : IPlayerMessageSender<TPlayerType, TBaseMessageType>, IPlayerMessageReceiver<TPlayerType, TBaseMessageType> 
+    public interface IPlayerMessageManager<in TPlayerType, in TBaseMessageType> : IPlayerMessageSender<TPlayerType, TBaseMessageType>, 
+        IPlayerMessageReceiver<TPlayerType, TBaseMessageType> 
         where TBaseMessageType : IMessage
         where TPlayerType : Player
     {
