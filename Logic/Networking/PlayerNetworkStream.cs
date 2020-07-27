@@ -14,7 +14,7 @@ using EtherBetClientLib.Models.Games;
 
 namespace EtherBetClientLib.Networking
 {
-    public class PlayerNetworkStream : Stream
+    public class PlayerNetworkStream : StreamController
     {
         public Player MyPlayer { get; set; }
 

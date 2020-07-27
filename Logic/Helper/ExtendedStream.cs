@@ -12,19 +12,25 @@ namespace EtherBetClientLib.Helper
     /// <summary>
     /// Stream reading writing helper class specially designed to make data exchange easier over network
     /// </summary>
-    public class StreamController
+    public class StreamController : Stream
     {
-        private readonly Stream _baseStream;
-        private readonly byte[] _buffer;
+        public Stream BaseStream { get; set; }
+        private readonly byte[] _buffer = new byte[8];
+
+
+        public StreamController()
+        {
+
+        }
+
         public StreamController(Stream baseStream)
         {
-            _baseStream = baseStream;
-            _buffer = new byte[8];
+            BaseStream = baseStream;
         }
 
         public async Task<short> ReadInt16Async()
         {
-            await _baseStream.ReadAsync(_buffer, 0, 2);
+            await BaseStream.ReadAsync(_buffer, 0, 2);
             var len = (short)(_buffer[0] | _buffer[1] << 8);
             return len;
         }
@@ -36,26 +42,26 @@ namespace EtherBetClientLib.Helper
             {
                 _buffer[0] = (byte)value;
                 _buffer[1] = (byte)(value >> 8);
-                await _baseStream.WriteAsync(_buffer, 0, 2);
+                await BaseStream.WriteAsync(_buffer, 0, 2);
             }
         }
 
         public async Task<byte> ReadByteAsync()
         {
-            await _baseStream.ReadAsync(_buffer, 0, 1);
+            await BaseStream.ReadAsync(_buffer, 0, 1);
             return _buffer[0];
         }
 
         public async Task<byte[]> ReadBytesOpaque8Async()
         {
             var len = await ReadByteAsync();
-            return await _baseStream.ReadBlockAsync(len);
+            return await BaseStream.ReadBlockAsync(len);
         }
 
         public async Task<byte[]> ReadBytesOpaque16Async()
         {
             var len = await ReadInt16Async();
-            return await _baseStream.ReadBlockAsync(len);
+            return await BaseStream.ReadBlockAsync(len);
         }
 
         /// <summary>
@@ -67,7 +73,7 @@ namespace EtherBetClientLib.Helper
         public async Task<int> ReadBytesOpaque16Async(byte[] bufferToWriteTo, int offset)
         {
             var len = await ReadInt16Async();
-            await _baseStream.ReadBlockAsync(bufferToWriteTo, offset, len);
+            await BaseStream.ReadBlockAsync(bufferToWriteTo, offset, len);
             return len;
         }
 
@@ -75,13 +81,13 @@ namespace EtherBetClientLib.Helper
         {
             if (bytes.Length > byte.MaxValue) throw new ArgumentOutOfRangeException(nameof(bytes));
             await WriteByteAsync((byte)bytes.Length);
-            await _baseStream.WriteAsync(bytes);
+            await BaseStream.WriteAsync(bytes);
         }
 
         public async Task WriteBytesOpaque16Async(byte[] bytes)
         {
             await WriteInt16Async(bytes.Length);
-            await _baseStream.WriteAsync(bytes);
+            await BaseStream.WriteAsync(bytes);
         }
 
         public async Task WriteAsciiOpaque8Async(string value)
@@ -99,7 +105,7 @@ namespace EtherBetClientLib.Helper
         public async Task WriteByteAsync(byte value)
         {
             _buffer[0] = value;
-            await _baseStream.WriteAsync(_buffer, 0, 1);
+            await BaseStream.WriteAsync(_buffer, 0, 1);
         }
 
 
@@ -115,5 +121,38 @@ namespace EtherBetClientLib.Helper
             await WriteByteAsync((byte)(object)e);
         }
 
+        public override void Flush()
+        {
+            BaseStream.Flush();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return BaseStream.Read(buffer, offset, count);
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            return BaseStream.Seek(offset, origin);
+        }
+
+        public override void SetLength(long value)
+        {
+            BaseStream.SetLength(value);
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            BaseStream.Write(buffer, offset, count);
+        }
+
+        public override bool CanRead => BaseStream.CanRead;
+        public override bool CanSeek => BaseStream.CanSeek;
+        public override bool CanWrite => BaseStream.CanWrite;
+        public override long Length => BaseStream.Length;
+        public override long Position {
+            get => BaseStream.Position;
+            set => BaseStream.Position = value;
+        }
     }
 }

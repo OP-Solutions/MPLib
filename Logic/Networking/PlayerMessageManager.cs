@@ -40,10 +40,7 @@ namespace EtherBetClientLib.Networking
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly byte[] _internalBuffer = new byte[1024 * 1024];
         private readonly Dictionary<Player, Dictionary<Type, Channel<Package>>> _messageStorage;
-
-
-        // TODO need to implement thi dictionary fill
-        private readonly IReadOnlyDictionary<short, Type> _messageCodeToTypeMap = new Dictionary<short, Type>();
+        private readonly TypeCodeMapper _messageTypeCodeMapper;
 
         /// <param name="otherPlayers">
         /// players dictionary. key is player itself, value - corresponding player identifier, which is included in each message
@@ -51,8 +48,13 @@ namespace EtherBetClientLib.Networking
         /// (<see cref="Package{TBaseMessageType}.SenderIdentifier"/>/>, (<see cref="Package{TBaseMessageType}.DestinationIdentifier"/>/>,
         /// </param>
         /// <param name="players">Contact list to send messages to</param>
-        public PlayerMessageManager(IReadOnlyDictionary<TPlayerType, string> players)
+        /// <param name="messageTypeTypeCodeMapper">
+        /// This is like dictionary which map types to number's, which are added as prefix when serialized
+        /// So deserializer party knows which type was sent and correctly deserializes message
+        /// </param>
+        public PlayerMessageManager(IReadOnlyDictionary<TPlayerType, string> players, TypeCodeMapper messageTypeTypeCodeMapper)
         {
+            _messageTypeCodeMapper = messageTypeTypeCodeMapper;
             _connectedPlayers = players.Where(p => !p.Key.IsMyPlayer).ToDictionary(p => p.Key, p => p.Value);
             var myPlayerInfo = players.First(p => p.Key.IsMyPlayer);
             var myPlayer = myPlayerInfo.Key;
@@ -80,15 +82,15 @@ namespace EtherBetClientLib.Networking
             {
                 Task.Run(async () =>
                 {
-                    var controller = new StreamController(player.NetworkStream);
+                    var networkStream = player.NetworkStream;
                     var memStream = new MemoryStream(_internalBuffer);
                     while (true)
                     {
                         //data length (without signature)
-                        var dataLen = await controller.ReadBytesOpaque16Async(_internalBuffer, 0);
+                        var dataLen = await networkStream.ReadBytesOpaque16Async(_internalBuffer, 0);
                         if(dataLen == 0) break;
-                        var messageTypeCode = await controller.ReadInt16Async();
-                        var messageType = _messageCodeToTypeMap[messageTypeCode];
+                        var messageTypeCode = await networkStream.ReadInt16Async();
+                        var messageType = _messageTypeCodeMapper.GetType(messageTypeCode);
                         Serializer.NonGeneric.TryDeserializeWithLengthPrefix(memStream, PrefixStyle.Fixed32BigEndian, 
                             _ => typeof(Package), out var packageObj);
                         var package = (Package)packageObj;
@@ -96,7 +98,7 @@ namespace EtherBetClientLib.Networking
                             _ => messageType, out var message);
 
 
-                        var signature = await controller.ReadBytesOpaque16Async();
+                        var signature = await networkStream.ReadBytesOpaque16Async();
                         if (signature == null) break;
 
                         if(!_signer.VerifyData(_internalBuffer, 0, dataLen, signature, HashAlgorithmName.SHA256))
@@ -136,9 +138,10 @@ namespace EtherBetClientLib.Networking
                 Serializer.NonGeneric.SerializeWithLengthPrefix(stream, package, PrefixStyle.Fixed32BigEndian, 0);
                 Serializer.NonGeneric.SerializeWithLengthPrefix(stream, message, PrefixStyle.Fixed32BigEndian, 0);
                 var signature = _signer.SignData(buffer, 0, (int)stream.Position, HashAlgorithmName.SHA256);
-                var controller = new StreamController(stream);
-                await controller.WriteBytesOpaque16Async(signature);
-                await stream.CopyToAsync(player.NetworkStream);
+                var networkStream = player.NetworkStream;
+                await networkStream.WriteInt16Async((short)stream.Position);
+                await stream.CopyToAsync(networkStream);
+                await networkStream.WriteBytesOpaque16Async(signature);
             }
             finally
             {

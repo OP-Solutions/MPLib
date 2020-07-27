@@ -111,7 +111,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Logic
                 dict[pokerPlayer] = i.ToString(); // player identifier in poker round messaging is index of player in round
             }
 
-            _messageManager = new PlayerMessageManager<PokerPlayer, IPokerMessage>(dict);
+            _messageManager = new PlayerMessageManager<PokerPlayer, IPokerMessage>(dict, TypeCodeMapper.FromEnum<PokerMessageType>());
         }
 
         /// <summary>
