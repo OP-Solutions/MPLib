@@ -5,7 +5,7 @@ using ProtoBuf;
 
 namespace MPLib.Core.Game.General.CardGame.Messaging.MessageTypes
 {
-    public class ReEncryptDeckMessage : IPokerMessage
+    public class ReEncryptDeckMessage : ICardGameMessage
     {
         [ProtoMember(1)]
         public IReadOnlyList<BigInteger> EncryptedCards { get; set; }

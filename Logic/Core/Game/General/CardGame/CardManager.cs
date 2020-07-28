@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using MPLib.Core.Game.General.CardGame.Messaging;
 using MPLib.Core.Game.General.CardGame.Messaging.MessageTypes;
 using MPLib.Core.Game.Poker.Messaging.MessageTypes;
 using MPLib.Crypto.Encryption.SRA;
@@ -26,9 +27,9 @@ namespace MPLib.Core.Game.General.CardGame
         private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _firstCycleDeck;
         private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _secondCycleDeck;
 
-        private readonly IPlayerMessageManager<TPlayer, IMessage> _messageManager;
+        private readonly IPlayerMessageManager<TPlayer, ICardGameMessage> _messageManager;
 
-        public CardManager(IPlayerMessageManager<TPlayer, IMessage> messageManager, IReadOnlyList<Card> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
+        public CardManager(IPlayerMessageManager<TPlayer, ICardGameMessage> messageManager, IReadOnlyList<Card> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
         {
 
             _messageManager = messageManager;
@@ -81,14 +82,14 @@ namespace MPLib.Core.Game.General.CardGame
                         var cardReEncrypted = provider2.Encrypt(decryptedCard);
                         reEncryptedCards.Add(cardReEncrypted);
                     }
-                    await _messageManager.BroadcastMessage(new EncryptShuffleDeckMessage(reEncryptedCards));
+                    await _messageManager.BroadcastMessage(new ReEncryptDeckMessage(reEncryptedCards));
 
 
                     currentDeck = reEncryptedCards;
                 }
                 else
                 {
-                    currentDeck = (await _messageManager.ReadMessageFrom<EncryptShuffleDeckMessage>(player)).EncryptedCards;
+                    currentDeck = (await _messageManager.ReadMessageFrom<ReEncryptDeckMessage>(player)).EncryptedCards;
                 }
                 _secondCycleDeck.Add(player, currentDeck);
             }

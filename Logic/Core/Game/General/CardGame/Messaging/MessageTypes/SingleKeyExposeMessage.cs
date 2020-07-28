@@ -5,7 +5,7 @@ using ProtoBuf;
 namespace MPLib.Core.Game.General.CardGame.Messaging.MessageTypes
 {
     [ProtoContract]
-    class SingleKeyExposeMessage : IPokerMessage
+    class SingleKeyExposeMessage : ICardGameMessage
     {
         [ProtoMember(1)]
         public int CardIndex { get; set; }
