@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using EtherBetClientLib.Models;
-using EtherBetClientLib.Models.Games;
-using EtherBetClientLib.Models.Games.Poker;
-using EtherBetClientLib.Networking;
+﻿using MPLib.Models.Games;
 
-namespace EtherBetClientLib.Core.Game.Poker.Logic
+namespace MPLib.Core.Game.Poker.Logic
 {
     /// <summary>
     /// Base class for all poker player.

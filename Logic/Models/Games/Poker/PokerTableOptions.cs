@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace EtherBetClientLib.Models.Games.Poker
+namespace MPLib.Models.Games.Poker
 {
     public class PokerTableOptions
     {

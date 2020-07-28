@@ -1,5 +1,4 @@
 ﻿using Xunit;
-using EtherBetClientLib.Models.Games.Poker.PokerCombinations;
 using System;
 using System.Collections.Generic;
 using System.Text;

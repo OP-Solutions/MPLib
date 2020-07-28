@@ -8,10 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using EtherBetClientLib.Models;
 using EtherBetClientLib.Models.Games;
-using EtherBetClientLib.Networking;
 using Xunit;
 using Xunit.Abstractions;
 using EtherBetClientLib.Models.Games;
+using MPLib.Models.Games;
+using MPLib.Networking;
 
 namespace SPRTest
 {

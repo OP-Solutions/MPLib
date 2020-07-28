@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using EtherBetClientLib.Random;
+using MPLib.Random;
 using Xunit;
 
 namespace SPRTest

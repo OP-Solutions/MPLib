@@ -1,7 +1,6 @@
-﻿using System.ServiceModel;
-using ProtoBuf;
+﻿using ProtoBuf;
 
-namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
+namespace MPLib.Core.Game.Poker.Messaging.MessageTypes
 {
     [ProtoContract]
     class BetMessage : IPokerMessage

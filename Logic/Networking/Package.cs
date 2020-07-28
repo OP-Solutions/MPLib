@@ -1,7 +1,7 @@
 ﻿using System;
 using ProtoBuf;
 
-namespace EtherBetClientLib.Core.Game.Poker.Messaging
+namespace MPLib.Networking
 {
     [ProtoContract]
     public class Package

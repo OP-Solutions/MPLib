@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace EtherBetClientLib.Crypto.Signing
+namespace MPLib.Crypto.Signing
 {
     class SignerStream : Stream
     {

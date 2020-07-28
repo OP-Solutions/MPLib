@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EtherBetClientLib.Crypto
+namespace MPLib.Crypto
 {
     public class CryptoNetWorkStream : Stream
     {

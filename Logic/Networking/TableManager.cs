@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using EtherBetClientLib.Models.Lobby;
+using MPLib.Models.Lobby;
 
-namespace EtherBetClientLib.Networking
+namespace MPLib.Networking
 {
     /// <summary>
     /// This class is responsible to create table or find all created tables of specific game within local network.

@@ -1,8 +1,8 @@
-﻿using System.Numerics;
-using EtherBetClientLib.Crypto.Encryption.SRA;
+﻿using MPLib.Core.Game.Poker.Messaging;
+using MPLib.Crypto.Encryption.SRA;
 using ProtoBuf;
 
-namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
+namespace MPLib.Core.Game.General.CardGame.Messaging.MessageTypes
 {
     [ProtoContract]
     class SingleKeyExposeMessage : IPokerMessage

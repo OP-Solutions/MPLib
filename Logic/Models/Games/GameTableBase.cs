@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using System.Threading.Tasks;
-using EtherBetClientLib.Core.Game.Poker.Logic;
+using MPLib.Core.Game.Poker.Logic;
 
-namespace EtherBetClientLib.Models.Games
+namespace MPLib.Models.Games
 {
     public abstract class GameTableBase<TPlayer, TMyPlayer>
     {

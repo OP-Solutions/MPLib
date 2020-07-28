@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using EtherBetClientLib.Core.Game.Poker.Messaging;
-using EtherBetClientLib.Models.Games;
-using EtherBetClientLib.Networking;
+using MPLib.Core.Game.Poker.Messaging;
+using MPLib.Models.Games;
+using MPLib.Networking;
 
-namespace EtherBetClientLib.Core.Game.Poker.Logic
+namespace MPLib.Core.Game.Poker.Logic
 {
     public class PokerRound
     {

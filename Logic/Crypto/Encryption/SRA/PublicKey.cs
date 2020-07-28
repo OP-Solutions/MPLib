@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace EtherBetClientLib.Crypto.Encryption.SRA
+namespace MPLib.Crypto.Encryption.SRA
 {
     public struct PublicKey
     {

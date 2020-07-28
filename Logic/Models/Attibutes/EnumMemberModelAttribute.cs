@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EtherBetClientLib.Models
+namespace MPLib.Models.Attibutes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
     public class EnumMemberModelAttribute : Attribute

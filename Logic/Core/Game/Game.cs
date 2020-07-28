@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using EtherBetClientLib.Core.Game.Poker.Logic;
+using MPLib.Core.Game.Poker.Logic;
 
-namespace EtherBetClientLib.Core.Game
+namespace MPLib.Core.Game
 {
     public static class Game
     {

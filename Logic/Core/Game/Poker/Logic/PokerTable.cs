@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using EtherBetClientLib.Models.Games;
+using MPLib.Models.Games;
 
-namespace EtherBetClientLib.Core.Game.Poker.Logic
+namespace MPLib.Core.Game.Poker.Logic
 {
     public class PokerTable : GameTableBase<PokerPlayer, MyPokerPlayer>
     {

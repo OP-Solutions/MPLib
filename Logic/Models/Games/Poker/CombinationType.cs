@@ -1,7 +1,7 @@
 ﻿using System;
-using EtherBetClientLib.Models.Games.CardGameModels;
+using MPLib.Models.Games.CardGameModels;
 
-namespace EtherBetClientLib.Models.Games.Poker
+namespace MPLib.Models.Games.Poker
 {
     [Flags]
     public enum CombinationType

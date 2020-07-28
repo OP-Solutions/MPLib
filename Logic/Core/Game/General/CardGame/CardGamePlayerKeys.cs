@@ -1,6 +1,6 @@
-﻿using EtherBetClientLib.Crypto.Encryption.SRA;
+﻿using MPLib.Crypto.Encryption.SRA;
 
-namespace EtherBetClientLib.Core.Game.General
+namespace MPLib.Core.Game.General.CardGame
 {
     public class PlayerKeys
     {

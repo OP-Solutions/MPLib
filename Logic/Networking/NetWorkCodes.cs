@@ -1,4 +1,4 @@
-﻿namespace EtherBetClientLib.Networking
+﻿namespace MPLib.Networking
 {
     public enum NetWorkCodes
     {

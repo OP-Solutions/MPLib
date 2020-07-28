@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Net;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using EtherBetClientLib.Core.Game.General;
-using EtherBetClientLib.Crypto.Encryption.SRA;
+using MPLib.Core.Game.General.CardGame;
 
-namespace EtherBetClientLib.Core.Game.Poker.Logic
+namespace MPLib.Core.Game.Poker.Logic
 {
     public class MyPokerPlayer : PokerPlayer, IMyCardGamePlayer
     {

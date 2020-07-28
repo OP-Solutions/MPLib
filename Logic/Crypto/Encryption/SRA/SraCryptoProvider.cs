@@ -1,6 +1,6 @@
 ﻿using BigInteger = System.Numerics.BigInteger;
 
-namespace EtherBetClientLib.Crypto.Encryption.SRA
+namespace MPLib.Crypto.Encryption.SRA
 {
     public class SraCryptoProvider
     {

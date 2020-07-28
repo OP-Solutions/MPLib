@@ -1,8 +1,7 @@
 ﻿using System;
-using EtherBetClientLib.Models;
-using EtherBetClientLib.Models.Games;
+using MPLib.Models.Games;
 
-namespace EtherBetClientLib.Lobby
+namespace MPLib.Lobby
 {
     public class PlayerMeeting
     {

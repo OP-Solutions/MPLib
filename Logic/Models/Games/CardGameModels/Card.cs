@@ -1,7 +1,7 @@
 ﻿using System;
-using EtherBetClientLib.Models.Games.Poker;
+using MPLib.Models.Games.Poker;
 
-namespace EtherBetClientLib.Models.Games.CardGameModels
+namespace MPLib.Models.Games.CardGameModels
 {
     /// <summary>
     /// The card.

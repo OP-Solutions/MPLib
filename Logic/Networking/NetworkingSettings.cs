@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using EtherBetClientLib.Core.Game.Poker.Messaging;
+﻿using System.Collections.Generic;
 
-namespace EtherBetClientLib.Networking
+namespace MPLib.Networking
 {
     internal static class NetworkingSettings
     {

@@ -1,4 +1,4 @@
-﻿namespace EtherBetClientLib.Models.Games.CardGameModels
+﻿namespace MPLib.Models.Games.CardGameModels
 {
     /// <summary>
     /// Card suits

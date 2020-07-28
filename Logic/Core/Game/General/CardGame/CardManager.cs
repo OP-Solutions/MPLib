@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using EtherBetClientLib.Core.Game.Poker.Messaging;
-using EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes;
-using EtherBetClientLib.Crypto.Encryption.SRA;
-using EtherBetClientLib.Models.Games;
-using EtherBetClientLib.Models.Games.CardGameModels;
-using EtherBetClientLib.Networking;
-using EtherBetClientLib.Random;
+using MPLib.Core.Game.General.CardGame.Messaging.MessageTypes;
+using MPLib.Core.Game.Poker.Messaging.MessageTypes;
+using MPLib.Crypto.Encryption.SRA;
+using MPLib.Models.Games;
+using MPLib.Models.Games.CardGameModels;
+using MPLib.Networking;
+using MPLib.Random;
 
-namespace EtherBetClientLib.Core.Game.General
+namespace MPLib.Core.Game.General.CardGame
 {
     public class CardManager<TPlayer, TMyPlayer>
         where TPlayer : CardGamePlayer

@@ -1,18 +1,14 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using EtherBetClientLib.Core.Game.General;
-using EtherBetClientLib.Crypto;
-using EtherBetClientLib.Helper;
-using EtherBetClientLib.Models;
-using EtherBetClientLib.Models.Games;
+using MPLib.Crypto;
+using MPLib.Helper;
+using MPLib.Models.Games;
 
-namespace EtherBetClientLib.Networking
+namespace MPLib.Networking
 {
     public class PlayerNetworkStream : StreamController
     {

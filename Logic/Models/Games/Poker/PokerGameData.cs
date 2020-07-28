@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using EtherBetClientLib.Models.Games.CardGameModels;
-using EtherBetClientLib.Models.Games.Poker.PokerCombinations;
+using MPLib.Models.Games.CardGameModels;
+using MPLib.Models.Games.Poker.PokerCombinations;
 
-namespace EtherBetClientLib.Models.Games.Poker
+namespace MPLib.Models.Games.Poker
 {
     /// <summary>
     /// Class for storing essential variables and constraints

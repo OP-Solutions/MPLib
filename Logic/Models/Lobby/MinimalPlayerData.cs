@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 
-namespace EtherBetClientLib.Models.Lobby
+namespace MPLib.Models.Lobby
 {
     class MinimalPlayerData
     {

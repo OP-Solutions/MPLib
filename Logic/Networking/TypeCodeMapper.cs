@@ -1,47 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Reflection;
-using EtherBetClientLib.Models;
+using MPLib.Models.Attibutes;
 
-namespace EtherBetClientLib.Networking
+namespace MPLib.Networking
 {
     public struct TypeCodeMapper
     {
-        private readonly Dictionary<short, Type> _codeToType;
-        private Dictionary<Type, short> _typeToCode;
+        private Dictionary<int, Type> _codeToType;
+        private Dictionary<Type, int> _typeToCode;
+        private int _maxCodeValue;
 
         public static TypeCodeMapper FromEnum<T>() where T : Enum
         {
-            return new TypeCodeMapper(typeof(T));
+            var mapper = new TypeCodeMapper
+            {
+                _codeToType = new Dictionary<int, Type>(), 
+                _typeToCode = new Dictionary<Type, int>()
+            };
+            return mapper.AddEnum<T>();
         }
 
-        private TypeCodeMapper(Type sourceEnum)
+        private TypeCodeMapper AddEnum<TEnum>()
         {
-            _codeToType = new Dictionary<short, Type>();
-            _typeToCode = new Dictionary<Type, short>();
-            var values = Enum.GetValues(sourceEnum);
+            var typeCodeOffset = _maxCodeValue + 1;
+            var values = Enum.GetValues(typeof(TEnum));
             foreach (var value in values)
             {
                 var memberName = value.ToString();
                 var memberValue = (int)value;
-                var typeCode = (short)memberValue;
-                var memberInfo = sourceEnum.GetMember(memberName)[0];
+                var typeCode = typeCodeOffset + (short)memberValue;
+                var memberInfo = typeof(TEnum).GetMember(memberName)[0];
                 var attribute = (EnumMemberModelAttribute)memberInfo.GetCustomAttributes(typeof(EnumMemberModelAttribute)).FirstOrDefault();
-                if(attribute == null) continue;
+                if (attribute == null) continue;
                 var type = attribute.ModelType;
                 _codeToType[typeCode] = type;
                 _typeToCode[type] = typeCode;
+                if (typeCode > _maxCodeValue) _maxCodeValue = typeCode;
             }
+
+            return this;
         }
 
-        public readonly Type GetType(short typeCode)
+        public readonly Type GetType(int typeCode)
         {
             return _codeToType[typeCode];
         }
 
-        public readonly short GetCode(Type type)
+        public readonly int GetCode(Type type)
         {
             return _typeToCode[type];
         }

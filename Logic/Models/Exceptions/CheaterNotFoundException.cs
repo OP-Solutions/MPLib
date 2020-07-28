@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace EtherBetClientLib.Models.Exceptions
+namespace MPLib.Models.Exceptions
 {
     [Serializable]
     public class CheaterNotFoundException : Exception

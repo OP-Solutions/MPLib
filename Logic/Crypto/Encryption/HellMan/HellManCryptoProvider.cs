@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Numerics;
 using System.Text;
-using EtherBetClientLib.Crypto.Encryption.SRA;
+using MPLib.Crypto.Encryption.SRA;
 
-namespace EtherBetClientLib.Crypto.Encryption.HellMan
+namespace MPLib.Crypto.Encryption.HellMan
 {
 
     [Obsolete("This class is not intended to use as commutative encryption anymore. Instead use: " + nameof(SraCryptoProvider))]

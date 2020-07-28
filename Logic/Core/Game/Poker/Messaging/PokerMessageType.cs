@@ -1,24 +1,13 @@
-﻿using EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes;
-using EtherBetClientLib.Models;
+﻿using MPLib.Core.Game.General.CardGame.Messaging.MessageTypes;
+using MPLib.Core.Game.Poker.Messaging.MessageTypes;
+using MPLib.Models.Attibutes;
 
-namespace EtherBetClientLib.Core.Game.Poker.Messaging
+namespace MPLib.Core.Game.Poker.Messaging
 {
     public enum PokerMessageType
     {
         [EnumMemberModel(typeof(RoundStampMessage))]
         RoundStamp = 100,
-
-        [EnumMemberModel(typeof(EncryptShuffleDeckMessage))]
-        EncryptShuffleDeck,
-
-        [EnumMemberModel(typeof(ReEncryptDeckMessage))]
-        ReEncryptDeck,
-
-        [EnumMemberModel(typeof(DecryptCardMessage))]
-        DecryptCard,
-
-        [EnumMemberModel(typeof(SingleKeyExposeMessage))]
-        SingleKeyExpose,
 
         [EnumMemberModel(typeof(BetMessage))]
         Bet,
@@ -26,12 +15,7 @@ namespace EtherBetClientLib.Core.Game.Poker.Messaging
         [EnumMemberModel(typeof(FoldMessage))]
         Fold,
 
-        [EnumMemberModel(typeof(ExposeKeysMessage))]
-        ExposeKeys,
-
         [EnumMemberModel(typeof(LeaveTableMessage))]
         LeaveTable,
-
-        ReShuffle,
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
-using EtherBetClientLib.Networking;
+using MPLib.Networking;
 
-namespace EtherBetClientLib.Models.Games
+namespace MPLib.Models.Games
 {
     public class Player
     {

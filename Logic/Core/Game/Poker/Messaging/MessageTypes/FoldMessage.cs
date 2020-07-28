@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
+﻿namespace MPLib.Core.Game.Poker.Messaging.MessageTypes
 {
     class FoldMessage : IPokerMessage
     {

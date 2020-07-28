@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
-using EtherBetClientLib.Models.Games.CardGameModels;
+using MPLib.Core.Game.Poker.Messaging;
 using ProtoBuf;
 
-namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
+namespace MPLib.Core.Game.General.CardGame.Messaging.MessageTypes
 {
     class EncryptShuffleDeckMessage : IPokerMessage
     {
-
-        public const PokerMessageType BoundType = PokerMessageType.EncryptShuffleDeck;
-
-        public PokerMessageType Type { get; set; } = BoundType;
-
         [ProtoMember(1)]
         public IReadOnlyList<BigInteger> EncryptedCards { get; set; }
 

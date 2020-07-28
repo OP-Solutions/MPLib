@@ -1,25 +1,17 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Runtime.Serialization;
 using System.Security.Cryptography;
-using System.ServiceModel.Channels;
-using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using System.Xml.Schema;
-using EtherBetClientLib.Core.Game.Poker.Messaging;
-using EtherBetClientLib.Helper;
-using EtherBetClientLib.Models;
-using EtherBetClientLib.Models.Games;
+using MPLib.Helper;
+using MPLib.Models.Games;
 using ProtoBuf;
 
-namespace EtherBetClientLib.Networking
+namespace MPLib.Networking
 {
     /// <summary>
     /// Class which manager card deck. This class is intended to be used in various card game logic implementation
@@ -134,7 +126,8 @@ namespace EtherBetClientLib.Networking
             var buffer = ArrayPool<byte>.Shared.Rent(1024 * 32);
             try
             {
-                await using var stream = new MemoryStream(buffer) { Position = 0 };
+                await using var stream = new StreamController(new MemoryStream(buffer) { Position = 0 });
+                await stream.WriteInt16Async(_messageTypeCodeMapper.GetCode(message.GetType()));
                 Serializer.NonGeneric.SerializeWithLengthPrefix(stream, package, PrefixStyle.Fixed32BigEndian, 0);
                 Serializer.NonGeneric.SerializeWithLengthPrefix(stream, message, PrefixStyle.Fixed32BigEndian, 0);
                 var signature = _signer.SignData(buffer, 0, (int)stream.Position, HashAlgorithmName.SHA256);

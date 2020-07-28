@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net;
-using System.Text;
 
-namespace EtherBetClientLib.Models.Lobby
+namespace MPLib.Models.Lobby
 {
     class GameTableData
     {

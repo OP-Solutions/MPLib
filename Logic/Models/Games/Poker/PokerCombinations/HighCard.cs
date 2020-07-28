@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using EtherBetClientLib.Models.Exceptions;
-using EtherBetClientLib.Models.Games.CardGameModels;
+using MPLib.Models.Exceptions;
+using MPLib.Models.Games.CardGameModels;
 
-namespace EtherBetClientLib.Models.Games.Poker.PokerCombinations
+namespace MPLib.Models.Games.Poker.PokerCombinations
 {
     /// <summary>
     /// Hig Card combination

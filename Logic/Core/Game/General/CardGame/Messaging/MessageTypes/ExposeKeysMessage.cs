@@ -1,8 +1,7 @@
-﻿using System.Numerics;
-using EtherBetClientLib.Core.Game.General;
+﻿using MPLib.Core.Game.Poker.Messaging;
 using ProtoBuf;
 
-namespace EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes
+namespace MPLib.Core.Game.General.CardGame.Messaging.MessageTypes
 {
     public class ExposeKeysMessage : IPokerMessage
     {

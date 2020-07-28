@@ -1,7 +1,6 @@
-﻿using EtherBetClientLib.Core.Game.Poker.Messaging.MessageTypes;
-using ProtoBuf;
+﻿using MPLib.Networking;
 
-namespace EtherBetClientLib.Core.Game.Poker.Messaging
+namespace MPLib.Core.Game.Poker.Messaging
 {
     public interface IPokerMessage : IMessage
     {

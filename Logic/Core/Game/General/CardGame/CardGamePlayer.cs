@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Numerics;
-using System.Security.Cryptography;
-using System.Text;
-using EtherBetClientLib.Crypto.Encryption.SRA;
-using EtherBetClientLib.Models;
-using EtherBetClientLib.Models.Games;
+﻿using MPLib.Models.Games;
 
-namespace EtherBetClientLib.Core.Game.General
+namespace MPLib.Core.Game.General.CardGame
 {
 
     public class CardGamePlayer : Player
