@@ -1,9 +1,12 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Text;
+using EtherBetClientLib.Crypto.Encryption.SRA;
 
 namespace EtherBetClientLib.Crypto.Encryption.HellMan
 {
 
+    [Obsolete("This class is not intended to use as commutative encryption anymore. Instead use: " + nameof(SraCryptoProvider))]
     public class HellManCryptoProvider
     {
         private PohligHellmanKey Key { get; }
