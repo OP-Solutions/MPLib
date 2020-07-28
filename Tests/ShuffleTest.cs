@@ -4,7 +4,7 @@ using System.Numerics;
 using MPLib.Random;
 using Xunit;
 
-namespace SPRTest
+namespace Tests
 {
     public class ShuffleTest
     {

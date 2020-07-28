@@ -1,10 +1,6 @@
 ﻿using Xunit;
-using EtherBetClientLib.Models.Games.Poker;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace EtherBetClientLib.Models.Games.Poker.Tests
+namespace Tests.Models.Games.Poker
 {
     public class CombinationTests
     {

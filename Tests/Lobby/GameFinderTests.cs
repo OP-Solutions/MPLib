@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using Xunit;
-
-namespace SPRTest.Lobby
+﻿namespace Tests.Lobby
 {
     public class GameFinderTests
     {
