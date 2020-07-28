@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.IO;
+using System.Net;
 using System.Security.Cryptography;
 using MPLib.Helper;
 using MPLib.Networking;
@@ -17,6 +18,7 @@ namespace MPLib.Models.Games
             };
         }
 
+
         protected Player()
         {
 
@@ -34,7 +36,7 @@ namespace MPLib.Models.Games
 
         public bool IsMyPlayer => NetworkStream != null;
 
-        internal ExtendedStream NetworkStream { get; private set; }
+        internal Stream NetworkStream { get; private set; }
     }
 
     public enum PlayerType

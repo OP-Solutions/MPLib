@@ -22,7 +22,7 @@ namespace MPLib.Networking
         /// </summary>
         public IPEndPoint Endpoint { get; set; }
 
-        public ExtendedStream Stream { get; private set; }
+        public Stream Stream { get; private set; }
         private AesCryptoServiceProvider _aesProvider;
 
         private readonly TcpClient _client;
@@ -47,39 +47,34 @@ namespace MPLib.Networking
             return RemotePlayer;
         }
 
-        public ExtendedStream GetStream()
-        {
-            return new ExtendedStream(_client.GetStream());
-        }
 
         private async Task ExchangeBasicInfo()
         {
-            var controller = new ExtendedStream(_client.GetStream());
-            await controller.WriteAsciiOpaque8Async(MyPlayer.Name);
-            var remotePlayerName = await controller.ReadAsciiOpaque8Async();
+            var stream = _client.GetStream();
+            await stream.WriteAsciiOpaque8Async(MyPlayer.Name);
+            var remotePlayerName = await stream.ReadAsciiOpaque8Async();
             RemotePlayer.Name = remotePlayerName;
         }
 
         private async Task Authentication()
         {
             var stream = _client.GetStream();
-            var controller = new ExtendedStream(stream);
             using var randomProvider = new RNGCryptoServiceProvider();
             var myRandom = new byte[32];
             var pubKey = MyPlayer.Key.Export(CngKeyBlobFormat.EccFullPublicBlob);
-            await controller.WriteBytesOpaque16Async(pubKey);
-            await controller.WriteBytesOpaque8Async(myRandom);
-            var otherPartyPubKey  = await controller.ReadBytesOpaque16Async();
-            var otherPartyRandom = await controller.ReadBytesOpaque8Async();
+            await stream.WriteBytesOpaque16Async(pubKey);
+            await stream.WriteBytesOpaque8Async(myRandom);
+            var otherPartyPubKey  = await stream.ReadBytesOpaque16Async();
+            var otherPartyRandom = await stream.ReadBytesOpaque8Async();
             var signer = new ECDsaCng(MyPlayer.Key);
             var remotePlayerKey = CngKey.Import(otherPartyPubKey, CngKeyBlobFormat.EccPublicBlob);
             var verifier = new ECDsaCng(remotePlayerKey);
             var mySignature = signer.SignData(otherPartyRandom, HashAlgorithmName.SHA256);
-            await controller.WriteBytesOpaque16Async(mySignature);
-            var otherPartySignature = await controller.ReadBytesOpaque8Async();
+            await stream.WriteBytesOpaque16Async(mySignature);
+            var otherPartySignature = await stream.ReadBytesOpaque8Async();
             verifier.VerifyData(myRandom, otherPartySignature, HashAlgorithmName.SHA256);
-            await controller.WriteEnumAsByteAsync(NetWorkCodes.AuthSuccess);
-            var code = await controller.ReadByteAsEnumAsync<NetWorkCodes>();
+            await stream.WriteEnumAsByteAsync(NetWorkCodes.AuthSuccess);
+            var code = await stream.ReadByteAsEnumAsync<NetWorkCodes>();
             if (code != NetWorkCodes.AuthSuccess) throw new AuthenticationException();
             RemotePlayer.Key = remotePlayerKey;
         }
@@ -101,7 +96,7 @@ namespace MPLib.Networking
 
             _aesProvider = new AesCryptoServiceProvider { Key = sharedKey };
             var cryptoStream = new CryptoNetWorkStream(stream, _aesProvider);
-            Stream = new ExtendedStream(cryptoStream);
+            Stream = cryptoStream;
         }
 
     }

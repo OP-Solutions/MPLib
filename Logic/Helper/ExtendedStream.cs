@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Buffers;
+using System.Data;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,56 +11,46 @@ namespace MPLib.Helper
     /// <summary>
     /// Stream reading writing helper class specially designed to make data exchange easier over network
     /// </summary>
-    public class ExtendedStream : Stream
+    public static class StreamHelpers
     {
-        public Stream BaseStream { get; set; }
-        private readonly byte[] _buffer = new byte[8];
 
-
-        public ExtendedStream()
+        public static async Task<short> ReadInt16Async(this Stream source)
         {
-
-        }
-
-        public ExtendedStream(Stream baseStream)
-        {
-            BaseStream = baseStream;
-        }
-
-        public async Task<short> ReadInt16Async()
-        {
-            await BaseStream.ReadAsync(_buffer, 0, 2);
-            var len = (short)(_buffer[0] | _buffer[1] << 8);
+            var buffer = new byte[2];
+            await source.ReadAsync(buffer, 0, 2);
+            var len = (short)(buffer[0] | buffer[1] << 8);
             return len;
         }
 
-        public async Task WriteInt16Async(int value)
+        public static async Task WriteInt16Async(this Stream source, int value)
         {
+            var buffer = new byte[2];
             if (value > short.MaxValue) throw new ArgumentOutOfRangeException(nameof(value));
             unchecked
             {
-                _buffer[0] = (byte)value;
-                _buffer[1] = (byte)(value >> 8);
-                await BaseStream.WriteAsync(_buffer, 0, 2);
+                buffer[0] = (byte)value;
+                buffer[1] = (byte)(value >> 8);
+                await source.WriteAsync(buffer, 0, 2);
             }
         }
 
-        public async Task<byte> ReadByteAsync()
+        public static async Task<byte> ReadByteAsync(this Stream source)
         {
-            await BaseStream.ReadAsync(_buffer, 0, 1);
-            return _buffer[0];
+            var buffer = new byte[1];
+            await source.ReadAsync(buffer, 0, 1);
+            return buffer[0];
         }
 
-        public async Task<byte[]> ReadBytesOpaque8Async()
+        public static async Task<byte[]> ReadBytesOpaque8Async(this Stream source)
         {
-            var len = await ReadByteAsync();
-            return await BaseStream.ReadBlockAsync(len);
+            var len = await ReadByteAsync(source);
+            return await source.ReadBlockAsync(len);
         }
 
-        public async Task<byte[]> ReadBytesOpaque16Async()
+        public static async Task<byte[]> ReadBytesOpaque16Async(this Stream source)
         {
-            var len = await ReadInt16Async();
-            return await BaseStream.ReadBlockAsync(len);
+            var len = await ReadInt16Async(source);
+            return await source.ReadBlockAsync(len);
         }
 
         /// <summary>
@@ -67,89 +59,56 @@ namespace MPLib.Helper
         /// <param name="bufferToWriteTo">buffer to which read bytes will be written</param>
         /// <param name="offset">offset to start writing at that index</param>
         /// <returns>bytes written</returns>
-        public async Task<int> ReadBytesOpaque16Async(byte[] bufferToWriteTo, int offset)
+        public static async Task<int> ReadBytesOpaque16Async(this Stream source, byte[] bufferToWriteTo, int offset)
         {
-            var len = await ReadInt16Async();
-            await BaseStream.ReadBlockAsync(bufferToWriteTo, offset, len);
+            var len = await ReadInt16Async(source);
+            await source.ReadBlockAsync(bufferToWriteTo, offset, len);
             return len;
         }
 
-        public async Task WriteBytesOpaque8Async(byte[] bytes)
+        public static async Task WriteBytesOpaque8Async(this Stream source, byte[] bytes)
         {
             if (bytes.Length > byte.MaxValue) throw new ArgumentOutOfRangeException(nameof(bytes));
-            await WriteByteAsync((byte)bytes.Length);
-            await BaseStream.WriteAsync(bytes);
+            await WriteByteAsync(source, (byte)bytes.Length);
+            await source.WriteAsync(bytes);
         }
 
-        public async Task WriteBytesOpaque16Async(byte[] bytes)
+        public static async Task WriteBytesOpaque16Async(this Stream source, byte[] bytes)
         {
-            await WriteInt16Async(bytes.Length);
-            await BaseStream.WriteAsync(bytes);
+            await WriteInt16Async(source, bytes.Length);
+            await source.WriteAsync(bytes);
         }
 
-        public async Task WriteAsciiOpaque8Async(string value)
+        public static  async Task WriteAsciiOpaque8Async(this Stream source, string value)
         {
             var bytes = Encoding.ASCII.GetBytes(value);
-            await WriteBytesOpaque8Async(bytes);
+            await WriteBytesOpaque8Async(source, bytes);
         }
 
-        public async Task<string> ReadAsciiOpaque8Async()
+        public static async Task<string> ReadAsciiOpaque8Async(this Stream source)
         {
-            var bytes = await ReadBytesOpaque8Async();
+            var bytes = await ReadBytesOpaque8Async(source);
             return Encoding.ASCII.GetString(bytes);
         }
 
-        public async Task WriteByteAsync(byte value)
+        public static async Task WriteByteAsync(this Stream source, byte value)
         {
-            _buffer[0] = value;
-            await BaseStream.WriteAsync(_buffer, 0, 1);
+            var buffer = new byte[1];
+            buffer[0] = value;
+            await source.WriteAsync(buffer, 0, 1);
         }
 
 
-        public async Task<T> ReadByteAsEnumAsync<T>() where T : Enum
+        public static async Task<T> ReadByteAsEnumAsync<T>(this Stream source) where T : Enum
         {
-            var b = await ReadByteAsync();
+            var b = await ReadByteAsync(source);
             // ReSharper disable once PossibleInvalidCastException
             return (T)(object)b;
         }
 
-        public async Task WriteEnumAsByteAsync(Enum e)
+        public static async Task WriteEnumAsByteAsync(this Stream source, Enum e)
         {
-            await WriteByteAsync((byte)(object)e);
-        }
-
-        public override void Flush()
-        {
-            BaseStream.Flush();
-        }
-
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            return BaseStream.Read(buffer, offset, count);
-        }
-
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            return BaseStream.Seek(offset, origin);
-        }
-
-        public override void SetLength(long value)
-        {
-            BaseStream.SetLength(value);
-        }
-
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            BaseStream.Write(buffer, offset, count);
-        }
-
-        public override bool CanRead => BaseStream.CanRead;
-        public override bool CanSeek => BaseStream.CanSeek;
-        public override bool CanWrite => BaseStream.CanWrite;
-        public override long Length => BaseStream.Length;
-        public override long Position {
-            get => BaseStream.Position;
-            set => BaseStream.Position = value;
+            await WriteByteAsync(source, (byte)(object)e);
         }
     }
 }
