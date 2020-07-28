@@ -126,7 +126,7 @@ namespace MPLib.Networking
             var buffer = ArrayPool<byte>.Shared.Rent(1024 * 32);
             try
             {
-                await using var stream = new StreamController(new MemoryStream(buffer) { Position = 0 });
+                await using var stream = new ExtendedStream(new MemoryStream(buffer) { Position = 0 });
                 await stream.WriteInt16Async(_messageTypeCodeMapper.GetCode(message.GetType()));
                 Serializer.NonGeneric.SerializeWithLengthPrefix(stream, package, PrefixStyle.Fixed32BigEndian, 0);
                 Serializer.NonGeneric.SerializeWithLengthPrefix(stream, message, PrefixStyle.Fixed32BigEndian, 0);

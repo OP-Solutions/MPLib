@@ -5,7 +5,6 @@ namespace MPLib.Core.Game.General.CardGame
 
     public class CardGamePlayer : Player
     {
-
     }
 
     public interface IMyCardGamePlayer

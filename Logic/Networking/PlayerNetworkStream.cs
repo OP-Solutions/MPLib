@@ -10,7 +10,7 @@ using MPLib.Models.Games;
 
 namespace MPLib.Networking
 {
-    public class PlayerNetworkStream : StreamController
+    public class PlayerNetworkStream
     {
         public Player MyPlayer { get; set; }
 
@@ -22,7 +22,7 @@ namespace MPLib.Networking
         /// </summary>
         public IPEndPoint Endpoint { get; set; }
 
-        public Stream Stream { get; private set; }
+        public ExtendedStream Stream { get; private set; }
         private AesCryptoServiceProvider _aesProvider;
 
         private readonly TcpClient _client;
@@ -47,9 +47,14 @@ namespace MPLib.Networking
             return RemotePlayer;
         }
 
+        public ExtendedStream GetStream()
+        {
+            return new ExtendedStream(_client.GetStream());
+        }
+
         private async Task ExchangeBasicInfo()
         {
-            var controller = new StreamController(_client.GetStream());
+            var controller = new ExtendedStream(_client.GetStream());
             await controller.WriteAsciiOpaque8Async(MyPlayer.Name);
             var remotePlayerName = await controller.ReadAsciiOpaque8Async();
             RemotePlayer.Name = remotePlayerName;
@@ -58,7 +63,7 @@ namespace MPLib.Networking
         private async Task Authentication()
         {
             var stream = _client.GetStream();
-            var controller = new StreamController(stream);
+            var controller = new ExtendedStream(stream);
             using var randomProvider = new RNGCryptoServiceProvider();
             var myRandom = new byte[32];
             var pubKey = MyPlayer.Key.Export(CngKeyBlobFormat.EccFullPublicBlob);
@@ -96,37 +101,8 @@ namespace MPLib.Networking
 
             _aesProvider = new AesCryptoServiceProvider { Key = sharedKey };
             var cryptoStream = new CryptoNetWorkStream(stream, _aesProvider);
-            Stream = cryptoStream;
+            Stream = new ExtendedStream(cryptoStream);
         }
 
-        public override void Flush()
-        {
-        }
-
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void SetLength(long value)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool CanRead { get; }
-        public override bool CanSeek { get; }
-        public override bool CanWrite { get; }
-        public override long Length { get; }
-        public override long Position { get; set; }
     }
 }

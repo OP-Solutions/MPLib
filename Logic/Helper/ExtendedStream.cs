@@ -9,18 +9,18 @@ namespace MPLib.Helper
     /// <summary>
     /// Stream reading writing helper class specially designed to make data exchange easier over network
     /// </summary>
-    public class StreamController : Stream
+    public class ExtendedStream : Stream
     {
         public Stream BaseStream { get; set; }
         private readonly byte[] _buffer = new byte[8];
 
 
-        public StreamController()
+        public ExtendedStream()
         {
 
         }
 
-        public StreamController(Stream baseStream)
+        public ExtendedStream(Stream baseStream)
         {
             BaseStream = baseStream;
         }
