@@ -23,13 +23,13 @@ namespace MPLib.Networking
     /// </remarks>
     /// <typeparam name="TPlayerType"></typeparam>
     /// <typeparam name="TBaseMessageType"></typeparam>
-    internal class PlayerMessageManager<TPlayerType, TBaseMessageType> : IPlayerMessageManager<TPlayerType, TBaseMessageType> where TBaseMessageType : IMessage where TPlayerType : Player
+    internal class PlayerMessageManager<TBaseMessageType> : IPlayerMessageManager<TBaseMessageType> where TBaseMessageType : IMessage
     {
 
         private readonly PlayerIdentifyMode _identifyMode;
         private readonly ECDsa _signer;
-        private readonly TPlayerType[] _connectedPlayers;
-        private readonly TPlayerType _myPlayer;
+        private readonly Player[] _connectedPlayers;
+        private readonly Player _myPlayer;
         private readonly TypeCodeMapper _messageTypeCodeMapper;
 
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -44,7 +44,7 @@ namespace MPLib.Networking
         /// This is like dictionary which map types to number's, which are added as prefix when serialized
         /// So deserializer party knows which type was sent and correctly deserializes message
         /// </param>
-        public PlayerMessageManager(IReadOnlyList<TPlayerType> players, TypeCodeMapper messageTypeTypeCodeMapper, PlayerIdentifyMode identifyMode)
+        public PlayerMessageManager(IReadOnlyList<Player> players, TypeCodeMapper messageTypeTypeCodeMapper, PlayerIdentifyMode identifyMode)
         {
             _messageTypeCodeMapper = messageTypeTypeCodeMapper;
             _connectedPlayers = players.Where(p => !p.IsMyPlayer).ToArray();
@@ -76,7 +76,7 @@ namespace MPLib.Networking
                 Task.Run(() => HandleMessageStreamFromPlayer(player, playerIndex), _cancellationTokenSource.Token);
             }
         }
-        private async Task HandleMessageStreamFromPlayer(TPlayerType player, int playerIndex)
+        private async Task HandleMessageStreamFromPlayer(Player player, int playerIndex)
         {
             var networkStream = player.NetworkStream;
             var memStream = new MemoryStream(_internalBuffer);
@@ -86,7 +86,7 @@ namespace MPLib.Networking
                     break;
             }
         }
-        private async Task<bool> HandleMessageFromPlayer(TPlayerType player, int playerIndex, Stream networkStream, Stream stream)
+        private async Task<bool> HandleMessageFromPlayer(Player player, int playerIndex, Stream networkStream, Stream stream)
         {
 
             //data length (without signature)
@@ -110,7 +110,7 @@ namespace MPLib.Networking
             return false;
         }
 
-        private async Task<byte[]> CheckSignature(Stream networkStream, TPlayerType player, int playerIndex, int dataLen)
+        private async Task<byte[]> CheckSignature(Stream networkStream, Player player, int playerIndex, int dataLen)
         {
             var signature = await networkStream.ReadBytesOpaque16Async();
             if (signature == null)
@@ -143,13 +143,13 @@ namespace MPLib.Networking
 
         public async Task BroadcastMessage(TBaseMessageType message)
         {
-            var tasks = (from TPlayerType player in _connectedPlayers
+            var tasks = (from player in _connectedPlayers
                          select SendMessageTo(player, message)).ToList();
 
             await Task.WhenAll(tasks);
         }
 
-        public async Task SendMessageTo(TPlayerType player, TBaseMessageType message)
+        public async Task SendMessageTo(Player player, TBaseMessageType message)
         {
 
             byte[] identifier;
@@ -197,7 +197,7 @@ namespace MPLib.Networking
             
         }
 
-        public async Task<T> ReadMessageFrom<T>(TPlayerType player) where T : TBaseMessageType
+        public async Task<T> ReadMessageFrom<T>(Player player) where T : TBaseMessageType
         {
             var channel = GetChannel(player, typeof(T));
             var package = await channel.Reader.ReadAsync();
@@ -205,7 +205,7 @@ namespace MPLib.Networking
         }
 
 
-        private Channel<Package> GetChannel(TPlayerType player, Type messageType)
+        private Channel<Package> GetChannel(Player player, Type messageType)
         {
 
             Channel<Package> channel;
@@ -223,22 +223,21 @@ namespace MPLib.Networking
 
     }
 
-    interface IPlayerMessageManager<in TPlayerType, in TBaseMessageType> : IPlayerMessageSender<TPlayerType, TBaseMessageType>, 
-        IPlayerMessageReceiver<TPlayerType, TBaseMessageType> 
+    interface IPlayerMessageManager<in TBaseMessageType> : IPlayerMessageSender<TBaseMessageType>, 
+        IPlayerMessageReceiver<TBaseMessageType> 
         where TBaseMessageType : IMessage
-        where TPlayerType : Player
     {
     }
 
-    interface IPlayerMessageSender<in TPlayerType, in TBaseMessageType> where TBaseMessageType : IMessage
+    interface IPlayerMessageSender<in TBaseMessageType> where TBaseMessageType : IMessage
     {
-        Task SendMessageTo(TPlayerType player, TBaseMessageType message);
+        Task SendMessageTo(Player player, TBaseMessageType message);
         Task BroadcastMessage(TBaseMessageType message);
     }
 
-    interface IPlayerMessageReceiver<in TPlayerType, in TBaseMessageType> where TBaseMessageType : IMessage
+    interface IPlayerMessageReceiver<in TBaseMessageType> where TBaseMessageType : IMessage
     {
-        Task<T> ReadMessageFrom<T>(TPlayerType player) where T : TBaseMessageType;
+        Task<T> ReadMessageFrom<T>(Player player) where T : TBaseMessageType;
     }
 
     enum PlayerIdentifyMode

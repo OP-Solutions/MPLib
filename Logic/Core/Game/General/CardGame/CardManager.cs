@@ -27,9 +27,9 @@ namespace MPLib.Core.Game.General.CardGame
         private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _firstCycleDeck;
         private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _secondCycleDeck;
 
-        private readonly IPlayerMessageManager<TPlayer, ICardGameMessage> _messageManager;
+        private readonly IPlayerMessageManager<ICardGameMessage> _messageManager;
 
-        public CardManager(IPlayerMessageManager<TPlayer, ICardGameMessage> messageManager, IReadOnlyList<Card> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
+        public CardManager(IPlayerMessageManager<ICardGameMessage> messageManager, IReadOnlyList<Card> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
         {
 
             _messageManager = messageManager;

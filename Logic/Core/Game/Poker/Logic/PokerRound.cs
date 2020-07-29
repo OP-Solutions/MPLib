@@ -93,14 +93,14 @@ namespace MPLib.Core.Game.Poker.Logic
         public PokerRoundState State { get; set; }
 
 
-        private readonly IPlayerMessageManager<PokerPlayer, IPokerMessage> _messageManager;
+        private readonly IPlayerMessageManager<IPokerMessage> _messageManager;
 
         public PokerRound(PokerTable table, IReadOnlyList<PokerPlayer> players)
         {
             Table = table;
             State = PokerRoundState.NoStarted;
             var mapper = TypeCodeMapper.FromEnum<PokerMessageType>().AddEnum<CardGameMessageType>();
-            _messageManager = new PlayerMessageManager<PokerPlayer, IPokerMessage>(players, mapper, PlayerIdentifyMode.Index);
+            _messageManager = new PlayerMessageManager<IPokerMessage>(players, mapper, PlayerIdentifyMode.Index);
         }
 
         /// <summary>

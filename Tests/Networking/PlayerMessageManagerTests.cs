@@ -2,7 +2,9 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using MPLib.Core.Game.Poker.Messaging;
 using MPLib.Models.Games;
+using MPLib.Networking;
 using Xunit;
 using static Tests.StaticData;
 
