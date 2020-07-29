@@ -36,9 +36,7 @@ namespace MPLib.Networking
         private readonly byte[] _internalBuffer = new byte[1024 * 1024];
         private readonly Dictionary<Player, Dictionary<Type, Channel<Package>>> _messageStorage;
 
-        /// <param name="players">
-        /// players dictionary. key is player itself, value - corresponding player identifier, which is included in each message
-        /// so remote party knows who message are coming from, or who is destination of that message:
+
         /// (<see cref="Package.SenderIdentifier"/>/>, (<see cref="Package.DestinationIdentifier"/>/>,
         /// </param>
         /// <param name="players">Contact list to send messages to</param>
