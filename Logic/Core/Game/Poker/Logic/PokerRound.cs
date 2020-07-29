@@ -93,11 +93,6 @@ namespace MPLib.Core.Game.Poker.Logic
         public PokerRoundState State { get; set; }
 
 
-        /// <summary>
-        /// Deck card list after shuffling, cards are represented as encrypted bigIntegers
-        /// </summary>
-        private BigInteger[] ShuffledDeck { get; set; }
-
         private readonly IPlayerMessageManager<PokerPlayer, IPokerMessage> _messageManager;
 
         public PokerRound(PokerTable table, IReadOnlyList<PokerPlayer> players)
@@ -105,7 +100,7 @@ namespace MPLib.Core.Game.Poker.Logic
             Table = table;
             State = PokerRoundState.NoStarted;
             var mapper = TypeCodeMapper.FromEnum<PokerMessageType>().AddEnum<CardGameMessageType>();
-            _messageManager = new PlayerMessageManager<PokerPlayer, IPokerMessage>(players, mapper);
+            _messageManager = new PlayerMessageManager<PokerPlayer, IPokerMessage>(players, mapper, PlayerIdentifyMode.Index);
         }
 
         /// <summary>

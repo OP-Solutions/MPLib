@@ -26,35 +26,38 @@ namespace MPLib.Networking
     internal class PlayerMessageManager<TPlayerType, TBaseMessageType> : IPlayerMessageManager<TPlayerType, TBaseMessageType> where TBaseMessageType : IMessage where TPlayerType : Player
     {
 
+        private readonly PlayerIdentifyMode _identifyMode;
         private readonly ECDsa _signer;
-        private readonly IReadOnlyList<TPlayerType> _connectedPlayers;
+        private readonly TPlayerType[] _connectedPlayers;
         private readonly TPlayerType _myPlayer;
+        private readonly TypeCodeMapper _messageTypeCodeMapper;
+
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly byte[] _internalBuffer = new byte[1024 * 1024];
         private readonly Dictionary<Player, Dictionary<Type, Channel<Package>>> _messageStorage;
-        private readonly TypeCodeMapper _messageTypeCodeMapper;
 
-        /// <param name="otherPlayers">
+        /// <param name="players">
         /// players dictionary. key is player itself, value - corresponding player identifier, which is included in each message
         /// so remote party knows who message are coming from, or who is destination of that message:
-        /// (<see cref="Package{TBaseMessageType}.SenderIdentifier"/>/>, (<see cref="Package{TBaseMessageType}.DestinationIdentifier"/>/>,
+        /// (<see cref="Package.SenderIdentifier"/>/>, (<see cref="Package.DestinationIdentifier"/>/>,
         /// </param>
         /// <param name="players">Contact list to send messages to</param>
         /// <param name="messageTypeTypeCodeMapper">
         /// This is like dictionary which map types to number's, which are added as prefix when serialized
         /// So deserializer party knows which type was sent and correctly deserializes message
         /// </param>
-        public PlayerMessageManager(IReadOnlyList<TPlayerType> players, TypeCodeMapper messageTypeTypeCodeMapper)
+        public PlayerMessageManager(IReadOnlyList<TPlayerType> players, TypeCodeMapper messageTypeTypeCodeMapper, PlayerIdentifyMode identifyMode)
         {
             _messageTypeCodeMapper = messageTypeTypeCodeMapper;
             _connectedPlayers = players.Where(p => !p.IsMyPlayer).ToArray();
             _myPlayer = players.First(p => p.IsMyPlayer);
             _signer = new ECDsaCng(_myPlayer.Key);
-            _messageStorage = new Dictionary<Player, Dictionary<Type, Channel<Package>>>(_connectedPlayers.Count);
+            _messageStorage = new Dictionary<Player, Dictionary<Type, Channel<Package>>>(_connectedPlayers.Length);
             foreach (var player in _connectedPlayers)
             {
                 _messageStorage[player] = new Dictionary<Type, Channel<Package>>();
             }
+            _identifyMode = identifyMode;
         }
 
 
@@ -68,44 +71,78 @@ namespace MPLib.Networking
         /// </remarks>
         public void StartAsyncReading()
         {
-            foreach (var player in _connectedPlayers)
+            for (var i = 0; i < _connectedPlayers.Length; i++)
             {
-                Task.Run(async () =>
-                {
-                    var networkStream = player.NetworkStream;
-                    var memStream = new MemoryStream(_internalBuffer);
-                    while (true)
-                    {
-                        //data length (without signature)
-                        var dataLen = await networkStream.ReadBytesOpaque16Async(_internalBuffer, 0);
-                        if(dataLen == 0) break;
-                        var messageTypeCode = await networkStream.ReadInt16Async();
-                        var messageType = _messageTypeCodeMapper.GetType(messageTypeCode);
-                        Serializer.NonGeneric.TryDeserializeWithLengthPrefix(memStream, PrefixStyle.Fixed32BigEndian, 
-                            _ => typeof(Package), out var packageObj);
-                        var package = (Package)packageObj;
-                        Serializer.NonGeneric.TryDeserializeWithLengthPrefix(memStream, PrefixStyle.Fixed32BigEndian, 
-                            _ => messageType, out var message);
-
-
-                        var signature = await networkStream.ReadBytesOpaque16Async();
-                        if (signature == null) break;
-
-                        var signer = new ECDsaCng(player.Key);
-
-                        if(!signer.VerifyData(_internalBuffer, 0, dataLen, signature, HashAlgorithmName.SHA256))
-                            break;
-
-                        package.SenderSignature = signature;
-                        package.Message = message;
-
-                        var channel = GetChannel(player, messageType);
-                        await channel.Writer.WriteAsync(package);
-                    }
-                }, _cancellationTokenSource.Token);
+                var player = _connectedPlayers[i];
+                var playerIndex = i;
+                Task.Run(() => HandleMessageStreamFromPlayer(player, playerIndex), _cancellationTokenSource.Token);
             }
         }
-        
+        private async Task HandleMessageStreamFromPlayer(TPlayerType player, int playerIndex)
+        {
+            var networkStream = player.NetworkStream;
+            var memStream = new MemoryStream(_internalBuffer);
+            while (true)
+            {
+                if (await HandleMessageFromPlayer(player, playerIndex, networkStream, memStream))
+                    break;
+            }
+        }
+        private async Task<bool> HandleMessageFromPlayer(TPlayerType player, int playerIndex, Stream networkStream, Stream stream)
+        {
+
+            //data length (without signature)
+            var dataLen = await networkStream.ReadBytesOpaque16Async(_internalBuffer, 0);
+            if (dataLen == 0) return true;
+            var messageTypeCode = await networkStream.ReadInt16Async();
+            var messageType = _messageTypeCodeMapper.GetType(messageTypeCode);
+            Serializer.NonGeneric.TryDeserializeWithLengthPrefix(stream, PrefixStyle.Fixed32BigEndian, _ => typeof(Package), out var packageObj);
+            var package = (Package)packageObj;
+            Serializer.NonGeneric.TryDeserializeWithLengthPrefix(stream, PrefixStyle.Fixed32BigEndian, _ => messageType, out var message);
+
+            var signature = await CheckSignature(networkStream, player, playerIndex, dataLen);
+
+            CheckSender(package, playerIndex);
+
+            package.SenderSignature = signature;
+            package.Message = message;
+
+            var channel = GetChannel(player, messageType);
+            await channel.Writer.WriteAsync(package);
+            return false;
+        }
+
+        private async Task<byte[]> CheckSignature(Stream networkStream, TPlayerType player, int playerIndex, int dataLen)
+        {
+            var signature = await networkStream.ReadBytesOpaque16Async();
+            if (signature == null)
+                throw new Exception($"Can't read network message signature from player: {player} (index={playerIndex}");
+
+            var signer = new ECDsaCng(player.Key);
+
+            if (!signer.VerifyData(_internalBuffer, 0, dataLen, signature, HashAlgorithmName.SHA256))
+                throw new Exception($"Invalid signature of network message from player: {player} (index={playerIndex}");
+            return signature;
+        }
+        private void CheckSender(Package package, int playerIndex)
+        {
+
+            var senderIdentifier = package.SenderIdentifier;
+
+            switch (_identifyMode)
+            {
+
+                case PlayerIdentifyMode.Index:
+                    var deserializedIndex = BitConverter.ToInt16(senderIdentifier);
+                    if (deserializedIndex != playerIndex) throw new Exception("Incorrect sender indicated");
+                    break;
+                case PlayerIdentifyMode.PublicKey:
+                    break;
+                default:
+                    throw new NotSupportedException($"Unknown identify mode: {_identifyMode}");
+            }
+        }
+
         public async Task BroadcastMessage(TBaseMessageType message)
         {
             var tasks = (from TPlayerType player in _connectedPlayers
@@ -116,10 +153,29 @@ namespace MPLib.Networking
 
         public async Task SendMessageTo(TPlayerType player, TBaseMessageType message)
         {
+
+            byte[] identifier;
+
+            switch (_identifyMode)
+            {
+                case PlayerIdentifyMode.Index:
+                {
+                    var index = Array.IndexOf(_connectedPlayers, player);
+                    if(index == -1) throw new Exception("Invalid player");
+                    identifier = BitConverter.GetBytes((short)index);
+                    break;
+                }
+                case PlayerIdentifyMode.PublicKey:
+                    identifier = player.PublicKeyBytes;
+                    break;
+                default:
+                    throw new NotSupportedException($"Unknown Player identify mode: {_identifyMode}");
+            }
+
             var package = new Package()
             {
                 SenderIdentifier = _myPlayer.Key.Export(CngKeyBlobFormat.EccPublicBlob),
-                DestinationIdentifier = player.PublicKeyBytes,
+                DestinationIdentifier = identifier,
                 Message = message
             };
 
@@ -169,21 +225,37 @@ namespace MPLib.Networking
 
     }
 
-    public interface IPlayerMessageManager<in TPlayerType, in TBaseMessageType> : IPlayerMessageSender<TPlayerType, TBaseMessageType>, 
+    interface IPlayerMessageManager<in TPlayerType, in TBaseMessageType> : IPlayerMessageSender<TPlayerType, TBaseMessageType>, 
         IPlayerMessageReceiver<TPlayerType, TBaseMessageType> 
         where TBaseMessageType : IMessage
         where TPlayerType : Player
     {
     }
 
-    public interface IPlayerMessageSender<in TPlayerType, in TBaseMessageType> where TBaseMessageType : IMessage
+    interface IPlayerMessageSender<in TPlayerType, in TBaseMessageType> where TBaseMessageType : IMessage
     {
         Task SendMessageTo(TPlayerType player, TBaseMessageType message);
         Task BroadcastMessage(TBaseMessageType message);
     }
 
-    public interface IPlayerMessageReceiver<in TPlayerType, in TBaseMessageType> where TBaseMessageType : IMessage
+    interface IPlayerMessageReceiver<in TPlayerType, in TBaseMessageType> where TBaseMessageType : IMessage
     {
         Task<T> ReadMessageFrom<T>(TPlayerType player) where T : TBaseMessageType;
+    }
+
+    enum PlayerIdentifyMode
+    {
+
+        /// <summary>
+        /// When player sends message to other player he writes his index in players list in <see cref="Package.SenderIdentifier"/>
+        /// and index of receiver in <see cref="Package.DestinationIdentifier"/>
+        /// </summary>
+        Index,
+
+        /// <summary>
+        /// When player sends message to other player he writes his public key in <see cref="Package.SenderIdentifier"/>
+        /// and public key of receiver in <see cref="Package.DestinationIdentifier"/>
+        /// </summary>
+        PublicKey,
     }
 }

@@ -14,7 +14,7 @@ using MPLib.Random;
 
 namespace MPLib.Core.Game.General.CardGame
 {
-    public class CardManager<TPlayer, TMyPlayer>
+    class CardManager<TPlayer, TMyPlayer>
         where TPlayer : CardGamePlayer
         where TMyPlayer : TPlayer, IMyCardGamePlayer
     {
