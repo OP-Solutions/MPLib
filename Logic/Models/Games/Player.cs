@@ -10,14 +10,14 @@ namespace MPLib.Models.Games
     public class Player
     {
 
-        internal static Player CreateMyPlayer(string name)
+        internal static Player CreateMyPlayer(string name, CngKey key)
         {
-            return new Player() { Name = name, Key = CngKey.Create(CngAlgorithm.ECDsa), PlayerType = PlayerType.Local };
+            return new Player() { Name = name, Key = key, PlayerType = PlayerType.Local };
         }
 
-        internal static Player CreateOtherPlayer(string name, Stream networkStream)
+        internal static Player CreateOtherPlayer(string name, Stream networkStream, CngKey key)
         {
-            return new Player() { Name = name, NetworkStream = networkStream, PlayerType = PlayerType.Remote };
+            return new Player() { Name = name, NetworkStream = networkStream, Key = key, PlayerType = PlayerType.Remote };
         }
 
         protected Player()

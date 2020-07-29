@@ -6,9 +6,6 @@ namespace MPLib.Networking
     [ProtoContract]
     public class Package
     {
-
-        public short MessageTypeCode { get; set; }
-
         /// <summary>
         /// Sender identifier. It can be senders public key, sender player index index in game, etc..
         /// But it strictly depends on situation. for example if we are sending message in poker round it should be always sender player index in round, not anything else
@@ -26,6 +23,8 @@ namespace MPLib.Networking
         public DateTime TimeStampUtc { get; set; }
 
         #region These fields are [de]serialized manually
+
+        public short MessageTypeCode { get; set; }
 
         public object Message { get; set; }
 

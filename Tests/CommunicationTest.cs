@@ -23,7 +23,7 @@ namespace Tests
         //[InlineData("31.146.149.134, 8788", "bakurits", "Chudo123")] // party 2
         public void TestP2P(string targetIp, int targetPort, string messageToSend, string messageToReceive)
         {
-            var remoteClient = new PlayerNetworkStream(Player.CreateMyPlayer("MyTestPlayer"), new IPEndPoint(IPAddress.Parse(targetIp), targetPort));
+            var remoteClient = new PlayerNetworkStream(Player.CreateMyPlayer("MyTestPlayer", CngKey.Create(CngAlgorithm.ECDsaP384)), new IPEndPoint(IPAddress.Parse(targetIp), targetPort));
             var time = DateTime.UtcNow;
             var time2 = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute + 1, 0);
             Thread.Sleep(time2 - time);

@@ -14,5 +14,10 @@ namespace MPLib.Core.Game.General.CardGame.Messaging.MessageTypes
         {
             EncryptedCards = encryptedCards;
         }
+
+        public ReEncryptDeckMessage()
+        {
+
+        }
     }
 }

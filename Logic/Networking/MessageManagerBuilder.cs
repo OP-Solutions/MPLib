@@ -15,13 +15,13 @@ namespace MPLib.Networking
             _identifyMode = identifyMode;
         }
 
-        public MessageManagerBuilder UseMessageTypes<TEnumType>()
+        public MessageManagerBuilder WithMessageTypes<TEnumType>()
         {
             _typeCodeMapper.AddEnum<TEnumType>();
             return this;
         }
 
-        public PlayerMessageManager<TBaseMessageType> Build<TBaseMessageType>(IReadOnlyList<Player> players) where TBaseMessageType : IMessage
+        public IPlayerMessageManager<TBaseMessageType> Build<TBaseMessageType>(IReadOnlyList<Player> players) where TBaseMessageType : IMessage
         {
             return new PlayerMessageManager<TBaseMessageType>(players, _typeCodeMapper, _identifyMode);
         }

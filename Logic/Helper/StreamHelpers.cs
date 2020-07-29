@@ -79,6 +79,12 @@ namespace MPLib.Helper
             await source.WriteAsync(bytes);
         }
 
+        public static async Task WriteBytesOpaque16Async(this Stream source, byte[] bytes, int offset, int count)
+        {
+            await WriteInt16Async(source, count);
+            await source.WriteAsync(bytes, offset, count);
+        }
+
         public static  async Task WriteAsciiOpaque8Async(this Stream source, string value)
         {
             var bytes = Encoding.ASCII.GetBytes(value);

@@ -14,8 +14,8 @@ namespace MPLib.Core.Game.Poker.Logic
 
         private static readonly MessageManagerBuilder _messageManagerBuilder = 
             new MessageManagerBuilder(PlayerIdentifyMode.Index)
-                .UseMessageTypes<PokerMessageType>()
-                .UseMessageTypes<CardGameMessageType>();
+                .WithMessageTypes<PokerMessageType>()
+                .WithMessageTypes<CardGameMessageType>();
 
         #region Events
 
@@ -102,6 +102,7 @@ namespace MPLib.Core.Game.Poker.Logic
 
         public PokerRound(PokerTable table, IReadOnlyList<PokerPlayer> players)
         {
+            Players = players;
             Table = table;
             State = PokerRoundState.NoStarted;
             _messageManager = _messageManagerBuilder.Build<IPokerMessage>(Players);

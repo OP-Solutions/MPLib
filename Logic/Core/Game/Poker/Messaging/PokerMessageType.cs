@@ -7,7 +7,7 @@ namespace MPLib.Core.Game.Poker.Messaging
     public enum PokerMessageType
     {
         [EnumMemberModel(typeof(RoundStampMessage))]
-        RoundStamp = 100,
+        RoundStamp,
 
         [EnumMemberModel(typeof(BetMessage))]
         Bet,

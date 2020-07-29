@@ -30,5 +30,10 @@ namespace MPLib.Core.Game.Poker.Messaging.MessageTypes
             RoundUuid = roundUuid;
             Players = players;
         }
+
+        public RoundStampMessage()
+        {
+
+        }
     }
 }

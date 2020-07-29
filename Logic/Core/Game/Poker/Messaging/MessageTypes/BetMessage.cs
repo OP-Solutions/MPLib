@@ -10,6 +10,16 @@ namespace MPLib.Core.Game.Poker.Messaging.MessageTypes
         public PokerMessageType Type { get; set; } = BoundType;
 
         [ProtoMember(1)]
-        public double BetValue;
+        public double BetValue { get; }
+
+        public BetMessage()
+        {
+
+        }
+
+        public BetMessage(double betValue)
+        {
+            BetValue = betValue;
+        }
     }
 }
