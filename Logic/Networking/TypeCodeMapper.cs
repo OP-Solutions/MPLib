@@ -19,10 +19,23 @@ namespace MPLib.Networking
                 _codeToType = new Dictionary<int, Type>(), 
                 _typeToCode = new Dictionary<Type, int>()
             };
-            return mapper.AddEnum<T>();
+            mapper.AddEnum<T>();
+
+            return mapper;
         }
 
-        public TypeCodeMapper AddEnum<TEnum>()
+        internal static TypeCodeMapper Empty()
+        {
+            var mapper = new TypeCodeMapper
+            {
+                _codeToType = new Dictionary<int, Type>(),
+                _typeToCode = new Dictionary<Type, int>()
+            };
+
+            return mapper;
+        }
+
+        public void AddEnum<TEnum>()
         {
             var typeCodeOffset = _maxCodeValue + 1;
             var values = Enum.GetValues(typeof(TEnum));
@@ -39,8 +52,6 @@ namespace MPLib.Networking
                 _typeToCode[type] = typeCode;
                 if (typeCode > _maxCodeValue) _maxCodeValue = typeCode;
             }
-
-            return this;
         }
 
         public readonly Type GetType(int typeCode)

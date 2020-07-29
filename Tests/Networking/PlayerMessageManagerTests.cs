@@ -42,6 +42,7 @@ namespace Tests.Networking
             var player3 = Player.CreateOtherPlayer(Player3Name, player3Client.GetStream());
 
             var players = new List<Player>(1);
+            
         }
 
         private async Task RunPlayer2()

@@ -12,6 +12,11 @@ namespace MPLib.Core.Game.Poker.Logic
     public class PokerRound
     {
 
+        private static readonly MessageManagerBuilder _messageManagerBuilder = 
+            new MessageManagerBuilder(PlayerIdentifyMode.Index)
+                .UseMessageTypes<PokerMessageType>()
+                .UseMessageTypes<CardGameMessageType>();
+
         #region Events
 
         public event Action<PokerRoundState> StateChanges;
@@ -99,8 +104,7 @@ namespace MPLib.Core.Game.Poker.Logic
         {
             Table = table;
             State = PokerRoundState.NoStarted;
-            var mapper = TypeCodeMapper.FromEnum<PokerMessageType>().AddEnum<CardGameMessageType>();
-            _messageManager = new PlayerMessageManager<IPokerMessage>(players, mapper, PlayerIdentifyMode.Index);
+            _messageManager = _messageManagerBuilder.Build<IPokerMessage>(Players);
         }
 
         /// <summary>
@@ -111,7 +115,6 @@ namespace MPLib.Core.Game.Poker.Logic
         public async Task ProcessRound()
         {
             State = PokerRoundState.BeforeDeckShuffle;
-
             throw new NotImplementedException();
         }
 

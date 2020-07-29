@@ -23,7 +23,7 @@ namespace MPLib.Networking
     /// </remarks>
     /// <typeparam name="TPlayerType"></typeparam>
     /// <typeparam name="TBaseMessageType"></typeparam>
-    internal class PlayerMessageManager<TBaseMessageType> : IPlayerMessageManager<TBaseMessageType> where TBaseMessageType : IMessage
+    public class PlayerMessageManager<TBaseMessageType> : IPlayerMessageManager<TBaseMessageType> where TBaseMessageType : IMessage
     {
 
         private readonly PlayerIdentifyMode _identifyMode;
@@ -44,7 +44,7 @@ namespace MPLib.Networking
         /// This is like dictionary which map types to number's, which are added as prefix when serialized
         /// So deserializer party knows which type was sent and correctly deserializes message
         /// </param>
-        public PlayerMessageManager(IReadOnlyList<Player> players, TypeCodeMapper messageTypeTypeCodeMapper, PlayerIdentifyMode identifyMode)
+        internal PlayerMessageManager(IReadOnlyList<Player> players, TypeCodeMapper messageTypeTypeCodeMapper, PlayerIdentifyMode identifyMode)
         {
             _messageTypeCodeMapper = messageTypeTypeCodeMapper;
             _connectedPlayers = players.Where(p => !p.IsMyPlayer).ToArray();
@@ -240,7 +240,7 @@ namespace MPLib.Networking
         Task<T> ReadMessageFrom<T>(Player player) where T : TBaseMessageType;
     }
 
-    enum PlayerIdentifyMode
+    public enum PlayerIdentifyMode
     {
 
         /// <summary>
