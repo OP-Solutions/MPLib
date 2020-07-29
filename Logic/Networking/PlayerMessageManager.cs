@@ -23,12 +23,12 @@ namespace MPLib.Networking
     /// </remarks>
     /// <typeparam name="TPlayerType"></typeparam>
     /// <typeparam name="TBaseMessageType"></typeparam>
-    public class PlayerMessageManager<TPlayerType, TBaseMessageType> : IPlayerMessageManager<TPlayerType, TBaseMessageType> where TBaseMessageType : IMessage where TPlayerType : Player
+    internal class PlayerMessageManager<TPlayerType, TBaseMessageType> : IPlayerMessageManager<TPlayerType, TBaseMessageType> where TBaseMessageType : IMessage where TPlayerType : Player
     {
 
-        private readonly string _myIdentifier;
         private readonly ECDsa _signer;
-        private readonly IReadOnlyDictionary<TPlayerType, string> _connectedPlayers;
+        private readonly IReadOnlyList<TPlayerType> _connectedPlayers;
+        private readonly TPlayerType _myPlayer;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly byte[] _internalBuffer = new byte[1024 * 1024];
         private readonly Dictionary<Player, Dictionary<Type, Channel<Package>>> _messageStorage;
@@ -44,16 +44,14 @@ namespace MPLib.Networking
         /// This is like dictionary which map types to number's, which are added as prefix when serialized
         /// So deserializer party knows which type was sent and correctly deserializes message
         /// </param>
-        public PlayerMessageManager(IReadOnlyDictionary<TPlayerType, string> players, TypeCodeMapper messageTypeTypeCodeMapper)
+        public PlayerMessageManager(IReadOnlyList<TPlayerType> players, TypeCodeMapper messageTypeTypeCodeMapper)
         {
             _messageTypeCodeMapper = messageTypeTypeCodeMapper;
-            _connectedPlayers = players.Where(p => !p.Key.IsMyPlayer).ToDictionary(p => p.Key, p => p.Value);
-            var myPlayerInfo = players.First(p => p.Key.IsMyPlayer);
-            var myPlayer = myPlayerInfo.Key;
-            _myIdentifier = myPlayerInfo.Value;
-            _signer = new ECDsaCng(myPlayer.Key);
+            _connectedPlayers = players.Where(p => !p.IsMyPlayer).ToArray();
+            _myPlayer = players.First(p => p.IsMyPlayer);
+            _signer = new ECDsaCng(_myPlayer.Key);
             _messageStorage = new Dictionary<Player, Dictionary<Type, Channel<Package>>>(_connectedPlayers.Count);
-            foreach (var (player, _) in _connectedPlayers)
+            foreach (var player in _connectedPlayers)
             {
                 _messageStorage[player] = new Dictionary<Type, Channel<Package>>();
             }
@@ -70,7 +68,7 @@ namespace MPLib.Networking
         /// </remarks>
         public void StartAsyncReading()
         {
-            foreach (var (player, _) in _connectedPlayers)
+            foreach (var player in _connectedPlayers)
             {
                 Task.Run(async () =>
                 {
@@ -93,7 +91,9 @@ namespace MPLib.Networking
                         var signature = await networkStream.ReadBytesOpaque16Async();
                         if (signature == null) break;
 
-                        if(!_signer.VerifyData(_internalBuffer, 0, dataLen, signature, HashAlgorithmName.SHA256))
+                        var signer = new ECDsaCng(player.Key);
+
+                        if(!signer.VerifyData(_internalBuffer, 0, dataLen, signature, HashAlgorithmName.SHA256))
                             break;
 
                         package.SenderSignature = signature;
@@ -118,8 +118,8 @@ namespace MPLib.Networking
         {
             var package = new Package()
             {
-                SenderIdentifier = _myIdentifier,
-                DestinationIdentifier = _connectedPlayers[player],
+                SenderIdentifier = _myPlayer.Key.Export(CngKeyBlobFormat.EccPublicBlob),
+                DestinationIdentifier = player.PublicKeyBytes,
                 Message = message
             };
 

@@ -5,9 +5,7 @@ VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{143BA9F6-F8AD-4D39-9344-52785FD18428}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppContext", "AppContext\AppContext.csproj", "{9BCFAE93-CEA2-46D2-992E-2DA9D6B92A75}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logic", "Logic\Logic.csproj", "{20E80056-9EEB-479D-93FD-7A2DE665CB63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MPLib", "Logic\MPLib.csproj", "{20E80056-9EEB-479D-93FD-7A2DE665CB63}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +17,6 @@ Global
 		{143BA9F6-F8AD-4D39-9344-52785FD18428}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{143BA9F6-F8AD-4D39-9344-52785FD18428}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{143BA9F6-F8AD-4D39-9344-52785FD18428}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9BCFAE93-CEA2-46D2-992E-2DA9D6B92A75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9BCFAE93-CEA2-46D2-992E-2DA9D6B92A75}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9BCFAE93-CEA2-46D2-992E-2DA9D6B92A75}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9BCFAE93-CEA2-46D2-992E-2DA9D6B92A75}.Release|Any CPU.Build.0 = Release|Any CPU
 		{20E80056-9EEB-479D-93FD-7A2DE665CB63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{20E80056-9EEB-479D-93FD-7A2DE665CB63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20E80056-9EEB-479D-93FD-7A2DE665CB63}.Release|Any CPU.ActiveCfg = Release|Any CPU

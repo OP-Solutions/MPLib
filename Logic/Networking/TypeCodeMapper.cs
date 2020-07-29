@@ -6,7 +6,7 @@ using MPLib.Models.Attibutes;
 
 namespace MPLib.Networking
 {
-    public struct TypeCodeMapper
+    internal struct TypeCodeMapper
     {
         private Dictionary<int, Type> _codeToType;
         private Dictionary<Type, int> _typeToCode;
@@ -22,7 +22,7 @@ namespace MPLib.Networking
             return mapper.AddEnum<T>();
         }
 
-        private TypeCodeMapper AddEnum<TEnum>()
+        public TypeCodeMapper AddEnum<TEnum>()
         {
             var typeCodeOffset = _maxCodeValue + 1;
             var values = Enum.GetValues(typeof(TEnum));

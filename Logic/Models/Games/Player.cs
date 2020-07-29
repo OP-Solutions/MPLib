@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Net;
 using System.Security.Cryptography;
+using MPLib.Crypto.Encryption.SRA;
 using MPLib.Helper;
 using MPLib.Networking;
 
@@ -9,15 +10,15 @@ namespace MPLib.Models.Games
     public class Player
     {
 
-        public static Player CreateMyPlayer(string name)
+        internal static Player CreateMyPlayer(string name)
         {
-            return new Player()
-            {
-                Name = name,
-                Key = CngKey.Create(CngAlgorithm.ECDsa)
-            };
+            return new Player() { Name = name, Key = CngKey.Create(CngAlgorithm.ECDsa), PlayerType = PlayerType.Local };
         }
 
+        internal static Player CreateOtherPlayer(string name, Stream networkStream)
+        {
+            return new Player() { Name = name, NetworkStream = networkStream, PlayerType = PlayerType.Remote };
+        }
 
         protected Player()
         {
@@ -30,11 +31,24 @@ namespace MPLib.Models.Games
         /// </summary>
         public CngKey Key { get; internal set; }
 
+
+        public byte[] PublicKeyBytes {
+            get
+            {
+                if (_publicKeyBytes == null) _publicKeyBytes = Key.Export(CngKeyBlobFormat.EccPublicBlob);
+                return _publicKeyBytes;
+            }
+        }
+
+        private byte[] _publicKeyBytes;
+
         public virtual string Name { get; set; }
 
         public bool IsPlaying { get; internal set; }
 
-        public bool IsMyPlayer => NetworkStream != null;
+        public PlayerType PlayerType { get; private set; }
+
+        public bool IsMyPlayer => PlayerType == PlayerType.Local;
 
         internal Stream NetworkStream { get; private set; }
     }

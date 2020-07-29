@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using MPLib.Core.Game.General.CardGame.Messaging;
 using MPLib.Core.Game.Poker.Messaging;
 using MPLib.Models.Games;
 using MPLib.Networking;
@@ -103,14 +104,8 @@ namespace MPLib.Core.Game.Poker.Logic
         {
             Table = table;
             State = PokerRoundState.NoStarted;
-            var dict = new Dictionary<PokerPlayer, string>();
-            for (var i = 0; i < players.Count; i++)
-            {
-                var pokerPlayer = players[i];
-                dict[pokerPlayer] = i.ToString(); // player identifier in poker round messaging is index of player in round
-            }
-
-            _messageManager = new PlayerMessageManager<PokerPlayer, IPokerMessage>(dict, TypeCodeMapper.FromEnum<PokerMessageType>());
+            var mapper = TypeCodeMapper.FromEnum<PokerMessageType>().AddEnum<CardGameMessageType>();
+            _messageManager = new PlayerMessageManager<PokerPlayer, IPokerMessage>(players, mapper);
         }
 
         /// <summary>

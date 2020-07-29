@@ -14,13 +14,13 @@ namespace MPLib.Networking
         /// But it strictly depends on situation. for example if we are sending message in poker round it should be always sender player index in round, not anything else
         /// </summary>
         [ProtoMember(1)]
-        public string SenderIdentifier { get; set; }
+        public byte[] SenderIdentifier { get; set; }
 
         /// <summary>
         /// Destination identifier, same rules as: <see cref="SenderIdentifier"/>
         /// </summary>
         [ProtoMember(2)]
-        public string DestinationIdentifier { get; set; }
+        public byte[] DestinationIdentifier { get; set; }
 
         [ProtoMember(3)]
         public DateTime TimeStampUtc { get; set; }

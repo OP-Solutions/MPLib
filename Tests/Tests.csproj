@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logic\Logic.csproj" />
+    <ProjectReference Include="..\Logic\MPLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
