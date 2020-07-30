@@ -1,12 +1,9 @@
-﻿using MPLib.Models.Games;
+﻿using System.Collections.Generic;
+using MPLib.Models.Games;
+using MPLib.Models.Games.CardGameModels;
 
 namespace MPLib.Core.Game.General.CardGame
 {
-
-    public class CardGamePlayer : Player
-    {
-    }
-
     public interface IMyCardGamePlayer
     {
         /// <summary>
@@ -14,6 +11,11 @@ namespace MPLib.Core.Game.General.CardGame
         /// <see cref="PlayerKeys"/>
         /// </summary>
         internal PlayerKeys CardEncryptionKeys { get; set; }
+
+        /// <summary>
+        /// Cards visible only for local player
+        /// </summary>
+        public IReadOnlyList<Card> Cards { get; }
 
     }
 }

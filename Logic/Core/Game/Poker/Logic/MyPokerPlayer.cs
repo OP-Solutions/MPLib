@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MPLib.Core.Game.General.CardGame;
+using MPLib.Models.Games.CardGameModels;
 
 namespace MPLib.Core.Game.Poker.Logic
 {
@@ -13,6 +15,8 @@ namespace MPLib.Core.Game.Poker.Logic
         #region Internal Properties
         PlayerKeys IMyCardGamePlayer.CardEncryptionKeys { get; set; }
         #endregion
+
+        public IReadOnlyList<Card> Cards { get; private set; }
 
         public MyPokerPlayer()
         {

@@ -61,9 +61,9 @@ namespace MPLib.Models.Games.Poker
         public const int AllCardCount = 52;
 
         /// <summary>
-        /// List of all poker combinations types
+        /// List of all poker combinations types, sorted from higher combinations to lower
         /// </summary>
-        public static ICombinationTypeChecker[] CombTypes =
+        public static readonly ICombinationTypeChecker[] CombTypes =
         {
             new RoyalFlush(),
             new StraightFlush(),
@@ -81,7 +81,7 @@ namespace MPLib.Models.Games.Poker
         /// <summary>
         /// Dictionary of all poker combination types
         /// </summary>
-        public static Dictionary<CombinationType, ICombinationTypeChecker> CombTypesDictionary = new Dictionary<CombinationType, ICombinationTypeChecker>()
+        public static readonly Dictionary<CombinationType, ICombinationTypeChecker> CombTypesDictionary = new Dictionary<CombinationType, ICombinationTypeChecker>()
         {
             [CombinationType.RoyalFlush] = new RoyalFlush(),
             [CombinationType.StraightFlush] = new StraightFlush(),
@@ -99,23 +99,9 @@ namespace MPLib.Models.Games.Poker
         /// List of all cards
         /// will be initialized in main method
         /// </summary>
-        public static Card[] CardDeck = Enumerable.Range(0, 52).Select(Card.FromNumber).ToArray();
+        public static readonly IReadOnlyList<Card> CardDeck = Enumerable.Range(0, 52).Select(Card.FromNumber).ToArray();
 
         #endregion
 
-
-
-        /// <summary>
-        /// Main database where frequency of getting each combination
-        /// as highest combination is stored. frequency of combination
-        /// is number how many times we got that combination as highest 
-        /// combination after checking all possible card sets in concrete situation. 
-        /// </summary>
-        public static Dictionary<CombinationType, int> FrequencyTable = new Dictionary<CombinationType, int>(10);
-
-        /// <summary>
-        /// Count of all checked cases
-        /// </summary>
-        public static int CaseCount = 0;
     }
 }

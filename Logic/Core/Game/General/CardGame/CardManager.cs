@@ -15,7 +15,7 @@ using MPLib.Random;
 namespace MPLib.Core.Game.General.CardGame
 {
     class CardManager<TPlayer, TMyPlayer>
-        where TPlayer : CardGamePlayer
+        where TPlayer : Player
         where TMyPlayer : TPlayer, IMyCardGamePlayer
     {
 
@@ -48,7 +48,7 @@ namespace MPLib.Core.Game.General.CardGame
         /// </summary>
         /// <returns>shuffled and encrypted deck</returns>
 
-        public async Task<IReadOnlyList<BigInteger>> Shuffle()
+        public async Task<IReadOnlyList<BigInteger>> ShuffleAsync()
         {
             var currentDeck = SourceDeck;
             var provider1 = new SraCryptoProvider(MyPlayer.CardEncryptionKeys.SraKey1);
@@ -105,9 +105,9 @@ namespace MPLib.Core.Game.General.CardGame
         /// </summary>
         /// <returns>Decrypted card</returns>
         /// <remarks>
-        /// when this is called, <see cref="OpenOtherPlayerCard"/> should be called on all remote player devices.
+        /// when this is called, <see cref="OpenOtherPlayerCardAsync"/> should be called on all remote player devices.
         /// </remarks>
-        public async Task<Card> OpenMyCard(int cardIndex)
+        public async Task<Card> OpenMyCardAsync(int cardIndex)
         {
             var card = _finalDeck[cardIndex];
             foreach (var player in Players)
@@ -128,9 +128,9 @@ namespace MPLib.Core.Game.General.CardGame
         /// <returns></returns>
         /// <remarks>
         /// This method is should be called on all player devices, except of target player who should decrypt card,
-        /// instead <see cref="OpenMyCard"/> should be called on target player device.
+        /// instead <see cref="OpenMyCardAsync"/> should be called on target player device.
         /// </remarks>
-        public async Task OpenOtherPlayerCard(TPlayer targetPlayer, int cardIndex)
+        public async Task OpenOtherPlayerCardAsync(TPlayer targetPlayer, int cardIndex)
         {
             await _messageManager.SendMessageTo(targetPlayer, new SingleKeyExposeMessage()
             {
@@ -149,7 +149,7 @@ namespace MPLib.Core.Game.General.CardGame
         /// This method should be called on all player devices, so everyone knows keys of each other and all can decrypt target card
         /// </remarks>  
         /// <returns>Decrypted card</returns>
-        public async Task<Card> OpenPublicCard(int cardIndex)
+        public async Task<Card> OpenPublicCardAsync(int cardIndex)
         {
             await _messageManager.BroadcastMessage(new SingleKeyExposeMessage()
             {
@@ -174,7 +174,7 @@ namespace MPLib.Core.Game.General.CardGame
         /// and return an array of these actions along with players that executed them
         /// </summary>
         /// <returns> a list of cheat instances</returns>
-        public async Task<List<CheatInstance>> FindCheater(TPlayer requestedBy)
+        public async Task<List<CheatInstance>> FindCheaterAsync(TPlayer requestedBy)
         {
             var playerKeyDict = new Dictionary<TPlayer, PlayerKeys>();
 

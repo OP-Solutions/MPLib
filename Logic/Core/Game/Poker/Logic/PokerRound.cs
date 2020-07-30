@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using MPLib.Core.Game.General.CardGame;
 using MPLib.Core.Game.General.CardGame.Messaging;
 using MPLib.Core.Game.Poker.Messaging;
 using MPLib.Models.Games;
+using MPLib.Models.Games.CardGameModels;
+using MPLib.Models.Games.Poker;
 using MPLib.Networking;
 
 namespace MPLib.Core.Game.Poker.Logic
@@ -99,13 +102,17 @@ namespace MPLib.Core.Game.Poker.Logic
 
 
         private readonly IPlayerMessageManager<IPokerMessage> _messageManager;
+        private readonly CardManager<PokerPlayer, MyPokerPlayer> _cardManager;
+
 
         public PokerRound(PokerTable table, IReadOnlyList<PokerPlayer> players)
         {
             Players = players;
             Table = table;
             State = PokerRoundState.NoStarted;
-            _messageManager = _messageManagerBuilder.Build<IPokerMessage>(Players);
+            var messageManager = _messageManagerBuilder.Build<IMessage>(Players);
+            _messageManager = messageManager;
+            _cardManager = new CardManager<PokerPlayer, MyPokerPlayer>(messageManager, PokerGameData.CardDeck, Players, MyPlayer);
         }
 
         /// <summary>
@@ -116,8 +123,38 @@ namespace MPLib.Core.Game.Poker.Logic
         public async Task ProcessRound()
         {
             State = PokerRoundState.BeforeDeckShuffle;
-            throw new NotImplementedException();
+            await _cardManager.ShuffleAsync();
+            State = PokerRoundState.DeckShuffled;
+            await DealPlayerCards();
         }
+
+
+        private async Task<Card[]> DealPlayerCards()
+        {
+            var tasks = new List<Task>();
+            Task<Card> myCard1Task = null;
+            Task<Card> myCard2Task = null;
+            for (var i = 0; i < Players.Count; i++)
+            {
+                var player = Players[i];
+                if (!player.IsMyPlayer)
+                {
+                    tasks.Add(_cardManager.OpenOtherPlayerCardAsync(player, i));
+                    tasks.Add(_cardManager.OpenOtherPlayerCardAsync(player, Players.Count + i));
+                }else
+                {
+                    myCard1Task = _cardManager.OpenMyCardAsync(i);
+                    tasks.Add(myCard1Task);
+                    myCard2Task =_cardManager.OpenMyCardAsync(Players.Count + 1);
+                    tasks.Add(myCard2Task);
+                }
+            }
+
+            await Task.WhenAll(tasks);
+
+            return new Card[]{myCard1Task.Result, myCard2Task.Result};
+        }
+
 
         private void PlaceBlinds()
         {
