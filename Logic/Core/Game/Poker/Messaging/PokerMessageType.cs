@@ -9,11 +9,8 @@ namespace MPLib.Core.Game.Poker.Messaging
         [EnumMemberModel(typeof(RoundStampMessage))]
         RoundStamp,
 
-        [EnumMemberModel(typeof(BetMessage))]
-        Bet,
-
-        [EnumMemberModel(typeof(FoldMessage))]
-        Fold,
+        [EnumMemberModel(typeof(PokerMoveMessage))]
+        Move,
 
         [EnumMemberModel(typeof(LeaveTableMessage))]
         LeaveTable,

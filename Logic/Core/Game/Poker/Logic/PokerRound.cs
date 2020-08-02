@@ -183,50 +183,6 @@ namespace MPLib.Core.Game.Poker.Logic
 
     }
 
-
-    public class PokerPlayerMoveInfo
-    {
-        public PokerPlayerMoveType Type { get; }
-
-
-        private int _fullBetAmount { get; set; }
-        private int _extraBetAmount { get; set; }
-
-
-        public PokerPlayerMoveInfo(PokerPlayerMoveType type, int fullBetAmount, int extraBetAmount)
-        {
-            Type = type;
-            _fullBetAmount = fullBetAmount;
-            _extraBetAmount = extraBetAmount;
-        }
-
-        /// <summary>
-        /// Full bet amount of player move. this is 0 in case of "Check" and throws <see cref="InvalidOperationException"/> in case of "Fold"
-        /// </summary>
-        public int FullBetAmount
-        {
-            get
-            {
-                if (Type == PokerPlayerMoveType.Fold) throw new InvalidOperationException("Player can't get bet amount of move when move is \"Fold\" ");
-                return _fullBetAmount;
-            }
-        }
-
-
-        /// <summary>
-        /// Extra bet amount of player move. this is 0 in case of "Check", "Call" and throws <see cref="InvalidOperationException"/> in case of "Fold"
-        /// </summary>
-        public int ExtraBetAmount
-        {
-            get
-            {
-                if (Type == PokerPlayerMoveType.Fold) throw new InvalidOperationException("Player can't get bet amount of move when move is \"Fold\" ");
-                return _fullBetAmount;
-            }
-        }
-
-    }
-
     public enum PokerRoundState
     {
         NoStarted,

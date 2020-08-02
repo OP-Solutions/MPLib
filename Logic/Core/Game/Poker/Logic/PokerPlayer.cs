@@ -1,4 +1,5 @@
-﻿using MPLib.Models.Games;
+﻿using MPLib.Core.Game.Poker.Messaging.MessageTypes;
+using MPLib.Models.Games;
 
 namespace MPLib.Core.Game.Poker.Logic
 {
@@ -58,7 +59,5 @@ namespace MPLib.Core.Game.Poker.Logic
     /// <param name="moveAuthor">Author of move</param>
     /// <param name="moveInfo">move information</param>
     /// <param name="nextPlayer">Player whose turn is next after this move</param>
-    public delegate void PokerPlayerMoveEventHandler(Player moveAuthor, PokerPlayerMoveInfo moveInfo, Player nextPlayer);
-
-    public enum PokerPlayerMoveType { Check, Call, Fold, Bet, Raise }
+    public delegate void PokerPlayerMoveEventHandler(Player moveAuthor, PokerMoveMessage moveInfo, Player nextPlayer);
 }
