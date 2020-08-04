@@ -22,25 +22,8 @@ namespace MPLib.Core.Game.Poker.Messaging.MessageTypes
             }
         }
 
-
-        /// <summary>
-        /// Extra bet amount of player move. this is 0 in case of "Check", "Call" and throws <see cref="InvalidOperationException"/> in case of "Fold"
-        /// </summary>
-        public int ExtraBetAmount
-        {
-            get
-            {
-                if (Type == PokerPlayerMoveType.Fold) throw new InvalidOperationException("Player can't get bet amount of move when move is \"Fold\" ");
-                return _fullBetAmount;
-            }
-        }
-
-
         [ProtoMember(1)]
         private int _fullBetAmount { get; set; }
-
-        [ProtoMember(2)]
-        private int _extraBetAmount { get; set; }
 
 
         public PokerMoveMessage()
@@ -48,11 +31,10 @@ namespace MPLib.Core.Game.Poker.Messaging.MessageTypes
 
         }
 
-        public PokerMoveMessage(PokerPlayerMoveType type, int fullBetAmount, int extraBetAmount)
+        public PokerMoveMessage(PokerPlayerMoveType type, int fullBetAmount)
         {
             Type = type;
             _fullBetAmount = fullBetAmount;
-            _extraBetAmount = extraBetAmount;
         }
 
     }

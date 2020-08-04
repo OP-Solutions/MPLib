@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using MPLib.Core.Game.General.CardGame;
 using MPLib.Core.Game.General.CardGame.Messaging;
 using MPLib.Core.Game.Poker.Messaging;
+using MPLib.Core.Game.Poker.Messaging.MessageTypes;
 using MPLib.Models.Games;
 using MPLib.Models.Games.CardGameModels;
 using MPLib.Models.Games.Poker;
@@ -12,6 +14,11 @@ using MPLib.Networking;
 
 namespace MPLib.Core.Game.Poker.Logic
 {
+
+    /// <summary>
+    /// This class contains logic of poker game round (dealing cards, betting, etcc..)
+    /// TODO: Note that, Implementation of this class is halfway!
+    /// </summary>
     public class PokerRound
     {
 
@@ -61,15 +68,17 @@ namespace MPLib.Core.Game.Poker.Logic
 
 
         /// <summary>
-        /// Players that are playing in this round. Note that this many not be same as <seealso cref="PokerTable.Players"/>,
+        /// Players that are playing in this round. Players should be ordered as they are on table and
+        /// first player in this list should be small blind of this round, next - big blind, etc..
+        /// Note that this may not be same player list as <seealso cref="PokerTable.Players"/> (not just reordered),
         /// because some player may be joined on table but not playing in this round.
         /// For example if player just joined table, it will not be in current round but will start playing from next round
         /// </summary>
-        public IReadOnlyList<PokerPlayer> Players { get; set; }
+        public IReadOnlyList<PokerPlayer> Players { get; }
 
-        public MyPokerPlayer MyPlayer { get; set; }
+        public MyPokerPlayer MyPlayer { get; }
 
-        public PokerTable Table { get; internal set; }
+        public int SmallBlind { get; }
 
         /// <summary>
         /// Current bet amount for single player (not sum)
@@ -79,13 +88,13 @@ namespace MPLib.Core.Game.Poker.Logic
         /// After that, if other players will "Call" or "Fold" to that raised amount, it will stay unchanged,
         /// But if someone will re-"Raise" this value will increase more instantly.
         /// </summary>
-        public int CurrentBetAmount { get; }
+        public int CurrentBetAmount { get; private set; }
 
 
         /// <summary>
-        /// Current sum of all player bets done in this round until thi time
+        /// Current sum of all player bets done in this round until this time
         /// </summary>
-        public int SumOfBet { get; }
+        public int SumOfBet { get; private set; }
 
 
         /// <summary>
@@ -98,18 +107,22 @@ namespace MPLib.Core.Game.Poker.Logic
         /// </summary>
         public Player CurrentPlayer => Players[CurrentPlayerIndex];
 
+        public IReadOnlyList<Card> PublicCards => _publicCards;
+
+        
         public PokerRoundState State { get; set; }
 
 
         private readonly IPlayerMessageManager<IPokerMessage> _messageManager;
         private readonly CardManager<PokerPlayer, MyPokerPlayer> _cardManager;
+        private List<Card> _publicCards;
 
 
-        public PokerRound(PokerTable table, IReadOnlyList<PokerPlayer> players)
+        public PokerRound(int smallBlind, IReadOnlyList<PokerPlayer> players)
         {
             Players = players;
-            Table = table;
             State = PokerRoundState.NoStarted;
+            SmallBlind = smallBlind;
             var messageManager = _messageManagerBuilder.Build<IMessage>(Players);
             _messageManager = messageManager;
             _cardManager = new CardManager<PokerPlayer, MyPokerPlayer>(messageManager, PokerGameData.CardDeck, Players, MyPlayer);
@@ -126,6 +139,67 @@ namespace MPLib.Core.Game.Poker.Logic
             await _cardManager.ShuffleAsync();
             State = PokerRoundState.DeckShuffled;
             await DealPlayerCards();
+
+            
+            await SingleRoundCycle();
+
+            var curCardIndex = await DealFlop(); // next card index in the remaining deck
+        }
+
+        private async Task SingleRoundCycle(bool isFirstCycle = false)
+        {
+
+            IEnumerable<PokerPlayer> players = Players;
+
+            if (isFirstCycle)
+            {
+                var bigBlind = SmallBlind * 2;
+                var smallBlindPlayer = Players[0];
+                var bigBlindPlayer = Players[1];
+                smallBlindPlayer.CurrentBetAmount = SmallBlind;
+                bigBlindPlayer.CurrentBetAmount = bigBlind; // big blind 
+
+                CurrentBetAmount = bigBlind;
+                SumOfBet = SmallBlind + bigBlind;
+                players = Players.Skip(2); // skip small and big blind player since they already betted
+            }
+
+            foreach (var player in players)
+            {
+                var move = await _messageManager.ReadMessageFrom<PokerMoveMessage>(player);
+                switch (move.Type)
+                {
+                    case PokerPlayerMoveType.Fold:
+                        player.State = PokerPlayerState.Fold;
+                        continue;
+                    case PokerPlayerMoveType.Call:
+                        continue;
+                    case PokerPlayerMoveType.Raise:
+                        var extraBetAmount = move.FullBetAmount - (CurrentBetAmount - player.CurrentBetAmount);
+                        CurrentBetAmount += extraBetAmount;
+                        break;
+                }
+
+                player.CurrentBetAmount += move.FullBetAmount;
+                SumOfBet += move.FullBetAmount;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        private async Task<int> DealFlop()
+        {
+
+            var curCardIndex = Players.Count * 2;
+
+            // ReSharper disable once RedundantAssignment
+            curCardIndex++; //skip 1 card before opening
+
+
+            await _cardManager.OpenPublicCardAsync(curCardIndex++);
+            await _cardManager.OpenPublicCardAsync(curCardIndex++);
+            await _cardManager.OpenPublicCardAsync(curCardIndex);
+            return curCardIndex;
         }
 
 
