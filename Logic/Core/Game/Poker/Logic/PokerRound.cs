@@ -82,11 +82,11 @@ namespace MPLib.Core.Game.Poker.Logic
 
         /// <summary>
         /// Current bet amount for single player (not sum)
-        /// This value start with big blind value and can increase several time in round
+        /// This value start with big blind value and can increase several times in round
         /// as some players will do "Raise"
         /// This value should be updated instantly after <see cref="MyPokerPlayer.Raise"/> is called, before cycle completed
         /// After that, if other players will "Call" or "Fold" to that raised amount, it will stay unchanged,
-        /// But if someone will re-"Raise" this value will increase more instantly.
+        /// But if someone will re-"Raise" this value will increase instantly.
         /// </summary>
         public int CurrentBetAmount { get; private set; }
 
@@ -173,6 +173,7 @@ namespace MPLib.Core.Game.Poker.Logic
                         player.State = PokerPlayerState.Fold;
                         continue;
                     case PokerPlayerMoveType.Call:
+                        
                         continue;
                     case PokerPlayerMoveType.Raise:
                         var extraBetAmount = move.FullBetAmount - (CurrentBetAmount - player.CurrentBetAmount);

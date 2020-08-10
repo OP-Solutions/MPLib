@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using MPLib.Core.Game.Poker.Messaging;
 using MPLib.Models.Attibutes;
 
 namespace MPLib.Networking

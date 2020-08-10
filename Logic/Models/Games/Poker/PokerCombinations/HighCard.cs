@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using MPLib.Models.Exceptions;
 using MPLib.Models.Games.CardGameModels;
 
 namespace MPLib.Models.Games.Poker.PokerCombinations
@@ -26,7 +25,7 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
         {
             if (cards.Length != 7)
             {
-                throw new WrongSizeArrayException();
+                throw new ArgumentException($"Invalid card array. Should contain 7 cards, but contains {cards.Length} cards", nameof(cards));
             }
             combination.Top5 = cards.Skip(2).ToArray();
             combination.Type = CombinationType.HighCard;
