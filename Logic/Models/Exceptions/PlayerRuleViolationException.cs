@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text;
+using MPLib.Core.Game;
 
 namespace MPLib.Models.Exceptions
 {
     class PlayerRuleViolationException : Exception
     {
-        public int GameCode { get; }
+        public Game Game { get; }
         public int ErrorCode { get; }
         public override string Message { get; }
 
-        public PlayerRuleViolationException(int gameCode, int errorCode, string message)
+        public PlayerRuleViolationException(Game game, int errorCode, string message)
         {
-            GameCode = gameCode;
+            Game = game;
             ErrorCode = errorCode;
             Message = message;
         }
@@ -25,7 +26,7 @@ namespace MPLib.Models.Exceptions
 
         public new TErrorCode ErrorCode { get; }
 
-        public PlayerRuleViolationException(int gameCode, TErrorCode errorCode) : base(gameCode, (int)(object)errorCode, GetErrorMessage(errorCode))
+        public PlayerRuleViolationException(Game game, TErrorCode errorCode) : base(game, (int)(object)errorCode, GetErrorMessage(errorCode))
         {
             ErrorCode = errorCode;
         }

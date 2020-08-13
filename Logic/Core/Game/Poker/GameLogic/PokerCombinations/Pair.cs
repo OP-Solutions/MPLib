@@ -43,7 +43,7 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
                 break;
             }
 
-            if (pair[0].Rank == CardRank.Default)
+            if (pair[0].Rank == CardRank.Undefined)
             {
                 combination.UnsatisfiedCombinationTypes |= CombinationType.Pair;
                 return false;

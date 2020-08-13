@@ -29,7 +29,7 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
             PokerGameData.Combinations[CombinationType.ThreeOfAKind] = null;
             */
 
-            var isThreeOfaKind = threeOfaKind[0].Rank != CardRank.Default;
+            var isThreeOfaKind = threeOfaKind[0].Rank != CardRank.Undefined;
             for (var i = 0; i < cards.Length - 1; i++)
             {
                 if (cards[i].Rank == cards[i + 1].Rank)
@@ -47,7 +47,7 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
                     }
                 }
 
-                var isPair = pair[0].Rank != CardRank.Default;
+                var isPair = pair[0].Rank != CardRank.Undefined;
 
                 /*
                 if (isPair) PokerGameData.Combinations[CombinationType.Pair] = pair;

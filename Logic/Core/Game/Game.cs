@@ -1,15 +1,13 @@
 ﻿using System;
-using MPLib.Core.Game.Poker.Logic;
+using System.Collections.Generic;
+using System.Text;
 
 namespace MPLib.Core.Game
 {
-    public static class Game
+    public class Game
     {
-        public static PokerTable CreatePokerTable(string tableName, bool showInLAN, bool showInInternet)
-        {
-            if(showInInternet) throw new NotSupportedException(); //not yet supported
-
-            throw new NotImplementedException();
-        }
+        public virtual string FullName { get; internal set; }
+        public virtual Guid Guid { get; }
+        public virtual Version Version { get; internal set; }
     }
 }

@@ -9,6 +9,8 @@ namespace MPLib.Models.Games.CardGameModels
     public struct Card : IComparable<Card>
     {
 
+        public static Card Undefined = new Card(CardRank.Undefined, CardSuit.Undefined);
+
         public bool Equals(Card other)
         {
             return Rank == other.Rank && Suit == other.Suit;

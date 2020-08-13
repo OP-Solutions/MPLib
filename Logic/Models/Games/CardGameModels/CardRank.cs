@@ -6,7 +6,10 @@
     /// </summary>
     public enum CardRank
     {
-        Default, // virtual cardRank using only to differ auto initialized card from real
+        /// <summary>
+        /// virtual CardRank using only to differ auto initialized not eyt defined, card from real
+        /// </summary>
+        Undefined,
         Ace,
         Two,
         Three,

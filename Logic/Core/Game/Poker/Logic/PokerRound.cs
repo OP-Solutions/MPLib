@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using MPLib.Core.Game.General.CardGame;
 using MPLib.Core.Game.General.CardGame.Messaging;
+using MPLib.Core.Game.Poker.Exceptions;
 using MPLib.Core.Game.Poker.Messaging;
 using MPLib.Core.Game.Poker.Messaging.MessageTypes;
 using MPLib.Models.Games;
@@ -115,7 +116,8 @@ namespace MPLib.Core.Game.Poker.Logic
 
         private readonly IPlayerMessageManager<IPokerMessage> _messageManager;
         private readonly CardManager<PokerPlayer, MyPokerPlayer> _cardManager;
-        private List<Card> _publicCards;
+        private List<Card> _publicCards = new List<Card>(5);
+        private int _nextCardIndex; // first card index which was not dealt yet (top card on yet non used deck)
 
 
         public PokerRound(int smallBlind, IReadOnlyList<PokerPlayer> players)
@@ -141,69 +143,98 @@ namespace MPLib.Core.Game.Poker.Logic
             await DealPlayerCards();
 
             
+            await SingleRoundCycle(true);
+
+            await DealPublicCards(3); // deal flop
+
             await SingleRoundCycle();
 
-            var curCardIndex = await DealFlop(); // next card index in the remaining deck
+            await DealPublicCards(1); // deal turn
+
+            await SingleRoundCycle();
+
+            await DealPublicCards(1); // deal river
+
         }
 
         private async Task SingleRoundCycle(bool isFirstCycle = false)
         {
 
-            IEnumerable<PokerPlayer> players = Players;
+            var curPlayerIndex = 0;
+            var betOpenerIndex = 0;
 
             if (isFirstCycle)
             {
                 var bigBlind = SmallBlind * 2;
                 var smallBlindPlayer = Players[0];
                 var bigBlindPlayer = Players[1];
-                smallBlindPlayer.CurrentBetAmount = SmallBlind;
-                bigBlindPlayer.CurrentBetAmount = bigBlind; // big blind 
+                smallBlindPlayer.RoundInfo.CurrentBetAmount = SmallBlind;
+                bigBlindPlayer.RoundInfo.CurrentBetAmount = bigBlind; // big blind 
 
                 CurrentBetAmount = bigBlind;
                 SumOfBet = SmallBlind + bigBlind;
-                players = Players.Skip(2); // skip small and big blind player since they already betted
+                curPlayerIndex = 2; // skip blinds and start betting from 3rd player
+
+                betOpenerIndex = 2; // bet opener in this case is 3nd player (player after big blind),
+                                    // because big blind is last one who does decision in first cycle
             }
 
-            foreach (var player in players)
+
+            int loopCount = 0;
+
+            for(; curPlayerIndex != betOpenerIndex; curPlayerIndex++)
             {
+                loopCount++;
+
+                if (curPlayerIndex == Players.Count) curPlayerIndex = 0; // cycle: after last player, comes first
+
+                var player = Players[curPlayerIndex];
+
+                if(player.RoundInfo.State != PokerPlayerState.Active) continue;
+
                 var move = await _messageManager.ReadMessageFrom<PokerMoveMessage>(player);
-                switch (move.Type)
+
+                if (move.BetAmount < 0) // check for fold
                 {
-                    case PokerPlayerMoveType.Fold:
-                        player.State = PokerPlayerState.Fold;
-                        continue;
-                    case PokerPlayerMoveType.Call:
-                        
-                        continue;
-                    case PokerPlayerMoveType.Raise:
-                        var extraBetAmount = move.FullBetAmount - (CurrentBetAmount - player.CurrentBetAmount);
-                        CurrentBetAmount += extraBetAmount;
-                        break;
+                    player.RoundInfo.State = PokerPlayerState.Fold;
+                    continue;
                 }
 
-                player.CurrentBetAmount += move.FullBetAmount;
-                SumOfBet += move.FullBetAmount;
+                player.RoundInfo.CurrentBetAmount += move.BetAmount;
+                player.CurrentChipAmount -= move.BetAmount;
+                SumOfBet += move.BetAmount;
+                if(player.CurrentChipAmount < 0) throw new PokerException(PokerRuleViolationType.NotEnoughChipsToBet);
+                else if (player.CurrentChipAmount == 0)
+                {
+                    player.RoundInfo.State = PokerPlayerState.AllIn;
+                    continue;
+                }
+
+                
+                if (player.RoundInfo.CurrentBetAmount < CurrentBetAmount) // player did not bet enough funds to call and did not "All-In" either
+                {
+                    throw new PokerException(PokerRuleViolationType.BetOutOfRange);
+                }
+
+                if (player.RoundInfo.CurrentBetAmount > CurrentBetAmount) // check is player raised current bet
+                {
+                    betOpenerIndex = curPlayerIndex;
+                    CurrentBetAmount = player.RoundInfo.CurrentBetAmount;
+
+                    if (loopCount > Players.Count)
+                    {
+                        //this means all players (including current player) did already bet or had chance to bet if he wanted,
+                        //so he can't re-raise anymore, he should call/check for now (to match current bet amount) or fold.
+                        throw new PokerException(PokerRuleViolationType.CascadingRaise);
+                    } 
+                }
+
             }
 
             throw new NotImplementedException();
         }
 
-        private async Task<int> DealFlop()
-        {
-
-            var curCardIndex = Players.Count * 2;
-
-            // ReSharper disable once RedundantAssignment
-            curCardIndex++; //skip 1 card before opening
-
-
-            await _cardManager.OpenPublicCardAsync(curCardIndex++);
-            await _cardManager.OpenPublicCardAsync(curCardIndex++);
-            await _cardManager.OpenPublicCardAsync(curCardIndex);
-            return curCardIndex;
-        }
-
-
+        
         private async Task<Card[]> DealPlayerCards()
         {
             var tasks = new List<Task>();
@@ -225,35 +256,31 @@ namespace MPLib.Core.Game.Poker.Logic
                 }
             }
 
+            _nextCardIndex = Players.Count * 2; // twice players count cards dealt already
+
             await Task.WhenAll(tasks);
 
             return new Card[]{myCard1Task.Result, myCard2Task.Result};
         }
 
-
-        private void PlaceBlinds()
+        /// <summary>
+        /// used for dealing public cards (flop, river, turn).
+        /// Skips 1 card before dealing, following poker rules
+        /// </summary>
+        /// <returns></returns>
+        private async Task DealPublicCards(int cardCountToDeal)
         {
+            _nextCardIndex++; // skip first card
 
-        }
+            var tasks = new Task[cardCountToDeal];
 
-        private void DealCards()
-        {
+            for (int  i = 0; i < cardCountToDeal; i++)
+            {
+                tasks[i] = _cardManager.OpenPublicCardAsync(_nextCardIndex);
+                _nextCardIndex++;
+            }
 
-        }
-
-        private void RoundFlop()
-        {
-
-        }
-
-        private void RoundTurn()
-        {
-
-        }
-
-        private void RoundRiver()
-        {
-
+            await Task.WhenAll(tasks);
         }
 
     }

@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Numerics;
 using MPLib.Random;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Tests
 {
     public class ShuffleTest
     {
+        private ITestOutputHelper _output;
+
+
         [Fact]
         public void TestMethod1()
         {

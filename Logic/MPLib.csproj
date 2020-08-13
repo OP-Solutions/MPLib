@@ -20,7 +20,6 @@
     <PackageReference Include="System.Threading.Channels" Version="4.7.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\Games\Poker\Interfaces\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 </Project>

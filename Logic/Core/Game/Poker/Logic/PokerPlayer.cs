@@ -26,9 +26,9 @@ namespace MPLib.Core.Game.Poker.Logic
         internal event PokerPlayerMoveEventHandler ThisPlayerMoveReceived; 
 
         public int CurrentChipAmount { get; internal set; }
-        public int LeftChipsAfterBet { get; internal set; }
-        public int CurrentBetAmount { get; internal set; }
-        public bool IsFold => State == PokerPlayerState.Fold;
+
+
+        public bool IsFold => RoundInfo.State == PokerPlayerState.Fold;
 
 
         /// <summary>
@@ -36,21 +36,27 @@ namespace MPLib.Core.Game.Poker.Logic
         /// </summary>
         public bool IsTurn => CurrentRound.CurrentPlayer == this;
 
-        public bool IsAllIn => State == PokerPlayerState.AllIn;
-        public PokerPlayerState State { get; internal set; }
+        public bool IsAllIn => RoundInfo.State == PokerPlayerState.AllIn;
 
+        internal PokerPlayerRoundInfo RoundInfo;
         internal PokerTable CurrentTable { get; set; }
         internal PokerRound CurrentRound { get; set; }
         internal bool HasRaised { get; set; }
 
     }
 
+    struct PokerPlayerRoundInfo
+    {
+        public int CurrentBetAmount { get; internal set; }
+        public PokerPlayerState State { get; internal set; }
+    }
+
+
     public enum PokerPlayerState
     {
         Active,
         Fold,
         AllIn,
-        NotPlaying
     }
 
     /// <summary>

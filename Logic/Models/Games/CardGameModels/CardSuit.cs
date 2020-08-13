@@ -5,7 +5,11 @@
     /// </summary>
     public enum CardSuit
     {
-        Default, // virtual cardSuit using only to differ auto initialized card from real
+        /// <summary>
+        /// virtual CardSuit using only to differ auto initialized not eyt defined, card from real
+        /// </summary>
+        Undefined, 
+
         Diamond,
         Heart,
         Club,

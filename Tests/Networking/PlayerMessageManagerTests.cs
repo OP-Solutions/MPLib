@@ -56,7 +56,7 @@ namespace Tests.Networking
             var players = new List<Player>(){player1, player2, player3};
             var messageManager = new MessageManagerBuilder(PlayerIdentifyMode.Index)
                 .WithMessageTypes<PokerMessageType>().Build<IPokerMessage>(players);
-            await messageManager.BroadcastMessage(new PokerMoveMessage(PokerPlayerMoveType.Fold, 0));
+            await messageManager.BroadcastMessage(new PokerMoveMessage(-1));
         }
 
         private async Task RunPlayer2()
@@ -76,7 +76,6 @@ namespace Tests.Networking
             var players = new List<Player>() { player1, player2, player3 };
             var messageManager = new MessageManagerBuilder(PlayerIdentifyMode.Index)
                 .WithMessageTypes<PokerMessageType>().Build<IPokerMessage>(players);
-
             var moveMessage = await messageManager.ReadMessageFrom<PokerMoveMessage>(player1);
         }
 

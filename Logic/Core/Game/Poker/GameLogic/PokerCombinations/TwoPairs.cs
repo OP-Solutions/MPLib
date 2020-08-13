@@ -42,7 +42,7 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
                 // already assumed that combination doesn't contains Three Of A Kind combination
                 if (cards[i].Rank != cards[i - 1].Rank) continue;
 
-                if (firstPair[0].Rank == CardRank.Default)
+                if (firstPair[0].Rank == CardRank.Undefined)
                 {
                     firstPair[0] = cards[i];
                     firstPair[1] = cards[i - 1];
@@ -54,7 +54,7 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
                 }
             }
 
-            if (firstPair[0].Rank == CardRank.Default)
+            if (firstPair[0].Rank == CardRank.Undefined)
             {
                 combination.UnsatisfiedCombinationTypes |= CombinationType.TwoPairs;
                 combination.UnsatisfiedCombinationTypes |= CombinationType.Pair;
@@ -66,7 +66,7 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
             Card[] kickers;
             Array.Resize(ref firstPair, 5);
 
-            if (secondPair[0].Rank != CardRank.Default)
+            if (secondPair[0].Rank != CardRank.Undefined)
             {
                 combination.SatisfiedCombinationTypes |= CombinationType.TwoPairs;
                 usedRanks.Add(secondPair[0].Rank);

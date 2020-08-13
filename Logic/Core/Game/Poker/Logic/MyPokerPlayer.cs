@@ -37,13 +37,13 @@ namespace MPLib.Core.Game.Poker.Logic
                 throw new InvalidOperationException();
 
 
-            if (CurrentRound.CurrentBetAmount - CurrentBetAmount >= CurrentChipAmount)
+            if (CurrentRound.CurrentBetAmount - RoundInfo.CurrentBetAmount >= CurrentChipAmount)
             {
                 AllIn();
                 return;
             }
 
-            CurrentChipAmount -= (CurrentRound.CurrentBetAmount - CurrentBetAmount);
+            CurrentChipAmount -= (CurrentRound.CurrentBetAmount - RoundInfo.CurrentBetAmount);
 
         }
 
@@ -80,7 +80,7 @@ namespace MPLib.Core.Game.Poker.Logic
         /// <returns></returns>
         public bool CanCheck()
         {
-            if (IsTurn && CurrentRound.CurrentBetAmount - CurrentBetAmount == 0 && !IsFold)
+            if (IsTurn && CurrentRound.CurrentBetAmount - RoundInfo.CurrentBetAmount == 0 && !IsFold)
                 return true;
 
             return false;
@@ -95,7 +95,7 @@ namespace MPLib.Core.Game.Poker.Logic
             if (!CanFold())
                 throw new InvalidOperationException();
 
-            State = PokerPlayerState.Fold;
+            RoundInfo.State = PokerPlayerState.Fold;
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace MPLib.Core.Game.Poker.Logic
                 throw new InvalidOperationException();
 
 
-            CurrentBetAmount += amount;
+            RoundInfo.CurrentBetAmount += amount;
             CurrentChipAmount -= amount;
         }
 
@@ -182,7 +182,7 @@ namespace MPLib.Core.Game.Poker.Logic
                 throw new InvalidOperationException();
 
 
-            CurrentBetAmount += amount;
+            RoundInfo.CurrentBetAmount += amount;
             CurrentChipAmount -= amount;
         }
 
@@ -224,7 +224,7 @@ namespace MPLib.Core.Game.Poker.Logic
             if(!CanAllIn())
                 throw new InvalidOleVariantTypeException();
 
-            State = PokerPlayerState.AllIn;
+            RoundInfo.State = PokerPlayerState.AllIn;
         }
 
 
