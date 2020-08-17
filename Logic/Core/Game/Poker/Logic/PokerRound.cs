@@ -180,12 +180,8 @@ namespace MPLib.Core.Game.Poker.Logic
             }
 
 
-            int loopCount = 0;
-
             for(; curPlayerIndex != betOpenerIndex; curPlayerIndex++)
             {
-                loopCount++;
-
                 if (curPlayerIndex == Players.Count) curPlayerIndex = 0; // cycle: after last player, comes first
 
                 var player = Players[curPlayerIndex];
@@ -221,12 +217,6 @@ namespace MPLib.Core.Game.Poker.Logic
                     betOpenerIndex = curPlayerIndex;
                     CurrentBetAmount = player.RoundInfo.CurrentBetAmount;
 
-                    if (loopCount > Players.Count)
-                    {
-                        //this means all players (including current player) did already bet or had chance to bet if he wanted,
-                        //so he can't re-raise anymore, he should call/check for now (to match current bet amount) or fold.
-                        throw new PokerException(PokerRuleViolationType.CascadingRaise);
-                    } 
                 }
 
             }
