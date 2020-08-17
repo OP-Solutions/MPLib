@@ -19,11 +19,12 @@ namespace MPLib.Core.Game.General.CardGame
         where TMyPlayer : TPlayer, IMyCardGamePlayer
     {
 
-        public IReadOnlyList<BigInteger> SourceDeck { get; }
+        public IReadOnlyList<DeckCard> Deck => _deck;
         public IReadOnlyList<TPlayer> Players { get; }
         public TMyPlayer MyPlayer { get; }
 
-        private IReadOnlyList<BigInteger> _finalDeck;
+        private DeckCard[] _deck;
+
         private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _firstCycleDeck;
         private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _secondCycleDeck;
 
@@ -35,7 +36,13 @@ namespace MPLib.Core.Game.General.CardGame
             _messageManager = messageManager;
             _firstCycleDeck = new Dictionary<TPlayer, IReadOnlyList<BigInteger>>();
             _secondCycleDeck = new Dictionary<TPlayer, IReadOnlyList<BigInteger>>();
-            SourceDeck = sourceDeck.Select(card => new BigInteger(Card.ToNumber(card))).ToArray();
+            _deck = sourceDeck.Select((card, index) => new DeckCard()
+            {
+                Owner = null,
+                Value = new BigInteger(Card.ToNumber(card)),
+                IsKnown = false,
+                
+            }).ToArray();
             Players = players;
             MyPlayer = myPlayer;
         }
@@ -48,10 +55,10 @@ namespace MPLib.Core.Game.General.CardGame
         /// </summary>
         /// <returns>shuffled and encrypted deck</returns>
 
-        public async Task<IReadOnlyList<BigInteger>> ShuffleAsync()
+        public async Task ShuffleAsync()
         {
-            var currentDeck = SourceDeck;
             var provider1 = new SraCryptoProvider(MyPlayer.CardEncryptionKeys.SraKey1);
+            IReadOnlyList<BigInteger> currentDeck = _deck.Select(d => d.Value).ToArray();
 
             foreach (var player in Players)
             {
@@ -94,8 +101,13 @@ namespace MPLib.Core.Game.General.CardGame
                 _secondCycleDeck.Add(player, currentDeck);
             }
 
-
-            return (_finalDeck = currentDeck);
+            _deck = currentDeck.Select( (val, index) => new DeckCard()
+            {
+                IsKnown = false,
+                Owner = null,
+                Value = val,
+                CardIndex = index 
+            }).ToArray();
         }
 
 
@@ -109,30 +121,31 @@ namespace MPLib.Core.Game.General.CardGame
         /// </remarks>
         public async Task<Card> OpenMyCardAsync(int cardIndex)
         {
-            var card = _finalDeck[cardIndex];
+            var card = _deck[cardIndex];
+            var value = card.Value;
             foreach (var player in Players)
             {
                 var key = player == MyPlayer ? MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex] : (await _messageManager.ReadMessageFrom<SingleKeyExposeMessage>(player)).Key;
                 var provider = new SraCryptoProvider(key);
-                card = provider.Decrypt(card);
+                value = provider.Decrypt(card.Value);
             }
             
-            return Card.FromNumber((int)card);
+            return Card.FromNumber((int)value);
         }
 
 
         /// <summary>
         /// Open card from deck for target player (only specified player will see what card it is)
-        /// When this is called local player sends his keys to specified player.
+        /// When this is called local sends his keys to all others (only player who should see card, not exposes his key to others).
         /// </summary>
         /// <returns></returns>
         /// <remarks>
         /// This method is should be called on all player devices, except of target player who should decrypt card,
         /// instead <see cref="OpenMyCardAsync"/> should be called on target player device.
         /// </remarks>
-        public async Task OpenOtherPlayerCardAsync(TPlayer targetPlayer, int cardIndex)
+        public async Task OpenOtherPlayerCardAsync(int cardIndex)
         {
-            await _messageManager.SendMessageTo(targetPlayer, new SingleKeyExposeMessage()
+            await _messageManager.BroadcastMessage(new SingleKeyExposeMessage()
             {
                 CardIndex = cardIndex,
                 Key = MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex]
@@ -157,15 +170,71 @@ namespace MPLib.Core.Game.General.CardGame
                 Key = MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex]
             });
 
-            var card = _finalDeck[cardIndex];
+            var card = _deck[cardIndex];
+            var value = card.Value;
             foreach (var player in Players)
             {
                 var key = player == MyPlayer ? MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex] : (await _messageManager.ReadMessageFrom<SingleKeyExposeMessage>(player)).Key;
                 var provider = new SraCryptoProvider(key);
-                card = provider.Decrypt(card);
+                value = provider.Decrypt(value);
             }
 
-            return Card.FromNumber((int)card);
+            return Card.FromNumber((int)value);
+        }
+
+
+        /// <summary>
+        /// publicly shows card whose this player already knows, to other players (makes it public).
+        /// Difference with this method and <see cref="OpenPublicCardAsync"/> is that, in current method local player not expects key from remote players,
+        /// therefore card is not decrypted for local player and no card value returned, because its assumed that local player already had decrypted card
+        /// or knows its value in some other way, so he do not need keys from other players
+        /// </summary>
+        /// <param name="cardIndexInDeck">index of card to show, in deck. Please note that index is not relative to players cards</param>
+        /// <returns></returns>
+        public async Task ShowMyCardAsync(int cardIndexInDeck)
+        {
+            await _messageManager.BroadcastMessage(new SingleKeyExposeMessage()
+            {
+                CardIndex = cardIndexInDeck,
+                Key = MyPlayer.CardEncryptionKeys.SraKeys2[cardIndexInDeck]
+            });
+        }
+
+
+        /// <summary>
+        /// Sends all his keys to other players, receives keys from them also and decrypts whole deck
+        /// This is called same time from all players, after this all cards will be public
+        /// </summary>
+        /// <returns></returns>
+        public async Task ExposeAllCards()
+        {
+            await _messageManager.BroadcastMessage(new ExposeKeysMessage() {Keys = MyPlayer.CardEncryptionKeys});
+
+            var keys = new PlayerKeys[Players.Count];
+
+            for (var i = 0; i < Players.Count; i++)
+            {
+                var player = Players[i];
+                if (player.IsMyPlayer) keys[i] = MyPlayer.CardEncryptionKeys;
+                else keys[i] = (await _messageManager.ReadMessageFrom<ExposeKeysMessage>(player)).Keys;
+            }
+
+            for (var cardIndex = 0; cardIndex < _deck.Length; cardIndex++)
+            {
+                var curCardVal = _deck[cardIndex].Value;
+
+                for (var playerIndex = 0; playerIndex < Players.Count; playerIndex++)
+                {
+                    var key = keys[playerIndex].SraKeys2[cardIndex];
+                    var provider = new SraCryptoProvider(key);
+                    curCardVal = provider.Decrypt(curCardVal);
+                }
+
+                var card = _deck[cardIndex];
+                card.IsKnown = true;
+                card.Value = curCardVal;
+                card.DecryptedValue = Card.FromNumber((int)curCardVal);
+            }
         }
 
 
@@ -180,43 +249,38 @@ namespace MPLib.Core.Game.General.CardGame
 
             foreach (var player in Players)
             {
-                if (player != MyPlayer)
+                if (!player.IsMyPlayer)
                 {
                     var playerKeys = (await _messageManager.ReadMessageFrom<ExposeKeysMessage>(player)).Keys;
                     playerKeyDict.Add(player, playerKeys);
                 }
                 else
                 {
-                    var playerKeys = new PlayerKeys
-                    {
-                        SraKey1 = MyPlayer.CardEncryptionKeys.SraKey1,
-                        SraKeys2 = MyPlayer.CardEncryptionKeys.SraKeys2
-                    };
-                    playerKeyDict.Add(player, playerKeys);
+                    playerKeyDict.Add(player, MyPlayer.CardEncryptionKeys);
                 }
             }
 
-            var sourceDeck = SourceDeck;
+            IReadOnlyList<BigInteger> encryptedDeck = _deck.Select(c => c.Value).ToArray();
             var cheaters = new List<CheatInstance>();
 
             foreach (var player in Players)
             {
-                if (!CheckShuffleValidity(sourceDeck, _firstCycleDeck[player], playerKeyDict[player].SraKey1))
+                if (!CheckShuffleValidity(encryptedDeck, _firstCycleDeck[player], playerKeyDict[player].SraKey1))
                 {
                     cheaters.Add(new CheatInstance(player, CheatType.InvalidShuffle));
                 }
 
-                sourceDeck = _firstCycleDeck[player];
+                encryptedDeck = _firstCycleDeck[player];
             }
 
             foreach (var player in Players)
             {
-                if (!CheckPostShuffleEncryptionValidity(sourceDeck, _secondCycleDeck[player], playerKeyDict[player]))
+                if (!CheckPostShuffleEncryptionValidity(encryptedDeck, _secondCycleDeck[player], playerKeyDict[player]))
                 {
                     cheaters.Add(new CheatInstance(player, CheatType.InvalidPostShuffleEncryption));
                 }
 
-                sourceDeck = _secondCycleDeck[player];
+                encryptedDeck = _secondCycleDeck[player];
             }
 
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace MPLib.Random
@@ -10,9 +11,9 @@ namespace MPLib.Random
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static List<BigInteger> Shuffle(IEnumerable<BigInteger> source)
+        public static List<T> Shuffle<T>(IEnumerable<T> source)
         {
-            var list = new List<BigInteger>();
+            var list = new List<T>();
             list.AddRange(source);
 
             for (var i = list.Count - 1; i > 0; i--)

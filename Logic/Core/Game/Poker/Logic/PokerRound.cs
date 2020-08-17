@@ -155,7 +155,16 @@ namespace MPLib.Core.Game.Poker.Logic
 
             await DealPublicCards(1); // deal river
 
+            var allPlayerCards = await ExposeCards();
         }
+
+
+        private async Task<Card[][]> ExposeCards() // cards[i][j] - j-th cards of i-th player
+        {
+            var result = new Card[Players.Count][];
+            throw new NotImplementedException();
+        }
+
 
         private async Task SingleRoundCycle(bool isFirstCycle = false)
         {
@@ -199,7 +208,15 @@ namespace MPLib.Core.Game.Poker.Logic
                 player.RoundInfo.CurrentBetAmount += move.BetAmount;
                 player.CurrentChipAmount -= move.BetAmount;
                 SumOfBet += move.BetAmount;
-                if(player.CurrentChipAmount < 0) throw new PokerException(PokerRuleViolationType.NotEnoughChipsToBet);
+
+
+                if (player.RoundInfo.CurrentBetAmount > CurrentBetAmount) // check is player raised current bet
+                {
+                    betOpenerIndex = curPlayerIndex;
+                    CurrentBetAmount = player.RoundInfo.CurrentBetAmount;
+                }
+
+                if (player.CurrentChipAmount < 0) throw new PokerException(PokerRuleViolationType.NotEnoughChipsToBet);
                 else if (player.CurrentChipAmount == 0)
                 {
                     player.RoundInfo.State = PokerPlayerState.AllIn;
@@ -211,17 +228,7 @@ namespace MPLib.Core.Game.Poker.Logic
                 {
                     throw new PokerException(PokerRuleViolationType.BetOutOfRange);
                 }
-
-                if (player.RoundInfo.CurrentBetAmount > CurrentBetAmount) // check is player raised current bet
-                {
-                    betOpenerIndex = curPlayerIndex;
-                    CurrentBetAmount = player.RoundInfo.CurrentBetAmount;
-
-                }
-
             }
-
-            throw new NotImplementedException();
         }
 
         
@@ -235,8 +242,8 @@ namespace MPLib.Core.Game.Poker.Logic
                 var player = Players[i];
                 if (!player.IsMyPlayer)
                 {
-                    tasks.Add(_cardManager.OpenOtherPlayerCardAsync(player, i));
-                    tasks.Add(_cardManager.OpenOtherPlayerCardAsync(player, Players.Count + i));
+                    tasks.Add(_cardManager.OpenOtherPlayerCardAsync(i));
+                    tasks.Add(_cardManager.OpenOtherPlayerCardAsync(Players.Count + i));
                 }else
                 {
                     myCard1Task = _cardManager.OpenMyCardAsync(i);

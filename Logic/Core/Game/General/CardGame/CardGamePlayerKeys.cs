@@ -1,9 +1,13 @@
 ﻿using MPLib.Crypto.Encryption.SRA;
+using MPLib.Models.Games;
 
 namespace MPLib.Core.Game.General.CardGame
 {
     public class PlayerKeys
     {
+
+        public Player Owner { get;  }
+
         /// <summary>
         /// Key for commutative encryption of cards, this key is private and each player generates one for each round
         /// Each card is encrypted with this key sequentially with each players key (order does not matter, its "commutative") 
@@ -23,5 +27,13 @@ namespace MPLib.Core.Game.General.CardGame
         /// and re-encrypts them each one with separate keys (<see cref="SraKey1"/> key was used on all before this step)
         /// </summary>
         public SraParameters[] SraKeys2 { get; set; }
+
+
+        public PlayerKeys(Player owner, SraParameters sraKey1, SraParameters[] sraKeys2)
+        {
+            Owner = owner;
+            SraKey1 = sraKey1;
+            SraKeys2 = sraKeys2;
+        }
     }
 }
