@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using MPLib.Core.Game.Poker.Messaging.MessageTypes;
 using MPLib.Models.Games;
 using MPLib.Models.Games.CardGames;
@@ -25,14 +26,14 @@ namespace MPLib.Core.Game.Poker.Logic
         /// <summary>
         /// Are called as soon as information about player move is received before any cryptographic verification
         /// </summary>
-        internal event PokerPlayerMoveEventHandler ThisPlayerMoveReceived; 
+        internal event PokerPlayerMoveEventHandler ThisPlayerMoveReceived;
 
         public int CurrentChipAmount { get; internal set; }
 
-        public IReadOnlyCollection<Card> Cards { get; }
-
         public bool IsFold => RoundInfo.State == PokerPlayerState.Fold;
 
+
+        ImmutableList<Card> ICardGamePlayer.InternalCards { get; set; }
 
         /// <summary>
         /// Indicates if it's this player turn now
@@ -45,6 +46,7 @@ namespace MPLib.Core.Game.Poker.Logic
         internal PokerTable CurrentTable { get; set; }
         internal PokerRound CurrentRound { get; set; }
         internal bool HasRaised { get; set; }
+
     }
 
     struct PokerPlayerRoundInfo

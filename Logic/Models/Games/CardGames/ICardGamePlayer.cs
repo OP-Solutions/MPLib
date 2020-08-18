@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace MPLib.Models.Games.CardGames
 {
@@ -7,6 +8,8 @@ namespace MPLib.Models.Games.CardGames
         /// <summary>
         /// This player's cards
         /// </summary>
-        IReadOnlyCollection<Card> Cards { get; }
+        sealed ImmutableList<Card> Cards => InternalCards;
+
+        internal ImmutableList<Card> InternalCards { get; set; }
     }
 }

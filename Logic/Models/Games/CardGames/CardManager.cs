@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -118,8 +119,11 @@ namespace MPLib.Models.Games.CardGames
                 var provider = new SraCryptoProvider(key);
                 value = provider.Decrypt(card.Value);
             }
-            
-            return Card.FromNumber((int)value);
+
+            var decryptedCard = Card.FromNumber((int)value);
+
+            _round.MyPlayer.InternalCards = _round.MyPlayer.Cards.Add(decryptedCard);
+            return decryptedCard;
         }
 
 
@@ -168,7 +172,11 @@ namespace MPLib.Models.Games.CardGames
                 value = provider.Decrypt(value);
             }
 
-            return Card.FromNumber((int)value);
+            var decryptedCard = Card.FromNumber((int)value);
+
+            _round.MyPlayer.InternalCards = _round.MyPlayer.Cards.Add(decryptedCard);
+
+            return decryptedCard;
         }
 
 
