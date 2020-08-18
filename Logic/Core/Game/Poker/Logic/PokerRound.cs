@@ -165,7 +165,7 @@ namespace MPLib.Core.Game.Poker.Logic
         }
 
 
-        private async Task<Card[][]> ExposeCards() // cards[i][j] - j-th cards of i-th player
+        private Task<Card[][]> ExposeCards() // cards[i][j] - j-th cards of i-th player
         {
             var result = new Card[Players.Count][];
             throw new NotImplementedException();

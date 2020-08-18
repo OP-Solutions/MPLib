@@ -123,10 +123,8 @@ namespace MPLib.Core.Game.Poker.Logic
         /// </exception>
         public void Bet(int amount)
         {
-            Range range;
-            CanBet(out range);
-
-            if (!CanBet(out range) && range.Start.Value < amount && range.End.Value > amount)
+            
+            if (!CanBet(out var range) && range.Start.Value < amount && range.End.Value > amount)
                 throw new InvalidOperationException();
 
 
@@ -172,9 +170,7 @@ namespace MPLib.Core.Game.Poker.Logic
         /// </exception>
         public void Raise(int amount)
         {
-            Range range;
-
-            if(!CanRaise(out range))
+            if(!CanRaise(out var range) || range.Start.Value > amount || range.End.Value < amount)
                 throw new InvalidOperationException();
 
 
