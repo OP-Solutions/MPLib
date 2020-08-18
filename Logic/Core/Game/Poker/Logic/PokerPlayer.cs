@@ -1,12 +1,14 @@
-﻿using MPLib.Core.Game.Poker.Messaging.MessageTypes;
+﻿using System.Collections.Generic;
+using MPLib.Core.Game.Poker.Messaging.MessageTypes;
 using MPLib.Models.Games;
+using MPLib.Models.Games.CardGames;
 
 namespace MPLib.Core.Game.Poker.Logic
 {
     /// <summary>
     /// Base class for all poker player.
     /// </summary>
-    public class PokerPlayer : Player
+    public class PokerPlayer : Player, ICardGamePlayer
     {
         /// <summary>
         /// Fires when this player turn comes
@@ -27,6 +29,7 @@ namespace MPLib.Core.Game.Poker.Logic
 
         public int CurrentChipAmount { get; internal set; }
 
+        public IReadOnlyCollection<Card> Cards { get; }
 
         public bool IsFold => RoundInfo.State == PokerPlayerState.Fold;
 
@@ -42,7 +45,6 @@ namespace MPLib.Core.Game.Poker.Logic
         internal PokerTable CurrentTable { get; set; }
         internal PokerRound CurrentRound { get; set; }
         internal bool HasRaised { get; set; }
-
     }
 
     struct PokerPlayerRoundInfo

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MPLib.Models.Games.CardGameModels;
+using MPLib.Models.Games.CardGames;
 using MPLib.Models.Games.Poker.PokerCombinations;
 
 namespace MPLib.Models.Games.Poker

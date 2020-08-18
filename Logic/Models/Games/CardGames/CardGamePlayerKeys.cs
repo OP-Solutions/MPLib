@@ -1,9 +1,8 @@
 ﻿using MPLib.Crypto.Encryption.SRA;
-using MPLib.Models.Games;
 
-namespace MPLib.Core.Game.General.CardGame
+namespace MPLib.Models.Games.CardGames
 {
-    public class PlayerKeys
+    public class CardEncryptionKeys
     {
 
         public Player Owner { get;  }
@@ -29,7 +28,7 @@ namespace MPLib.Core.Game.General.CardGame
         public SraParameters[] SraKeys2 { get; set; }
 
 
-        public PlayerKeys(Player owner, SraParameters sraKey1, SraParameters[] sraKeys2)
+        public CardEncryptionKeys(Player owner, SraParameters sraKey1, SraParameters[] sraKeys2)
         {
             Owner = owner;
             SraKey1 = sraKey1;

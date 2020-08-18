@@ -1,7 +1,8 @@
 ﻿using System;
+using MPLib.Models.Games.CardGameModels;
 using MPLib.Models.Games.Poker;
 
-namespace MPLib.Models.Games.CardGameModels
+namespace MPLib.Models.Games.CardGames
 {
     /// <summary>
     /// The card.

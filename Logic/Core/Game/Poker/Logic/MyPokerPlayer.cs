@@ -2,19 +2,15 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MPLib.Core.Game.General.CardGame;
-using MPLib.Models.Games.CardGameModels;
+using MPLib.Models.Games.CardGames;
 
 namespace MPLib.Core.Game.Poker.Logic
 {
-    public class MyPokerPlayer : PokerPlayer, IMyCardGamePlayer
+    public class MyPokerPlayer : PokerPlayer
     {
         public bool AutoCheckFoldEnabled { get; set; }
         public bool AutoCallEnabled { get; set; }
 
-
-        #region Internal Properties
-        PlayerKeys IMyCardGamePlayer.CardEncryptionKeys { get; set; }
-        #endregion
 
         public IReadOnlyList<Card> Cards { get; private set; }
 

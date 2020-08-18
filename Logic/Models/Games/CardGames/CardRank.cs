@@ -1,4 +1,4 @@
-﻿namespace MPLib.Models.Games.CardGameModels
+﻿namespace MPLib.Models.Games.CardGames
 {
     
     /// <summary>

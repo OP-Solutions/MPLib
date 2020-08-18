@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using MPLib.Models.Games.CardGameModels;
+using MPLib.Models.Games.CardGames;
 
 namespace MPLib.Models.Games.Poker.PokerCombinations
 {

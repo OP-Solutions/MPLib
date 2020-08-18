@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -9,7 +10,8 @@ using MPLib.Core.Game.Poker.Exceptions;
 using MPLib.Core.Game.Poker.Messaging;
 using MPLib.Core.Game.Poker.Messaging.MessageTypes;
 using MPLib.Models.Games;
-using MPLib.Models.Games.CardGameModels;
+using MPLib.Models.Games.CardGames;
+using MPLib.Models.Games.CardGames.Messaging;
 using MPLib.Models.Games.Poker;
 using MPLib.Networking;
 
@@ -20,7 +22,7 @@ namespace MPLib.Core.Game.Poker.Logic
     /// This class contains logic of poker game round (dealing cards, betting, etcc..)
     /// TODO: Note that, Implementation of this class is halfway!
     /// </summary>
-    public class PokerRound
+    public class PokerRound : ICardGameRound<PokerPlayer, MyPokerPlayer>
     {
 
         private static readonly MessageManagerBuilder _messageManagerBuilder = 
@@ -75,7 +77,7 @@ namespace MPLib.Core.Game.Poker.Logic
         /// because some player may be joined on table but not playing in this round.
         /// For example if player just joined table, it will not be in current round but will start playing from next round
         /// </summary>
-        public IReadOnlyList<PokerPlayer> Players { get; }
+        public ReadOnlyCollection<PokerPlayer> Players { get; }
 
         public MyPokerPlayer MyPlayer { get; }
 
@@ -114,20 +116,24 @@ namespace MPLib.Core.Game.Poker.Logic
         public PokerRoundState State { get; set; }
 
 
+
+        CardEncryptionKeys ICardGameRound<PokerPlayer, MyPokerPlayer>.MyPlayerCardEncryptionKeys { get; set; }
+        ReadOnlyCollection<Card> ICardGameRound<PokerPlayer, MyPokerPlayer>.SourceDeck { get; set; }
+
         private readonly IPlayerMessageManager<IPokerMessage> _messageManager;
         private readonly CardManager<PokerPlayer, MyPokerPlayer> _cardManager;
         private List<Card> _publicCards = new List<Card>(5);
         private int _nextCardIndex; // first card index which was not dealt yet (top card on yet non used deck)
 
 
-        public PokerRound(int smallBlind, IReadOnlyList<PokerPlayer> players)
+        public PokerRound(int smallBlind, ReadOnlyCollection<PokerPlayer> players)
         {
             Players = players;
             State = PokerRoundState.NoStarted;
             SmallBlind = smallBlind;
             var messageManager = _messageManagerBuilder.Build<IMessage>(Players);
             _messageManager = messageManager;
-            _cardManager = new CardManager<PokerPlayer, MyPokerPlayer>(messageManager, PokerGameData.CardDeck, Players, MyPlayer);
+            _cardManager = new CardManager<PokerPlayer, MyPokerPlayer>(messageManager, this);
         }
 
         /// <summary>
@@ -155,7 +161,7 @@ namespace MPLib.Core.Game.Poker.Logic
 
             await DealPublicCards(1); // deal river
 
-            var allPlayerCards = await ExposeCards();
+            await ExposeCards();
         }
 
 
@@ -279,7 +285,6 @@ namespace MPLib.Core.Game.Poker.Logic
 
             await Task.WhenAll(tasks);
         }
-
     }
 
     public enum PokerRoundState

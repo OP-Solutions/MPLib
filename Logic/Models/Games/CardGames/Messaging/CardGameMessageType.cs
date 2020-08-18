@@ -1,8 +1,7 @@
 ﻿using MPLib.Core.Game.General.CardGame.Messaging.MessageTypes;
-using MPLib.Core.Game.Poker.Messaging.MessageTypes;
 using MPLib.Models.Attibutes;
 
-namespace MPLib.Core.Game.General.CardGame.Messaging
+namespace MPLib.Models.Games.CardGames.Messaging
 {
     public enum CardGameMessageType
     {

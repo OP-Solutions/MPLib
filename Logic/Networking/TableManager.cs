@@ -38,7 +38,7 @@ namespace MPLib.Networking
         /// </summary>
         /// <param name="gameName"> game name/identifier </param>
         /// <returns></returns>
-        public async Task<GameTableData[]> DiscoverAllLanTables(string gameName)
+        public Task<GameTableData[]> DiscoverAllLanTables(string gameName)
         {
             throw new NotImplementedException();
         }
@@ -51,7 +51,7 @@ namespace MPLib.Networking
         /// </summary>
         /// <param name="tableUuid">uuid identifier of table to join <see cref="GameTableData.TableUuid"/></param>
         /// <returns></returns>
-        public async Task JoinTable(string tableUuid)
+        public Task JoinTable(string tableUuid)
         {
             throw new NotImplementedException();
         }
@@ -62,7 +62,7 @@ namespace MPLib.Networking
         /// </summary>
         /// <param name="tableUud"></param>
         /// <returns></returns>
-        public async Task LeaveTable(string tableUud)
+        public Task LeaveTable(string tableUud)
         {
             throw new NotImplementedException();
         }

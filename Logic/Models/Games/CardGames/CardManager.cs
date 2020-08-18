@@ -3,25 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using MPLib.Core.Game.General.CardGame.Messaging;
 using MPLib.Core.Game.General.CardGame.Messaging.MessageTypes;
-using MPLib.Core.Game.Poker.Messaging.MessageTypes;
 using MPLib.Crypto.Encryption.SRA;
-using MPLib.Models.Games;
-using MPLib.Models.Games.CardGameModels;
+using MPLib.Models.Games.CardGames.Messaging;
 using MPLib.Networking;
 using MPLib.Random;
 
-namespace MPLib.Core.Game.General.CardGame
+namespace MPLib.Models.Games.CardGames
 {
     class CardManager<TPlayer, TMyPlayer>
-        where TPlayer : Player
-        where TMyPlayer : TPlayer, IMyCardGamePlayer
+        where TPlayer : Player, ICardGamePlayer
+        where TMyPlayer : Player , ICardGamePlayer
     {
 
-        public IReadOnlyList<DeckCard> Deck => _deck;
-        public IReadOnlyList<TPlayer> Players { get; }
-        public TMyPlayer MyPlayer { get; }
+       
+
 
         private DeckCard[] _deck;
 
@@ -29,22 +25,15 @@ namespace MPLib.Core.Game.General.CardGame
         private readonly Dictionary<TPlayer, IReadOnlyList<BigInteger>> _secondCycleDeck;
 
         private readonly IPlayerMessageManager<ICardGameMessage> _messageManager;
+        private readonly ICardGameRound<TPlayer, TMyPlayer> _round;
 
-        public CardManager(IPlayerMessageManager<ICardGameMessage> messageManager, IReadOnlyList<Card> sourceDeck, IReadOnlyList<TPlayer> players, TMyPlayer myPlayer)
+        public CardManager(IPlayerMessageManager<ICardGameMessage> messageManager, ICardGameRound<TPlayer, TMyPlayer> round)
         {
 
             _messageManager = messageManager;
+            _round = round;
             _firstCycleDeck = new Dictionary<TPlayer, IReadOnlyList<BigInteger>>();
             _secondCycleDeck = new Dictionary<TPlayer, IReadOnlyList<BigInteger>>();
-            _deck = sourceDeck.Select((card, index) => new DeckCard()
-            {
-                Owner = null,
-                Value = new BigInteger(Card.ToNumber(card)),
-                IsKnown = false,
-                
-            }).ToArray();
-            Players = players;
-            MyPlayer = myPlayer;
         }
 
 
@@ -57,12 +46,12 @@ namespace MPLib.Core.Game.General.CardGame
 
         public async Task ShuffleAsync()
         {
-            var provider1 = new SraCryptoProvider(MyPlayer.CardEncryptionKeys.SraKey1);
+            var provider1 = new SraCryptoProvider(_round.MyPlayerCardEncryptionKeys.SraKey1);
             IReadOnlyList<BigInteger> currentDeck = _deck.Select(d => d.Value).ToArray();
 
-            foreach (var player in Players)
+            foreach (var player in _round.Players)
             {
-                if (player == MyPlayer)
+                if (player == _round.MyPlayer)
                 {
                     var shuffledCards = Shuffling.Shuffle(currentDeck);
                     var encryptedCards = shuffledCards.Select(n => provider1.Encrypt(n)).ToArray();
@@ -76,16 +65,16 @@ namespace MPLib.Core.Game.General.CardGame
                 _firstCycleDeck.Add(player, currentDeck);
             }
 
-            foreach (var player in Players)
+            foreach (var player in _round.Players)
             {
-                if (player == MyPlayer)
+                if (player == _round.MyPlayer)
                 {
                     var reEncryptedCards = new List<BigInteger>(currentDeck.Count);
                     for (var i = 0; i < currentDeck.Count; i++)
                     {
                         var card = currentDeck[i];
                         var decryptedCard = provider1.Decrypt(card);
-                        var provider2 = new SraCryptoProvider(MyPlayer.CardEncryptionKeys.SraKeys2[i]);
+                        var provider2 = new SraCryptoProvider(_round.MyPlayerCardEncryptionKeys.SraKeys2[i]);
                         var cardReEncrypted = provider2.Encrypt(decryptedCard);
                         reEncryptedCards.Add(cardReEncrypted);
                     }
@@ -123,9 +112,9 @@ namespace MPLib.Core.Game.General.CardGame
         {
             var card = _deck[cardIndex];
             var value = card.Value;
-            foreach (var player in Players)
+            foreach (var player in _round.Players)
             {
-                var key = player == MyPlayer ? MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex] : (await _messageManager.ReadMessageFrom<SingleKeyExposeMessage>(player)).Key;
+                var key = player == _round.MyPlayer ? _round.MyPlayerCardEncryptionKeys.SraKeys2[cardIndex] : (await _messageManager.ReadMessageFrom<SingleKeyExposeMessage>(player)).Key;
                 var provider = new SraCryptoProvider(key);
                 value = provider.Decrypt(card.Value);
             }
@@ -148,7 +137,7 @@ namespace MPLib.Core.Game.General.CardGame
             await _messageManager.BroadcastMessage(new SingleKeyExposeMessage()
             {
                 CardIndex = cardIndex,
-                Key = MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex]
+                Key = _round.MyPlayerCardEncryptionKeys.SraKeys2[cardIndex]
             });
         }
 
@@ -167,14 +156,14 @@ namespace MPLib.Core.Game.General.CardGame
             await _messageManager.BroadcastMessage(new SingleKeyExposeMessage()
             {
                 CardIndex = cardIndex,
-                Key = MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex]
+                Key = _round.MyPlayerCardEncryptionKeys.SraKeys2[cardIndex]
             });
 
             var card = _deck[cardIndex];
             var value = card.Value;
-            foreach (var player in Players)
+            foreach (var player in _round.Players)
             {
-                var key = player == MyPlayer ? MyPlayer.CardEncryptionKeys.SraKeys2[cardIndex] : (await _messageManager.ReadMessageFrom<SingleKeyExposeMessage>(player)).Key;
+                var key = player == _round.MyPlayer ? _round.MyPlayerCardEncryptionKeys.SraKeys2[cardIndex] : (await _messageManager.ReadMessageFrom<SingleKeyExposeMessage>(player)).Key;
                 var provider = new SraCryptoProvider(key);
                 value = provider.Decrypt(value);
             }
@@ -196,7 +185,7 @@ namespace MPLib.Core.Game.General.CardGame
             await _messageManager.BroadcastMessage(new SingleKeyExposeMessage()
             {
                 CardIndex = cardIndexInDeck,
-                Key = MyPlayer.CardEncryptionKeys.SraKeys2[cardIndexInDeck]
+                Key = _round.MyPlayerCardEncryptionKeys.SraKeys2[cardIndexInDeck]
             });
         }
 
@@ -208,14 +197,14 @@ namespace MPLib.Core.Game.General.CardGame
         /// <returns></returns>
         public async Task ExposeAllCards()
         {
-            await _messageManager.BroadcastMessage(new ExposeKeysMessage() {Keys = MyPlayer.CardEncryptionKeys});
+            await _messageManager.BroadcastMessage(new ExposeKeysMessage() {Keys = _round.MyPlayerCardEncryptionKeys});
 
-            var keys = new PlayerKeys[Players.Count];
+            var keys = new CardEncryptionKeys[_round.Players.Count];
 
-            for (var i = 0; i < Players.Count; i++)
+            for (var i = 0; i < _round.Players.Count; i++)
             {
-                var player = Players[i];
-                if (player.IsMyPlayer) keys[i] = MyPlayer.CardEncryptionKeys;
+                var player = _round.Players[i];
+                if (player.IsMyPlayer) keys[i] = _round.MyPlayerCardEncryptionKeys;
                 else keys[i] = (await _messageManager.ReadMessageFrom<ExposeKeysMessage>(player)).Keys;
             }
 
@@ -223,7 +212,7 @@ namespace MPLib.Core.Game.General.CardGame
             {
                 var curCardVal = _deck[cardIndex].Value;
 
-                for (var playerIndex = 0; playerIndex < Players.Count; playerIndex++)
+                for (var playerIndex = 0; playerIndex < _round.Players.Count; playerIndex++)
                 {
                     var key = keys[playerIndex].SraKeys2[cardIndex];
                     var provider = new SraCryptoProvider(key);
@@ -245,9 +234,9 @@ namespace MPLib.Core.Game.General.CardGame
         /// <returns> a list of cheat instances</returns>
         public async Task<List<CheatInstance>> FindCheaterAsync(TPlayer requestedBy)
         {
-            var playerKeyDict = new Dictionary<TPlayer, PlayerKeys>();
+            var playerKeyDict = new Dictionary<TPlayer, CardEncryptionKeys>();
 
-            foreach (var player in Players)
+            foreach (var player in _round.Players)
             {
                 if (!player.IsMyPlayer)
                 {
@@ -256,14 +245,14 @@ namespace MPLib.Core.Game.General.CardGame
                 }
                 else
                 {
-                    playerKeyDict.Add(player, MyPlayer.CardEncryptionKeys);
+                    playerKeyDict.Add(player, _round.MyPlayerCardEncryptionKeys);
                 }
             }
 
             IReadOnlyList<BigInteger> encryptedDeck = _deck.Select(c => c.Value).ToArray();
             var cheaters = new List<CheatInstance>();
 
-            foreach (var player in Players)
+            foreach (var player in _round.Players)
             {
                 if (!CheckShuffleValidity(encryptedDeck, _firstCycleDeck[player], playerKeyDict[player].SraKey1))
                 {
@@ -273,7 +262,7 @@ namespace MPLib.Core.Game.General.CardGame
                 encryptedDeck = _firstCycleDeck[player];
             }
 
-            foreach (var player in Players)
+            foreach (var player in _round.Players)
             {
                 if (!CheckPostShuffleEncryptionValidity(encryptedDeck, _secondCycleDeck[player], playerKeyDict[player]))
                 {
@@ -314,7 +303,7 @@ namespace MPLib.Core.Game.General.CardGame
         /// <param name="resultDeck"> deck state at the end of the step </param>
         /// <param name="keys"> keys by which the cards were encrypted post shuffle </param>
         /// <returns> true or false depending on the validity of the action taken </returns>
-        private bool CheckPostShuffleEncryptionValidity(IReadOnlyList<BigInteger> sourceDeck, IReadOnlyList<BigInteger> resultDeck, PlayerKeys keys)
+        private bool CheckPostShuffleEncryptionValidity(IReadOnlyList<BigInteger> sourceDeck, IReadOnlyList<BigInteger> resultDeck, CardEncryptionKeys keys)
         {
             var provider1 = new SraCryptoProvider(keys.SraKey1);
             var reEncryptedCards = new List<BigInteger>(sourceDeck.Count);

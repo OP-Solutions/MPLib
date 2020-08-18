@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
-using MPLib.Core.Game.General.CardGame;
 
-namespace MPLib.Models.Games.CardGameModels
+namespace MPLib.Models.Games.CardGames
 {
     public class DeckCard
     {
@@ -21,6 +18,6 @@ namespace MPLib.Models.Games.CardGameModels
 
         public BigInteger Value { get; internal set; }
 
-        public List<PlayerKeys> KnownKeys { get; internal set; }
+        public List<CardEncryptionKeys> KnownKeys { get; internal set; }
     }
 }
