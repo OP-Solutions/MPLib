@@ -55,7 +55,7 @@ namespace Tests.Networking
 
             var players = new List<Player>(){player1, player2, player3};
             var messageManager = new MessageManagerBuilder(PlayerIdentifyMode.Index)
-                .WithMessageTypes<PokerMessageType>().Build(players).OfType<IPokerMessage>();
+                .AddMessageTypesFromEnum<PokerMessageType>().Build(players).OfType<IPokerMessage>();
             await messageManager.BroadcastMessage(new PokerMoveMessage(-1));
         }
 
@@ -75,7 +75,7 @@ namespace Tests.Networking
 
             var players = new List<Player>() { player1, player2, player3 };
             var messageManager = new MessageManagerBuilder(PlayerIdentifyMode.Index)
-                .WithMessageTypes<PokerMessageType>().Build(players).OfType<IPokerMessage>();
+                .AddMessageTypesFromEnum<PokerMessageType>().Build(players).OfType<IPokerMessage>();
             var moveMessage = await messageManager.ReadMessageFrom<PokerMoveMessage>(player1);
         }
 
@@ -95,7 +95,7 @@ namespace Tests.Networking
 
             var players = new List<Player>() { player1, player2, player3 };
             var messageManager = new MessageManagerBuilder(PlayerIdentifyMode.Index)
-                .WithMessageTypes<PokerMessageType>().Build(players).OfType<IPokerMessage>();
+                .AddMessageTypesFromEnum<PokerMessageType>().Build(players).OfType<IPokerMessage>();
 
             var betMessage = await messageManager.ReadMessageFrom<PokerMoveMessage>(player1);
         }

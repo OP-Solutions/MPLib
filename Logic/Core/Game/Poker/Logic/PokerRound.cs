@@ -27,8 +27,8 @@ namespace MPLib.Core.Game.Poker.Logic
 
         private static readonly MessageManagerBuilder _messageManagerBuilder = 
             new MessageManagerBuilder(PlayerIdentifyMode.Index)
-                .WithMessageTypes<PokerMessageType>()
-                .WithMessageTypes<CardGameMessageType>();
+                .AddMessageTypesFromEnum<PokerMessageType>()
+                .AddMessageTypesFromEnum<CardGameMessageType>();
 
         #region Events
 
@@ -122,7 +122,7 @@ namespace MPLib.Core.Game.Poker.Logic
 
         private readonly IPlayerMessageManager<IPokerMessage> _messageManager;
         private readonly CardManager<PokerPlayer, MyPokerPlayer> _cardManager;
-        private List<Card> _publicCards = new List<Card>(5);
+        private readonly List<Card> _publicCards = new List<Card>(5);
         private int _nextCardIndex; // first card index which was not dealt yet (top card on yet non used deck)
 
 
