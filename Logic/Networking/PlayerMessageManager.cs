@@ -13,6 +13,7 @@ using ProtoBuf;
 
 namespace MPLib.Networking
 {
+
     /// <summary>
     /// Class which manager card deck. This class is intended to be used in various card game logic implementation
     /// This class is responsible for encrypting-shuffling cards, decrypting it only for specific player or decrypting publicly
@@ -143,6 +144,7 @@ namespace MPLib.Networking
             }
         }
 
+
         public async Task BroadcastMessage(TBaseMessageType message)
         {
             var tasks = (from player in _connectedPlayers
@@ -228,6 +230,25 @@ namespace MPLib.Networking
             return channel;
         }
 
+    }
+
+
+
+    class PlayerMessageManager : PlayerMessageManager<IMessage>, IPlayerMessageManager
+    {
+        public IPlayerMessageManager<T> OfType<T>() where T : IMessage
+        {
+            return (IPlayerMessageManager<T>) this;
+        }
+
+        internal PlayerMessageManager(IReadOnlyList<Player> players, TypeCodeMapper messageTypeTypeCodeMapper, PlayerIdentifyMode identifyMode) : base(players, messageTypeTypeCodeMapper, identifyMode)
+        {
+        }
+    }
+
+    public interface IPlayerMessageManager : IPlayerMessageManager<IMessage>
+    {
+        IPlayerMessageManager<T> OfType<T>() where T : IMessage;
     }
 
     public interface IPlayerMessageManager<in TBaseMessageType> : IPlayerMessageSender<TBaseMessageType>,

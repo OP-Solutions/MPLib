@@ -131,8 +131,8 @@ namespace MPLib.Core.Game.Poker.Logic
             Players = players;
             State = PokerRoundState.NoStarted;
             SmallBlind = smallBlind;
-            var messageManager = _messageManagerBuilder.Build<IMessage>(Players);
-            _messageManager = messageManager;
+            var messageManager = _messageManagerBuilder.Build(Players);
+            _messageManager = messageManager.OfType<IPokerMessage>();
             _cardManager = new CardManager<PokerPlayer, MyPokerPlayer>(messageManager, this);
         }
 
@@ -248,13 +248,13 @@ namespace MPLib.Core.Game.Poker.Logic
                 var player = Players[i];
                 if (!player.IsMyPlayer)
                 {
-                    tasks.Add(_cardManager.OpenOtherPlayerCardAsync(i));
-                    tasks.Add(_cardManager.OpenOtherPlayerCardAsync(Players.Count + i));
+                    tasks.Add(_cardManager.OpenCardForOtherPlayerAsync(i));
+                    tasks.Add(_cardManager.OpenCardForOtherPlayerAsync(Players.Count + i));
                 }else
                 {
-                    myCard1Task = _cardManager.OpenMyCardAsync(i);
+                    myCard1Task = _cardManager.OpenCardForMeAsync(i);
                     tasks.Add(myCard1Task);
-                    myCard2Task =_cardManager.OpenMyCardAsync(Players.Count + 1);
+                    myCard2Task =_cardManager.OpenCardForMeAsync(Players.Count + 1);
                     tasks.Add(myCard2Task);
                 }
             }
@@ -279,7 +279,7 @@ namespace MPLib.Core.Game.Poker.Logic
 
             for (int  i = 0; i < cardCountToDeal; i++)
             {
-                tasks[i] = _cardManager.OpenPublicCardAsync(_nextCardIndex);
+                tasks[i] = _cardManager.OpenCardForAllAsync(_nextCardIndex);
                 _nextCardIndex++;
             }
 

@@ -107,9 +107,9 @@ namespace MPLib.Models.Games.CardGames
         /// </summary>
         /// <returns>Decrypted card</returns>
         /// <remarks>
-        /// when this is called, <see cref="OpenOtherPlayerCardAsync"/> should be called on all remote player devices.
+        /// when this is called, <see cref="OpenCardForOtherPlayerAsync"/> should be called on all remote player devices.
         /// </remarks>
-        public async Task<Card> OpenMyCardAsync(int cardIndex)
+        public async Task<Card> OpenCardForMeAsync(int cardIndex)
         {
             var card = _deck[cardIndex];
             var value = card.Value;
@@ -134,9 +134,9 @@ namespace MPLib.Models.Games.CardGames
         /// <returns></returns>
         /// <remarks>
         /// This method is should be called on all player devices, except of target player who should decrypt card,
-        /// instead <see cref="OpenMyCardAsync"/> should be called on target player device.
+        /// instead <see cref="OpenCardForMeAsync"/> should be called on target player device.
         /// </remarks>
-        public async Task OpenOtherPlayerCardAsync(int cardIndex)
+        public async Task OpenCardForOtherPlayerAsync(int cardIndex)
         {
             await _messageManager.BroadcastMessage(new SingleKeyExposeMessage()
             {
@@ -155,7 +155,7 @@ namespace MPLib.Models.Games.CardGames
         /// This method should be called on all player devices, so everyone knows keys of each other and all can decrypt target card
         /// </remarks>  
         /// <returns>Decrypted card</returns>
-        public async Task<Card> OpenPublicCardAsync(int cardIndex)
+        public async Task<Card> OpenCardForAllAsync(int cardIndex)
         {
             await _messageManager.BroadcastMessage(new SingleKeyExposeMessage()
             {
@@ -182,7 +182,7 @@ namespace MPLib.Models.Games.CardGames
 
         /// <summary>
         /// publicly shows card whose this player already knows, to other players (makes it public).
-        /// Difference with this method and <see cref="OpenPublicCardAsync"/> is that, in current method local player not expects key from remote players,
+        /// Difference with this method and <see cref="OpenCardForAllAsync"/> is that, in current method local player not expects key from remote players,
         /// therefore card is not decrypted for local player and no card value returned, because its assumed that local player already had decrypted card
         /// or knows its value in some other way, so he do not need keys from other players
         /// </summary>

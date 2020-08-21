@@ -21,9 +21,9 @@ namespace MPLib.Networking
             return this;
         }
 
-        public IPlayerMessageManager<TBaseMessageType> Build<TBaseMessageType>(IReadOnlyList<Player> players) where TBaseMessageType : IMessage
+        public IPlayerMessageManager Build(IReadOnlyList<Player> players)
         {
-            return new PlayerMessageManager<TBaseMessageType>(players, _typeCodeMapper, _identifyMode);
+            return new PlayerMessageManager(players, _typeCodeMapper, _identifyMode);
         }
     }
 }
