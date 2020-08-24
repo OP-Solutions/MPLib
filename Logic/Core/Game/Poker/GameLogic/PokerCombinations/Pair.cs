@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using MPLib.Models.Games.CardGames;
+using MPLib.Models.Games.Poker;
 
-namespace MPLib.Models.Games.Poker.PokerCombinations
+namespace MPLib.Core.Game.Poker.GameLogic.PokerCombinations
 {
     /// <summary>
     /// Pair combination
@@ -53,7 +54,7 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
             var usedRanks = new List<CardRank> {pair[0].Rank};
             var kickers = Combination.GetKickers(cards, usedRanks, 3);
 
-            Array.Resize(ref pair, 4); 
+            Array.Resize(ref pair, 5); 
             Array.Copy(kickers, 0, pair, 2,
                 3);
             combination.Top5 = pair;

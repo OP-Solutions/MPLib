@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using MPLib.Models.Games.CardGames;
+using MPLib.Models.Games.Poker;
 
-namespace MPLib.Models.Games.Poker.PokerCombinations
+namespace MPLib.Core.Game.Poker.GameLogic.PokerCombinations
 {
     /// <summary>
     /// Straight combination
@@ -33,24 +34,48 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
             }
 
 
-            var straight = new List<Card>(5) {cards[6]};
-
-            for (var i = PokerGameData.CardCount - 1; i >= 1; i--)
+            var noDuplicates = new List<Card>(5){cards[cards.Length - 1]};
+            for (var i = cards.Length - 2; i >= 0; i--)
             {
-                if ((int) cards[i].Rank - (int) cards[i - 1].Rank == 1 ||
-                    (int) cards[i].Rank - (int) cards[i - 1].Rank == 12) straight.Add(cards[i - 1]);
-
-                if ((int) cards[i].Rank - (int) cards[i - 1].Rank > 1)
+                if (cards[i] != cards[i-1])
                 {
-                    straight.Clear();
-                    straight.Add(cards[i - 1]);
+                    noDuplicates.Add(cards[i]);
+                }
+            }
+
+            if (cards[cards.Length - 1].Rank == CardRank.Ace)
+            {
+                noDuplicates.Add(cards[cards.Length - 1]);
+            }
+
+            for (var i = 0; i <= noDuplicates.Count - 5; i++)
+            {
+                var isStraight = true; 
+                for (var j = 0; j < 4; j++)
+                {
+                    if (noDuplicates[i+j].Rank != noDuplicates[i+j+1].Rank + 1 && (noDuplicates[i+j+1].Rank != CardRank.Ace || noDuplicates[i+j].Rank != CardRank.Two))
+                    {
+                        isStraight = false;
+                        break;
+                    }
                 }
 
-                if (straight.Count != 5) continue;
-                combination.SatisfiedCombinationTypes |= CombinationType.Straight;
-                combination.Top5 = straight.ToArray();
-                return true;
+                if (isStraight)
+                {
+                    var straight = new Card[5];
+                    for (int j = 0; j < 4; j++)
+                    {
+                        straight[j] = noDuplicates[i + j];
+                    }
+
+                    combination.SatisfiedCombinationTypes |= CombinationType.Straight;
+                    combination.Top5 = straight;
+                    combination.Type = CombinationType.Straight;
+                    return true;
+                }
             }
+            
+           
 
             combination.UnsatisfiedCombinationTypes |= CombinationType.Straight;
             return false;
