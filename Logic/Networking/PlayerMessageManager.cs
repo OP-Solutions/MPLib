@@ -206,7 +206,7 @@ namespace MPLib.Networking
 
         }
 
-        public async Task<T> ReadMessageFrom<T>(Player player) where T : TBaseMessageType
+        public async Task<T> ReadMessageFrom<T>(Player player, T instance) where T : TBaseMessageType
         {
             var channel = GetChannel(player, typeof(T));
             var package = await channel.Reader.ReadAsync();
@@ -265,7 +265,13 @@ namespace MPLib.Networking
 
     public interface IPlayerMessageReceiver<in TBaseMessageType> where TBaseMessageType : IMessage
     {
-        Task<T> ReadMessageFrom<T>(Player player) where T : TBaseMessageType;
+        Task<T> ReadMessageFrom<T>(Player player) where T : TBaseMessageType, new()
+        {
+            var instance = new T();
+            return ReadMessageFrom<T>(player, instance);
+        }
+
+        Task<T> ReadMessageFrom<T>(Player player, T instance) where T : TBaseMessageType;
     }
 
     public enum PlayerIdentifyMode
