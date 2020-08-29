@@ -73,7 +73,7 @@ namespace Tests.Networking
             await player3Client.ConnectAsync(Localhost, Player3ListenPort); // connect to player 1
             var player3 = Player.CreateOtherPlayer(Player3Name, player3Client.GetStream(), Player3Key);
 
-            var players = new List<Player>() { player1, player2, player3 };
+            var players = new List<Player>() { player1, player2, player3 }.AsReadOnly();
             var messageManager = new MessageManagerBuilder(PlayerIdentifyMode.Index)
                 .AddMessageTypesFromEnum<PokerMessageType>().Build(players).OfType<IPokerMessage>();
             var moveMessage = await messageManager.ReadMessageFrom<PokerMoveMessage>(player1);
@@ -93,7 +93,7 @@ namespace Tests.Networking
             await player1Client.ConnectAsync(Localhost, Player1ListenPort); // connect to player 1
             var player1 = Player.CreateOtherPlayer(Player1Name, player1Client.GetStream(), Player1Key);
 
-            var players = new List<Player>() { player1, player2, player3 };
+            var players = new List<Player>() { player1, player2, player3 }.AsReadOnly();
             var messageManager = new MessageManagerBuilder(PlayerIdentifyMode.Index)
                 .AddMessageTypesFromEnum<PokerMessageType>().Build(players).OfType<IPokerMessage>();
 

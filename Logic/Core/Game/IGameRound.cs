@@ -9,7 +9,7 @@ namespace MPLib.Core.Game
 {
     public interface IGameRound<TPlayer, out TMyPlayer> where TPlayer : Player where TMyPlayer : Player
     {
-        ReadOnlyCollection<TPlayer> Players { get; }
+        IReadOnlyList<TPlayer> Players { get; }
         TMyPlayer MyPlayer { get; }
 
     }

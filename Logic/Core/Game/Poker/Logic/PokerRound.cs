@@ -77,7 +77,7 @@ namespace MPLib.Core.Game.Poker.Logic
         /// because some player may be joined on table but not playing in this round.
         /// For example if player just joined table, it will not be in current round but will start playing from next round
         /// </summary>
-        public ReadOnlyCollection<PokerPlayer> Players { get; }
+        public IReadOnlyList<PokerPlayer> Players { get; }
 
         public MyPokerPlayer MyPlayer { get; }
 
@@ -118,7 +118,7 @@ namespace MPLib.Core.Game.Poker.Logic
 
 
         CardEncryptionKeys ICardGameRound<PokerPlayer, MyPokerPlayer>.MyPlayerCardEncryptionKeys { get; set; }
-        ReadOnlyCollection<Card> ICardGameRound<PokerPlayer, MyPokerPlayer>.SourceDeck { get; set; }
+        IReadOnlyList<Card> ICardGameRound<PokerPlayer, MyPokerPlayer>.SourceDeck { get; set; }
 
         private readonly IPlayerMessageManager<IPokerMessage> _messageManager;
         private readonly CardManager<PokerPlayer, MyPokerPlayer> _cardManager;

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using MPLib.Core.Game;
 
 namespace MPLib.Models.Games.CardGames
@@ -7,6 +8,6 @@ namespace MPLib.Models.Games.CardGames
     {
         protected internal CardEncryptionKeys MyPlayerCardEncryptionKeys { get; set; }
 
-        protected internal ReadOnlyCollection<Card> SourceDeck { get; set; }
+        protected internal IReadOnlyList<Card> SourceDeck { get; set; }
     }
 }
