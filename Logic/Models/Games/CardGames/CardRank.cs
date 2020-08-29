@@ -10,8 +10,7 @@
         /// virtual CardRank using only to differ auto initialized not eyt defined, card from real
         /// </summary>
         Undefined,
-        Ace,
-        Two,
+        Two = 2,
         Three,
         Four,
         Five,
@@ -22,6 +21,7 @@
         Ten,
         Jack,
         Queen,
-        King
+        King,
+        Ace
     }
 }

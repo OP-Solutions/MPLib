@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using MPLib.Models.Games.CardGames;
+using MPLib.Models.Games.Poker;
 
-namespace MPLib.Models.Games.Poker.PokerCombinations
+namespace MPLib.Core.Game.Poker.GameLogic.PokerCombinations
 {
     /// <summary>
     /// The TwoPairs poker combination

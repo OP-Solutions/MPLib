@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MPLib.Core.Game.Poker.GameLogic.PokerCombinations;
 using MPLib.Models.Games.CardGames;
-using MPLib.Models.Games.Poker.PokerCombinations;
 
 namespace MPLib.Models.Games.Poker
 {

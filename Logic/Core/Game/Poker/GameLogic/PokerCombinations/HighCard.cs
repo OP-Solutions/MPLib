@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using MPLib.Models.Games.CardGames;
+using MPLib.Models.Games.Poker;
 
-namespace MPLib.Models.Games.Poker.PokerCombinations
+namespace MPLib.Core.Game.Poker.GameLogic.PokerCombinations
 {
     /// <summary>
     /// Hig Card combination

@@ -1,7 +1,8 @@
 ﻿using System;
 using MPLib.Models.Games.CardGames;
+using MPLib.Models.Games.Poker;
 
-namespace MPLib.Models.Games.Poker.PokerCombinations
+namespace MPLib.Core.Game.Poker.GameLogic.PokerCombinations
 {
     /// <summary>
     /// The straight flush combination
@@ -22,6 +23,8 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
         /// </returns>
         public bool Check(Card[] cards, Combination combination)
         {
+            
+
             return false;
         }
 

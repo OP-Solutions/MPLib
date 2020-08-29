@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MPLib.Models.Games.CardGames;
+using MPLib.Models.Games.Poker;
 
-namespace MPLib.Models.Games.Poker.PokerCombinations
+namespace MPLib.Core.Game.Poker.GameLogic.PokerCombinations
 {
     /// <summary>
     /// The Flush combination.
@@ -29,21 +32,37 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
             {
                 return true;
             }
+            if (combination.UnsatisfiedCombinationTypes.HasFlag(CombinationType.Flush))
+            {
+                return false;
+            }
 
-            var frequency = new int[4]; // frequency of each suit
+            var cardsOfSuit = new List<List<Card>>(); // frequency of each suit
+            for (int i = 0; i < 4; i++)
+            {
+                cardsOfSuit.Add(new List<Card>());
+            }
 
             var flushSuit = -1;
 
-            for (var i = 0; i < cards.Length; i++)
+            for (var i = cards.Length - 1; i >= 0; i--)
             {
-                frequency[(int) cards[i].Suit - 1] += 1;
+                var suit = (int) cards[i].Suit - 1;
+                cardsOfSuit[suit].Add(cards[i]);
 
-                if (frequency[(int) cards[i].Suit - 1] == 5) flushSuit = (int) cards[i].Suit;
+                if (cardsOfSuit[suit].Count != 5) continue;
+                flushSuit = (int) cards[i].Suit;
+                break;
             }
 
             if (flushSuit == -1)
+            {
+                combination.UnsatisfiedCombinationTypes |= CombinationType.Flush;
                 return false;
+            }
 
+            combination.SatisfiedCombinationTypes |= CombinationType.Flush;
+            combination.Top5 = cardsOfSuit[flushSuit].Take(5).ToArray();
             combination.Type = CombinationType.Flush;
             return true;
 

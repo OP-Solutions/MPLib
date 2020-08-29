@@ -1,6 +1,9 @@
-﻿using MPLib.Models.Games.CardGames;
+﻿using System;
+using System.Collections.Generic;
+using MPLib.Models.Games.CardGames;
+using MPLib.Models.Games.Poker;
 
-namespace MPLib.Models.Games.Poker.PokerCombinations
+namespace MPLib.Core.Game.Poker.GameLogic.PokerCombinations
 {
     /// <summary>
     /// Three Of A Kind combination
@@ -32,9 +35,32 @@ namespace MPLib.Models.Games.Poker.PokerCombinations
             {
                 return false;
             }
+            var triple = new Card[2];
+            for (var i = cards.Length - 2; i > 0; i--)
+            {
+                if (cards[i] != cards[i - 1] || cards[i-1] != cards[i-2]) continue;
+                triple[0] = cards[i];
+                triple[1] = cards[i - 1];
+                triple[2] = cards[i - 2];
+                break;
+            }
 
+            if (triple[0].Rank == CardRank.Undefined)
+            {
+                combination.UnsatisfiedCombinationTypes |= CombinationType.ThreeOfAKind;
+                return false;
+            }
 
-            return false;
+            combination.SatisfiedCombinationTypes |= CombinationType.ThreeOfAKind;
+            var usedRanks = new List<CardRank> { triple[0].Rank };
+            var kickers = Combination.GetKickers(cards, usedRanks, 2);
+
+            Array.Resize(ref triple, 5);
+            Array.Copy(kickers, 0, triple, 3,
+                2);
+            combination.Top5 = triple;
+            combination.Type = CombinationType.ThreeOfAKind;
+            return true;
 
         }
 
